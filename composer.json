@@ -1,0 +1,43 @@
+{
+  "name": "gustavosantarosa/controller-basics-extension",
+  "license": "MIT",
+  "homepage": "http://www.gustavosantarosa.esy.es/",
+  "description": "Controller Basics Extension",
+  "require": {
+    "php": "^8.0",
+    "laravel/framework": "^10.0 | ^11.0",
+    "gustavosantarosa/validate-trait": "^1.2.4",
+    "gustavosantarosa/perpage-trait": "^1.0",
+    "gustavosantarosa/handler-basics-extension": "^1.0",
+    "gustavosantarosa/model-basics-extension": "^1.0",
+    "gustavosantarosa/service-basics-extension": "^1.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "GustavoSantarosa\\ControllerBasicsExtension\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Luis Gustavo Santarosa",
+      "email": "gustavo-computacao@hotmail.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "gustavo-computacao@hotmail.com"
+  },
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "GustavoSantarosa\\ControllerBasicsExtension\\Provider\\ControllerBasicsExtensionProvider"
+      ]
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
+}
