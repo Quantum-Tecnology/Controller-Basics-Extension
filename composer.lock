@@ -697,16 +697,16 @@
         },
         {
             "name": "gustavosantarosa/model-basics-extension",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/Model-Basics-Extension.git",
-                "reference": "4577da3708df724da70c38f5d37d4f5c8fdd7241"
+                "reference": "ff999e3039e262b71e95acffa21bd35c432d0d55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/4577da3708df724da70c38f5d37d4f5c8fdd7241",
-                "reference": "4577da3708df724da70c38f5d37d4f5c8fdd7241",
+                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/ff999e3039e262b71e95acffa21bd35c432d0d55",
+                "reference": "ff999e3039e262b71e95acffa21bd35c432d0d55",
                 "shasum": ""
             },
             "require": {
@@ -745,9 +745,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/Model-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/1.0.0"
+                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/1.0.1"
             },
-            "time": "2025-02-14T14:50:01+00:00"
+            "time": "2025-02-14T16:20:09+00:00"
         },
         {
             "name": "gustavosantarosa/perpage-trait",
