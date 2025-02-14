@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GustavoSantarosa\ControllerBasicsExtension;
 
 use GustavoSantarosa\HandlerBasicsExtension\Traits\ApiResponseTrait;
@@ -57,6 +59,7 @@ abstract class BaseController extends Controller
     public function update(int $id): JsonResponse
     {
         $this->checkIncludes();
+
         return $this->okResponse(
             message: __('messages.successfully.updated'),
             data: new $this->defaultResource($this->defaultService->update($id)),
@@ -102,9 +105,7 @@ abstract class BaseController extends Controller
         );
 
         $this->defaultResource = $this->resource;
-        //dump(app($this->service));
         $this->defaultService  = app($this->service);
-
         $this->setAllowedIncludes($this->allowedIncludes);
     }
 }
