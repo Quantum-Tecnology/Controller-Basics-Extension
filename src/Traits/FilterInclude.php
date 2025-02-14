@@ -1,6 +1,6 @@
 <?php
 
-namespace GustavoSantarosa\ServiceBasicsExtension\Traits;
+namespace GustavoSantarosa\ControllerBasicsExtension\Traits;
 
 trait FilterInclude
 {
