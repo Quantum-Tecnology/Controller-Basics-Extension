@@ -23,6 +23,6 @@ class ControllerBasicsExtensionProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        $router->register(new EnhancedResourceProvider($router));
+        $router->setRegistrar(new EnhancedResourceProvider($router));
     }
 }
