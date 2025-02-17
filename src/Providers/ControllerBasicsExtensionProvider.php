@@ -2,7 +2,6 @@
 
 namespace GustavoSantarosa\ControllerBasicsExtension\Providers;
 
-use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class ControllerBasicsExtensionProvider extends ServiceProvider
