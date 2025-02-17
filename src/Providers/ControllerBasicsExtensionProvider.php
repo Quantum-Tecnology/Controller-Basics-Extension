@@ -23,6 +23,9 @@ class ControllerBasicsExtensionProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        $router->setRegistrar(new EnhancedResourceProvider($router));
+        /*
+         * TODO: esta apresentnado erro ao tentar registrar o provider
+         */
+        // $router->setRegistrar(new EnhancedResourceProvider($router));
     }
 }
