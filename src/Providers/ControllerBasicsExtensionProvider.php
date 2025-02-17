@@ -1,8 +1,9 @@
 <?php
 
-namespace GustavoSantarosa\ControllerBasicsExtension\Provider;
+namespace GustavoSantarosa\ControllerBasicsExtension\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Routing\Router;
 
 class ControllerBasicsExtensionProvider extends ServiceProvider
 {
@@ -20,7 +21,8 @@ class ControllerBasicsExtensionProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
+        $router->setRegistrar(new EnhancedResourceProvider($router));
     }
 }
