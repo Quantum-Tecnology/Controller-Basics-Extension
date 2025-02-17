@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "59312d5557dc53d887492c02d6ea4e0e",
+    "content-hash": "1b32836be1112c5e06ba48f1b5bf7319",
     "packages": [
         {
             "name": "brick/math",
@@ -697,16 +697,16 @@
         },
         {
             "name": "gustavosantarosa/model-basics-extension",
-            "version": "1.0.4",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/Model-Basics-Extension.git",
-                "reference": "ba51d3f14babbd99c9b75b78fb5efd0e88b40e3e"
+                "reference": "eb4fd6fa78feed0523c5a927b2b9723dc54ccfd2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/ba51d3f14babbd99c9b75b78fb5efd0e88b40e3e",
-                "reference": "ba51d3f14babbd99c9b75b78fb5efd0e88b40e3e",
+                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/eb4fd6fa78feed0523c5a927b2b9723dc54ccfd2",
+                "reference": "eb4fd6fa78feed0523c5a927b2b9723dc54ccfd2",
                 "shasum": ""
             },
             "require": {
@@ -745,9 +745,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/Model-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/1.0.4"
+                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/1.1.0"
             },
-            "time": "2025-02-16T20:32:15+00:00"
+            "time": "2025-02-17T00:19:27+00:00"
         },
         {
             "name": "gustavosantarosa/perpage-trait",
@@ -802,16 +802,16 @@
         },
         {
             "name": "gustavosantarosa/service-basics-extension",
-            "version": "1.8.2",
+            "version": "1.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/Service-Basics-Extension.git",
-                "reference": "cbe18707bfaa916cde792ffb1660c7392b6970fb"
+                "reference": "cb15086927247481513869dec35167c85cb8e4d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/cbe18707bfaa916cde792ffb1660c7392b6970fb",
-                "reference": "cbe18707bfaa916cde792ffb1660c7392b6970fb",
+                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/cb15086927247481513869dec35167c85cb8e4d7",
+                "reference": "cb15086927247481513869dec35167c85cb8e4d7",
                 "shasum": ""
             },
             "require": {
@@ -850,9 +850,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/Service-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.2"
+                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.3"
             },
-            "time": "2025-02-14T18:57:44+00:00"
+            "time": "2025-02-17T00:08:19+00:00"
         },
         {
             "name": "gustavosantarosa/validate-trait",
