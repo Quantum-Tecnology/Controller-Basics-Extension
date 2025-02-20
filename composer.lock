@@ -749,16 +749,16 @@
         },
         {
             "name": "gustavosantarosa/service-basics-extension",
-            "version": "1.8.10",
+            "version": "1.8.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/Service-Basics-Extension.git",
-                "reference": "83954fc23dbe75ab0d36476f4233da386e6ee880"
+                "reference": "9c6f0c014299de4a4ee19fef74be337dde0a48e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/83954fc23dbe75ab0d36476f4233da386e6ee880",
-                "reference": "83954fc23dbe75ab0d36476f4233da386e6ee880",
+                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/9c6f0c014299de4a4ee19fef74be337dde0a48e8",
+                "reference": "9c6f0c014299de4a4ee19fef74be337dde0a48e8",
                 "shasum": ""
             },
             "require": {
@@ -798,9 +798,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/Service-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.10"
+                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.11"
             },
-            "time": "2025-02-20T17:17:17+00:00"
+            "time": "2025-02-20T17:51:13+00:00"
         },
         {
             "name": "gustavosantarosa/setschema-trait-postgresql",
