@@ -7,10 +7,10 @@
     "php": "^8.0",
     "laravel/framework": "^10.0 | ^11.0",
     "gustavosantarosa/validate-trait": "^1.2.4",
-    "gustavosantarosa/perpage-trait": "^1.0",
+    "gustavosantarosa/perpage-trait": "^2.0",
     "gustavosantarosa/handler-basics-extension": "^1.0",
-    "gustavosantarosa/model-basics-extension": "^1.0",
-    "gustavosantarosa/service-basics-extension": "^1.7"
+    "gustavosantarosa/model-basics-extension": "^2.0",
+    "gustavosantarosa/service-basics-extension": "^1.0"
   },
   "autoload": {
     "psr-4": {

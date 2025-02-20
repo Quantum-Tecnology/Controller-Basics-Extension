@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b32836be1112c5e06ba48f1b5bf7319",
+    "content-hash": "6f1d925e3f396e1e44243e8f0fa20022",
     "packages": [
         {
             "name": "brick/math",
@@ -697,21 +697,21 @@
         },
         {
             "name": "gustavosantarosa/model-basics-extension",
-            "version": "1.1.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/Model-Basics-Extension.git",
-                "reference": "eb4fd6fa78feed0523c5a927b2b9723dc54ccfd2"
+                "reference": "eff28ad72aee5e1fe6f5ccc0ba8c1ff93d5eac82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/eb4fd6fa78feed0523c5a927b2b9723dc54ccfd2",
-                "reference": "eb4fd6fa78feed0523c5a927b2b9723dc54ccfd2",
+                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/eff28ad72aee5e1fe6f5ccc0ba8c1ff93d5eac82",
+                "reference": "eff28ad72aee5e1fe6f5ccc0ba8c1ff93d5eac82",
                 "shasum": ""
             },
             "require": {
                 "gustavosantarosa/handler-basics-extension": "^1.0",
-                "gustavosantarosa/perpage-trait": "^1.0",
+                "gustavosantarosa/perpage-trait": "^2.0",
                 "gustavosantarosa/validate-trait": "^1.2.4",
                 "laravel/framework": "^10.0 | ^11.0",
                 "php": "^8.0"
@@ -745,22 +745,22 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/Model-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/1.1.0"
+                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/2.0.0"
             },
-            "time": "2025-02-17T00:19:27+00:00"
+            "time": "2025-02-19T01:27:48+00:00"
         },
         {
             "name": "gustavosantarosa/perpage-trait",
-            "version": "1.5.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/PerPage-Trait.git",
-                "reference": "1597953f98821519073f16b6835b736cd283b51d"
+                "reference": "7148b15ff9604ec582c30c8578c2374d3da619a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/PerPage-Trait/zipball/1597953f98821519073f16b6835b736cd283b51d",
-                "reference": "1597953f98821519073f16b6835b736cd283b51d",
+                "url": "https://api.github.com/repos/GustavoSantarosa/PerPage-Trait/zipball/7148b15ff9604ec582c30c8578c2374d3da619a6",
+                "reference": "7148b15ff9604ec582c30c8578c2374d3da619a6",
                 "shasum": ""
             },
             "require": {
@@ -771,13 +771,13 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "GustavoSantarosa\\PerPageTrait\\Provider\\PerPageTraitProvider"
+                        "QuantumCode\\PerPageTrait\\Provider\\PerPageTraitProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "GustavoSantarosa\\PerPageTrait\\": "src/"
+                    "QuantumCode\\PerPageTrait\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -796,27 +796,28 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/PerPage-Trait/issues",
-                "source": "https://github.com/GustavoSantarosa/PerPage-Trait/tree/1.5.1"
+                "source": "https://github.com/GustavoSantarosa/PerPage-Trait/tree/2.0.0"
             },
-            "time": "2024-10-11T20:32:28+00:00"
+            "abandoned": "quantumcode/perpage-trait",
+            "time": "2025-02-19T01:10:45+00:00"
         },
         {
             "name": "gustavosantarosa/service-basics-extension",
-            "version": "1.8.3",
+            "version": "1.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GustavoSantarosa/Service-Basics-Extension.git",
-                "reference": "cb15086927247481513869dec35167c85cb8e4d7"
+                "reference": "c4bcd9e22754e406558096a13e9d0f86b2203193"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/cb15086927247481513869dec35167c85cb8e4d7",
-                "reference": "cb15086927247481513869dec35167c85cb8e4d7",
+                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/c4bcd9e22754e406558096a13e9d0f86b2203193",
+                "reference": "c4bcd9e22754e406558096a13e9d0f86b2203193",
                 "shasum": ""
             },
             "require": {
                 "gustavosantarosa/handler-basics-extension": "^1.0",
-                "gustavosantarosa/perpage-trait": "^1.0",
+                "gustavosantarosa/perpage-trait": "^2.0",
                 "gustavosantarosa/validate-trait": "^1.2.4",
                 "laravel/framework": "^10.0 | ^11.0",
                 "php": "^8.0"
@@ -850,9 +851,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/GustavoSantarosa/Service-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.3"
+                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.5"
             },
-            "time": "2025-02-17T00:08:19+00:00"
+            "time": "2025-02-20T16:17:22+00:00"
         },
         {
             "name": "gustavosantarosa/validate-trait",
@@ -1378,16 +1379,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.42.1",
+            "version": "v11.43.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "ff392f42f6c55cc774ce75553a11c6b031da67f8"
+                "reference": "99d1573698abc42222f04d25fcd5b213d0eedf21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/ff392f42f6c55cc774ce75553a11c6b031da67f8",
-                "reference": "ff392f42f6c55cc774ce75553a11c6b031da67f8",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/99d1573698abc42222f04d25fcd5b213d0eedf21",
+                "reference": "99d1573698abc42222f04d25fcd5b213d0eedf21",
                 "shasum": ""
             },
             "require": {
@@ -1589,7 +1590,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-02-12T20:58:18+00:00"
+            "time": "2025-02-19T21:53:48+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -3587,20 +3588,20 @@
         },
         {
             "name": "sentry/sentry-laravel",
-            "version": "4.12.0",
+            "version": "4.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-laravel.git",
-                "reference": "da1ee3417dfb3576a6aaa0f8b25892ebdb98fdb0"
+                "reference": "d232ac494258e0d50a77c575a5af5f1a426d3f87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/da1ee3417dfb3576a6aaa0f8b25892ebdb98fdb0",
-                "reference": "da1ee3417dfb3576a6aaa0f8b25892ebdb98fdb0",
+                "url": "https://api.github.com/repos/getsentry/sentry-laravel/zipball/d232ac494258e0d50a77c575a5af5f1a426d3f87",
+                "reference": "d232ac494258e0d50a77c575a5af5f1a426d3f87",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^6.0 | ^7.0 | ^8.0 | ^9.0 | ^10.0 | ^11.0",
+                "illuminate/support": "^6.0 | ^7.0 | ^8.0 | ^9.0 | ^10.0 | ^11.0 | ^12.0",
                 "nyholm/psr7": "^1.0",
                 "php": "^7.2 | ^8.0",
                 "sentry/sentry": "^4.10",
@@ -3610,12 +3611,12 @@
                 "friendsofphp/php-cs-fixer": "^3.11",
                 "guzzlehttp/guzzle": "^7.2",
                 "laravel/folio": "^1.1",
-                "laravel/framework": "^6.0 | ^7.0 | ^8.0 | ^9.0 | ^10.0 | ^11.0",
+                "laravel/framework": "^6.0 | ^7.0 | ^8.0 | ^9.0 | ^10.0 | ^11.0 | ^12.0",
                 "livewire/livewire": "^2.0 | ^3.0",
                 "mockery/mockery": "^1.3",
-                "orchestra/testbench": "^4.7 | ^5.1 | ^6.0 | ^7.0 | ^8.0 | ^9.0",
+                "orchestra/testbench": "^4.7 | ^5.1 | ^6.0 | ^7.0 | ^8.0 | ^9.0 | ^10.0",
                 "phpstan/phpstan": "^1.10",
-                "phpunit/phpunit": "^8.4 | ^9.3 | ^10.4"
+                "phpunit/phpunit": "^8.4 | ^9.3 | ^10.4 | ^11.5"
             },
             "type": "library",
             "extra": {
@@ -3660,7 +3661,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-laravel/issues",
-                "source": "https://github.com/getsentry/sentry-laravel/tree/4.12.0"
+                "source": "https://github.com/getsentry/sentry-laravel/tree/4.13.0"
             },
             "funding": [
                 {
@@ -3672,7 +3673,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2025-02-05T13:13:03+00:00"
+            "time": "2025-02-18T10:09:29+00:00"
         },
         {
             "name": "symfony/clock",
