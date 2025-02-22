@@ -1,6 +1,6 @@
 <?php
 
-namespace GustavoSantarosa\ControllerBasicsExtension\Providers;
+namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Routing\ResourceRegistrar as BaseResourceRegistrar;
 

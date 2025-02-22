@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace GustavoSantarosa\ControllerBasicsExtension;
+namespace QuantumTecnology\ControllerBasicsExtension;
 
-use GustavoSantarosa\HandlerBasicsExtension\Traits\ApiResponseTrait;
-use GustavoSantarosa\ServiceBasicsExtension\BaseService;
+use QuantumTecnology\HandlerBasicsExtension\Traits\ApiResponseTrait;
+use QuantumTecnology\ServiceBasicsExtension\BaseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;

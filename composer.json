@@ -1,16 +1,16 @@
 {
-  "name": "gustavosantarosa/controller-basics-extension",
+  "name": "quantumtecnology/controller-basics-extension",
   "license": "MIT",
   "homepage": "http://www.gustavosantarosa.esy.es/",
   "description": "Controller Basics Extension",
   "require": {
     "php": "^8.0",
     "laravel/framework": "^10.0 | ^11.0",
-    "gustavosantarosa/service-basics-extension": "^1.0"
+    "quantumtecnology/service-basics-extension": "^2.0"
   },
   "autoload": {
     "psr-4": {
-      "GustavoSantarosa\\ControllerBasicsExtension\\": "src/"
+      "QuantumTecnology\\ControllerBasicsExtension\\": "src/"
     }
   },
   "authors": [
@@ -27,7 +27,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "GustavoSantarosa\\ControllerBasicsExtension\\Providers\\ControllerBasicsExtensionProvider"
+        "QuantumTecnology\\ControllerBasicsExtension\\Providers\\ControllerBasicsExtensionProvider"
       ]
     }
   },

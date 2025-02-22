@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc23a7d2cca7a9ec133cc2360bedd2f9",
+    "content-hash": "68be93128b9606ba188332cad790dd5c",
     "packages": [
         {
             "name": "brick/math",
@@ -642,268 +642,6 @@
                 }
             ],
             "time": "2024-07-20T21:45:45+00:00"
-        },
-        {
-            "name": "gustavosantarosa/handler-basics-extension",
-            "version": "1.8.9",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GustavoSantarosa/Handler-Basics-Extension.git",
-                "reference": "ab10c0348ef31a6e9e7a306bd15a0f5e95d8a479"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Handler-Basics-Extension/zipball/ab10c0348ef31a6e9e7a306bd15a0f5e95d8a479",
-                "reference": "ab10c0348ef31a6e9e7a306bd15a0f5e95d8a479",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^10.0|^11.0",
-                "php": "^8.0",
-                "sentry/sentry-laravel": "^3.0|^4.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "GustavoSantarosa\\HandlerBasicsExtension\\Provider\\HandlerBasicsExtensionProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GustavoSantarosa\\HandlerBasicsExtension\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luis Gustavo Santarosa",
-                    "email": "gustavo-computacao@hotmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Handler Basics Extension",
-            "homepage": "http://www.gustavosantarosa.esy.es/",
-            "support": {
-                "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/GustavoSantarosa/Handler-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Handler-Basics-Extension/tree/1.8.9"
-            },
-            "time": "2024-07-11T16:56:22+00:00"
-        },
-        {
-            "name": "gustavosantarosa/model-basics-extension",
-            "version": "2.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GustavoSantarosa/Model-Basics-Extension.git",
-                "reference": "1a0e37b98e1bc1af00f1847814b7f332df8684ae"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Model-Basics-Extension/zipball/1a0e37b98e1bc1af00f1847814b7f332df8684ae",
-                "reference": "1a0e37b98e1bc1af00f1847814b7f332df8684ae",
-                "shasum": ""
-            },
-            "require": {
-                "gustavosantarosa/setschema-trait-postgresql": "^1.1",
-                "laravel/framework": "^10.0 | ^11.0",
-                "php": "^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "GustavoSantarosa\\ModelBasicsExtension\\Provider\\ModelBasicsExtensionProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GustavoSantarosa\\ModelBasicsExtension\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luis Gustavo Santarosa",
-                    "email": "gustavo-computacao@hotmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Model Basics Extension",
-            "homepage": "http://www.gustavosantarosa.esy.es/",
-            "support": {
-                "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/GustavoSantarosa/Model-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Model-Basics-Extension/tree/2.0.2"
-            },
-            "time": "2025-02-20T16:56:26+00:00"
-        },
-        {
-            "name": "gustavosantarosa/service-basics-extension",
-            "version": "1.8.11",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GustavoSantarosa/Service-Basics-Extension.git",
-                "reference": "9c6f0c014299de4a4ee19fef74be337dde0a48e8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Service-Basics-Extension/zipball/9c6f0c014299de4a4ee19fef74be337dde0a48e8",
-                "reference": "9c6f0c014299de4a4ee19fef74be337dde0a48e8",
-                "shasum": ""
-            },
-            "require": {
-                "gustavosantarosa/handler-basics-extension": "^1.8",
-                "gustavosantarosa/model-basics-extension": "^2.0",
-                "gustavosantarosa/validate-trait": "^1.2.4",
-                "laravel/framework": "^10.0 | ^11.0",
-                "php": "^8.0",
-                "quantumcode/perpage-trait": "^2.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "GustavoSantarosa\\ServiceBasicsExtension\\Provider\\ServiceBasicsExtensionProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GustavoSantarosa\\ServiceBasicsExtension\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luis Gustavo Santarosa",
-                    "email": "gustavo-computacao@hotmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Service Basics Extension",
-            "homepage": "http://www.gustavosantarosa.esy.es/",
-            "support": {
-                "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/GustavoSantarosa/Service-Basics-Extension/issues",
-                "source": "https://github.com/GustavoSantarosa/Service-Basics-Extension/tree/1.8.11"
-            },
-            "time": "2025-02-20T17:51:13+00:00"
-        },
-        {
-            "name": "gustavosantarosa/setschema-trait-postgresql",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GustavoSantarosa/SetSchema-Trait-Postgresql.git",
-                "reference": "351005b0e8a5740830f656c1eeda5220eabb5fdc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/SetSchema-Trait-Postgresql/zipball/351005b0e8a5740830f656c1eeda5220eabb5fdc",
-                "reference": "351005b0e8a5740830f656c1eeda5220eabb5fdc",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^v10|^v11",
-                "php": "^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "GustavoSantarosa\\SetSchemaTrait\\Provider\\SetSchemaTraitProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GustavoSantarosa\\SetSchemaTrait\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luis Gustavo Santarosa",
-                    "email": "gustavo-computacao@hotmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "SetSchema Trait Postgresql for Laravel",
-            "homepage": "http://www.gustavosantarosa.esy.es/",
-            "support": {
-                "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/GustavoSantarosa/SetSchema-Trait-Postgresql/issues",
-                "source": "https://github.com/GustavoSantarosa/SetSchema-Trait-Postgresql/tree/1.1.0"
-            },
-            "time": "2024-03-21T01:12:50+00:00"
-        },
-        {
-            "name": "gustavosantarosa/validate-trait",
-            "version": "1.2.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GustavoSantarosa/Validate-Trait.git",
-                "reference": "a960931b7f3afa3a73a5d1ec361ce97ffcc51310"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/Validate-Trait/zipball/a960931b7f3afa3a73a5d1ec361ce97ffcc51310",
-                "reference": "a960931b7f3afa3a73a5d1ec361ce97ffcc51310",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^v10|^v11",
-                "laravel/framework": "^10.0 | ^11.0",
-                "php": "^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "GustavoSantarosa\\ValidateTrait\\Provider\\ValidateTraitProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GustavoSantarosa\\ValidateTrait\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Luis Gustavo Santarosa",
-                    "email": "gustavo-computacao@hotmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "ValidateTrait for Laravel",
-            "homepage": "http://www.gustavosantarosa.esy.es/",
-            "support": {
-                "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/GustavoSantarosa/Validate-Trait/issues",
-                "source": "https://github.com/GustavoSantarosa/Validate-Trait/tree/1.2.5"
-            },
-            "time": "2024-10-16T13:44:56+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2366,16 +2104,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "3.8.5",
+            "version": "3.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CarbonPHP/carbon.git",
-                "reference": "b1a53a27898639579a67de42e8ced5d5386aa9a4"
+                "reference": "ff2f20cf83bd4d503720632ce8a426dc747bf7fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/b1a53a27898639579a67de42e8ced5d5386aa9a4",
-                "reference": "b1a53a27898639579a67de42e8ced5d5386aa9a4",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/ff2f20cf83bd4d503720632ce8a426dc747bf7fd",
+                "reference": "ff2f20cf83bd4d503720632ce8a426dc747bf7fd",
                 "shasum": ""
             },
             "require": {
@@ -2468,7 +2206,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-02-11T16:28:45+00:00"
+            "time": "2025-02-20T17:33:38+00:00"
         },
         {
             "name": "nette/schema",
@@ -3271,17 +3009,121 @@
             "time": "2021-10-29T13:26:27+00:00"
         },
         {
-            "name": "quantumcode/perpage-trait",
+            "name": "quantumtecnology/handler-basics-extension",
             "version": "2.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/GustavoSantarosa/PerPage-Trait.git",
-                "reference": "7148b15ff9604ec582c30c8578c2374d3da619a6"
+                "url": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension.git",
+                "reference": "9765efa840beb1adcee3a904cd95d217a257d15e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GustavoSantarosa/PerPage-Trait/zipball/7148b15ff9604ec582c30c8578c2374d3da619a6",
-                "reference": "7148b15ff9604ec582c30c8578c2374d3da619a6",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/9765efa840beb1adcee3a904cd95d217a257d15e",
+                "reference": "9765efa840beb1adcee3a904cd95d217a257d15e",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^10.0|^11.0",
+                "php": "^8.0",
+                "sentry/sentry-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "QuantumTecnology\\HandlerBasicsExtension\\Provider\\HandlerBasicsExtensionProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "QuantumTecnology\\HandlerBasicsExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luis Gustavo Santarosa",
+                    "email": "gustavo-computacao@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Handler Basics Extension",
+            "homepage": "http://www.gustavosantarosa.esy.es/",
+            "support": {
+                "email": "gustavo-computacao@hotmail.com",
+                "issues": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/issues",
+                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.0"
+            },
+            "time": "2025-02-22T21:20:15+00:00"
+        },
+        {
+            "name": "quantumtecnology/model-basics-extension",
+            "version": "2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Quantum-Tecnology/Model-Basics-Extension.git",
+                "reference": "eff660d23505734175617d16e82c8489721e8feb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/eff660d23505734175617d16e82c8489721e8feb",
+                "reference": "eff660d23505734175617d16e82c8489721e8feb",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^10.0 | ^11.0",
+                "php": "^8.0",
+                "quantumtecnology/setschema-trait-postgresql": "^1.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "QuantumTecnology\\ModelBasicsExtension\\Provider\\ModelBasicsExtensionProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "QuantumTecnology\\ModelBasicsExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luis Gustavo Santarosa",
+                    "email": "gustavo-computacao@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Model Basics Extension",
+            "homepage": "http://www.quantumtecnology.esy.es/",
+            "support": {
+                "email": "gustavo-computacao@hotmail.com",
+                "issues": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/issues",
+                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.0.3"
+            },
+            "time": "2025-02-22T21:16:28+00:00"
+        },
+        {
+            "name": "quantumtecnology/perpage-trait",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Quantum-Tecnology/PerPage-Trait.git",
+                "reference": "fc41f193915f409b6dc57c3d5b2048dcb30e1e01"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/PerPage-Trait/zipball/fc41f193915f409b6dc57c3d5b2048dcb30e1e01",
+                "reference": "fc41f193915f409b6dc57c3d5b2048dcb30e1e01",
                 "shasum": ""
             },
             "require": {
@@ -3292,13 +3134,13 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "QuantumCode\\PerPageTrait\\Provider\\PerPageTraitProvider"
+                        "QuantumTecnology\\PerPageTrait\\Provider\\PerPageTraitProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "QuantumCode\\PerPageTrait\\": "src/"
+                    "QuantumTecnology\\PerPageTrait\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3316,10 +3158,168 @@
             "homepage": "http://www.gustavosantarosa.esy.es/",
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
-                "issues": "https://github.com/GustavoSantarosa/PerPage-Trait/issues",
-                "source": "https://github.com/GustavoSantarosa/PerPage-Trait/tree/2.0.0"
+                "issues": "https://github.com/Quantum-Tecnology/PerPage-Trait/issues",
+                "source": "https://github.com/Quantum-Tecnology/PerPage-Trait/tree/2.0.2"
             },
-            "time": "2025-02-19T01:10:45+00:00"
+            "time": "2025-02-22T21:10:30+00:00"
+        },
+        {
+            "name": "quantumtecnology/service-basics-extension",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Quantum-Tecnology/Service-Basics-Extension.git",
+                "reference": "674506b8918824c8d52839fcb1ac27f9635afe4b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/674506b8918824c8d52839fcb1ac27f9635afe4b",
+                "reference": "674506b8918824c8d52839fcb1ac27f9635afe4b",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^10.0 | ^11.0",
+                "php": "^8.0",
+                "quantumtecnology/handler-basics-extension": "^2.0",
+                "quantumtecnology/model-basics-extension": "^2.0",
+                "quantumtecnology/perpage-trait": "^2.0",
+                "quantumtecnology/validate-trait": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "QuantumTecnology\\ServiceBasicsExtension\\Provider\\ServiceBasicsExtensionProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "QuantumTecnology\\ServiceBasicsExtension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luis Gustavo Santarosa",
+                    "email": "gustavo-computacao@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Service Basics Extension",
+            "homepage": "http://www.gustavosantarosa.esy.es/",
+            "support": {
+                "email": "gustavo-computacao@hotmail.com",
+                "issues": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/issues",
+                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.0.0"
+            },
+            "time": "2025-02-22T21:24:48+00:00"
+        },
+        {
+            "name": "quantumtecnology/setschema-trait-postgresql",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Quantum-Tecnology/SetSchema-Trait-Postgresql.git",
+                "reference": "351005b0e8a5740830f656c1eeda5220eabb5fdc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/SetSchema-Trait-Postgresql/zipball/351005b0e8a5740830f656c1eeda5220eabb5fdc",
+                "reference": "351005b0e8a5740830f656c1eeda5220eabb5fdc",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^v10|^v11",
+                "php": "^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "GustavoSantarosa\\SetSchemaTrait\\Provider\\SetSchemaTraitProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GustavoSantarosa\\SetSchemaTrait\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luis Gustavo Santarosa",
+                    "email": "gustavo-computacao@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "SetSchema Trait Postgresql for Laravel",
+            "homepage": "http://www.gustavosantarosa.esy.es/",
+            "support": {
+                "email": "gustavo-computacao@hotmail.com",
+                "issues": "https://github.com/Quantum-Tecnology/SetSchema-Trait-Postgresql/issues",
+                "source": "https://github.com/Quantum-Tecnology/SetSchema-Trait-Postgresql/tree/1.1.0"
+            },
+            "time": "2024-03-21T01:12:50+00:00"
+        },
+        {
+            "name": "quantumtecnology/validate-trait",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Quantum-Tecnology/Validate-Trait.git",
+                "reference": "0532b23a1284f788c9d6517c687bd696afcd4233"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/0532b23a1284f788c9d6517c687bd696afcd4233",
+                "reference": "0532b23a1284f788c9d6517c687bd696afcd4233",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^v10|^v11",
+                "laravel/framework": "^10.0 | ^11.0",
+                "php": "^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "QuantumTecnology\\ValidateTrait\\Provider\\ValidateTraitProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "QuantumTecnology\\ValidateTrait\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luis Gustavo Santarosa",
+                    "email": "gustavo-computacao@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "ValidateTrait for Laravel",
+            "homepage": "http://www.gustavosantarosa.esy.es/",
+            "support": {
+                "email": "gustavo-computacao@hotmail.com",
+                "issues": "https://github.com/Quantum-Tecnology/Validate-Trait/issues",
+                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.0.1"
+            },
+            "time": "2025-02-22T20:49:46+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
