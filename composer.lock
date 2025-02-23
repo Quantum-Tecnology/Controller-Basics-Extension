@@ -3304,16 +3304,16 @@
         },
         {
             "name": "quantumtecnology/service-basics-extension",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Service-Basics-Extension.git",
-                "reference": "064677a350f9b5c50c0a4473e69de071f854492d"
+                "reference": "6c770207c2d86992221229aca4a09d21923abe2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/064677a350f9b5c50c0a4473e69de071f854492d",
-                "reference": "064677a350f9b5c50c0a4473e69de071f854492d",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/6c770207c2d86992221229aca4a09d21923abe2b",
+                "reference": "6c770207c2d86992221229aca4a09d21923abe2b",
                 "shasum": ""
             },
             "require": {
@@ -3353,9 +3353,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.0.2"
+                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.0.3"
             },
-            "time": "2025-02-23T21:24:16+00:00"
+            "time": "2025-02-23T21:36:44+00:00"
         },
         {
             "name": "quantumtecnology/setschema-trait-postgresql",
