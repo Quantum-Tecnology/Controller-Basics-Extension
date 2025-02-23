@@ -3410,16 +3410,16 @@
         },
         {
             "name": "quantumtecnology/validate-trait",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Validate-Trait.git",
-                "reference": "7d9693ede228317e376a42cc31ae2ce996c2dd21"
+                "reference": "6996e773f1f69a92a07afb1960d98a627e05c4a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/7d9693ede228317e376a42cc31ae2ce996c2dd21",
-                "reference": "7d9693ede228317e376a42cc31ae2ce996c2dd21",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/6996e773f1f69a92a07afb1960d98a627e05c4a1",
+                "reference": "6996e773f1f69a92a07afb1960d98a627e05c4a1",
                 "shasum": ""
             },
             "require": {
@@ -3459,9 +3459,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Validate-Trait/issues",
-                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.1.0"
+                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.1.1"
             },
-            "time": "2025-02-23T21:22:29+00:00"
+            "time": "2025-02-23T21:35:02+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
