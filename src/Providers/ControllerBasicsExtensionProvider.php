@@ -23,6 +23,10 @@ class ControllerBasicsExtensionProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
+        $this->publishes([
+            __DIR__.'/../config/hashids.php' => config_path('hashids.php'),
+        ], 'config');
+
         /*
          * TODO: esta apresentnado erro ao tentar registrar o provider
          */

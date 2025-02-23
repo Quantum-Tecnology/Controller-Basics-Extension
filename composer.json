@@ -6,9 +6,13 @@
   "require": {
     "php": "^8.0",
     "laravel/framework": "^10.0 | ^11.0",
-    "quantumtecnology/service-basics-extension": "^2.0"
+    "quantumtecnology/service-basics-extension": "^2.0",
+    "vinkla/hashids": "^12.0"
   },
   "autoload": {
+    "files": [
+      "src/Libs/Helpers.php"
+    ],
     "psr-4": {
       "QuantumTecnology\\ControllerBasicsExtension\\": "src/"
     }
