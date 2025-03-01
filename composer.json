@@ -13,7 +13,7 @@
     "php": "^8.2",
     "quantumtecnology/hashids": "^13.0",
     "quantumtecnology/service-basics-extension": "^2.0",
-    "laravel/framework": "^11.44"
+    "laravel/framework": "^11.44 | ^12.0"
   },
   "autoload": {
     "files": [
