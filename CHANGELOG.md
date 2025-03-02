@@ -4,5 +4,8 @@ CHANGE LOG
 
 ## V2.x.x (02/03/2025)
 
-* Add Change Log
-* Fix phpcsfixer rules and actions
+# PT-BR
+* Corrigido os problemas com phpcsfixer na pipeline do git
+
+# EN
+* Fixed problems with phpcsfixer in Git pipeline
