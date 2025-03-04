@@ -2,8 +2,6 @@
 
 namespace QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography;
 
-use GetInApis\Lumen\Skeleton\Core\Exceptions\CustomException;
-use GetInApis\Lumen\Skeleton\Core\Exceptions\NotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -14,7 +12,6 @@ class Decoder
     /**
      * Handle an incoming request.
      *
-     * @throws CustomException|NotFoundException|\Throwable
      */
     public static function run(Request $request)
     {
