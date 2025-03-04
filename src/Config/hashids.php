@@ -34,6 +34,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Transform Attributes on Model
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which of the attributes you wish to transform on
+    | your models. Of course, you may use many attributes at once using the
+    | manager class.
+    | Example: 'attributes' => ['id', 'user_id']
+    |
+    */
+
+    'attributes' => [],
+
+    /*
+    |--------------------------------------------------------------------------
     | Hashids Connections
     |--------------------------------------------------------------------------
     |
