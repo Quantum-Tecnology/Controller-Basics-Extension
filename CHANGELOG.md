@@ -2,7 +2,7 @@ CHANGE LOG
 ==========
 
 
-## V2.2.10 (02/03/2025)
+## V2.2.10 (04/03/2025)
 
 # PT-BR
 * Introduzido novo fkchangetrait para que seja possivel bindar ids etc que nao sigam padroes definidos, configuravel no config('hashids.attributes')
