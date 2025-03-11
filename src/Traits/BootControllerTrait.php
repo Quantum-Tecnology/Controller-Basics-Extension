@@ -17,8 +17,6 @@ trait BootControllerTrait
     use DispatchesJobs;
     use ValidatesRequests;
 
-    protected array $allowedIncludes = [];
-
     private string|BaseService $defaultService = DefaultService::class;
     private string $defaultResource            = DefaultResource::class;
 
@@ -70,6 +68,6 @@ trait BootControllerTrait
             new \Exception('Service must be defined in the '.request()->route()->getAction('controller').'.')
         );
 
-        $this->setAllowedIncludes($this->allowedIncludes);
+        $this->setAllowedIncludes($this->allowedIncludes ?? []);
     }
 }
