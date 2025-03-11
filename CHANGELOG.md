@@ -1,6 +1,6 @@
 # CHANGE LOG
 
-## V2.2.11 (10/03/2025)
+## V2.2.1 (10/03/2025)
 
 # PT-BR
 
@@ -12,7 +12,7 @@
 - Fixed an error when overwriting allowedInclude @GustavoSantarosa
 - Updated the composer with the latest updates used in the package @GustavoSantarosa
 
-## V2.2.10 (04/03/2025)
+## V2.2.0 (04/03/2025)
 
 # PT-BR
 
