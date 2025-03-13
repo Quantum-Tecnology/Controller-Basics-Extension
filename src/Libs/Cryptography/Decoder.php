@@ -111,6 +111,10 @@ class Decoder
 
     private static function hashIsValid(string $key): bool
     {
-        return (bool) preg_match('/^(?!undefined)[a-zA-Z0-9]{1,9}$/', $key);
+        $alphabet = config('hashids.connections.'.config('hashids.default').'.alphabet');
+        $length   = config('hashids.connections.'.config('hashids.default').'.length');
+        $pattern  = '/^(?!undefined)['.preg_quote($alphabet, '/').']{1,'.$length.'}$/';
+
+        return (bool) preg_match($pattern, $key);
     }
 }
