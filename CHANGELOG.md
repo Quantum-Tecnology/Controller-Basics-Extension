@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.3.0 (12/03/2025)
+
+# PT-BR
+
+- Removido a lib temporaria quantumtecnology/hashids que foi criado para suportar o laravel 12 e adicionado o vinkla/hashids agora com suporte para laravel 12 @GustavoSantarosa
+
+# EN
+
+- Removed the temporary library quantumtecnology/hashids that was created to support Laravel 12 and added vinkla/hashids now with support for Laravel 12 @GustavoSantarosa
+
 ## V2.2.1 (10/03/2025)
 
 # PT-BR
