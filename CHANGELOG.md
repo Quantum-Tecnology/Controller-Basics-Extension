@@ -1,5 +1,14 @@
 # CHANGE LOG
 
+## V2.3.1 (13/03/2025)
+
+# PT-BR
+
+- Criado o BaseControllerExample e recriado o BaseController @GustavoSantarosa
+
+# EN
+- Created the BaseControllerExample and recreated the BaseController @GustavoSantarosa
+
 ## V2.3.0 (12/03/2025)
 
 # PT-BR
