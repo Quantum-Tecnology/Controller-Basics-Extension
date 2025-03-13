@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1f0fba60ef5d6a2cfa14d342d54d1a9",
+    "content-hash": "2df270a85049f727268d85e67815ef71",
     "packages": [
         {
             "name": "brick/math",
@@ -1254,16 +1254,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.1.1",
+            "version": "v12.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "9be5738f1ca1530055bb9d6db81f909a7ed34842"
+                "reference": "2fb06941bc69ea92f28b2888535ab144ee006889"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/9be5738f1ca1530055bb9d6db81f909a7ed34842",
-                "reference": "9be5738f1ca1530055bb9d6db81f909a7ed34842",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/2fb06941bc69ea92f28b2888535ab144ee006889",
+                "reference": "2fb06941bc69ea92f28b2888535ab144ee006889",
                 "shasum": ""
             },
             "require": {
@@ -1465,7 +1465,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-03-05T15:31:19+00:00"
+            "time": "2025-03-12T14:38:20+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -3149,16 +3149,16 @@
         },
         {
             "name": "quantumtecnology/handler-basics-extension",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension.git",
-                "reference": "e5cb5b80b28fff9cceec508659bee9041a9e5fa0"
+                "reference": "54711b4b2e3f44b43a92d66ace5bf6fbbd4ffd9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/e5cb5b80b28fff9cceec508659bee9041a9e5fa0",
-                "reference": "e5cb5b80b28fff9cceec508659bee9041a9e5fa0",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/54711b4b2e3f44b43a92d66ace5bf6fbbd4ffd9a",
+                "reference": "54711b4b2e3f44b43a92d66ace5bf6fbbd4ffd9a",
                 "shasum": ""
             },
             "require": {
@@ -3195,9 +3195,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.2"
+                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.3"
             },
-            "time": "2025-03-11T01:01:40+00:00"
+            "time": "2025-03-12T01:12:16+00:00"
         },
         {
             "name": "quantumtecnology/model-basics-extension",
