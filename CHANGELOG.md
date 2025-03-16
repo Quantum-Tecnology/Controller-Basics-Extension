@@ -1,5 +1,14 @@
 # CHANGE LOG
 
+## V2.3.2 (16/03/2025)
+
+# PT-BR
+
+- Introduzido suporte ao pacote vinkla/hashids:^11.0 para adequar o pacote para o laravel ^10.0  @GustavoSantarosa
+
+# EN
+- Introduced support for the vinkla/hashids:^11.0 package to adapt the package for Laravel ^10.0 @GustavoSantarosa@GustavoSantarosa
+
 ## V2.3.1 (13/03/2025)
 
 # PT-BR
