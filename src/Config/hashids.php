@@ -48,6 +48,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Regex Attributes to Transform on Request
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which of the attributes you wish to transform on
+    | your requests. Of course, you may use many attributes at once using the
+    | manager class.
+    |
+    */
+    'regex' => '/id$|_id$|Id$|_ids$/', // Default
+
+    /*
+    |--------------------------------------------------------------------------
+    | Headers to Transform on Request
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which of the headers you wish to transform on
+    | your requests. Of course, you may use many headers at once using the
+    | manager class.
+    |
+    */
+    'headers' => [
+        'regex' => '/^(X-Admin|X-Agent|X-User)/i',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Hashids Connections
     |--------------------------------------------------------------------------
     |

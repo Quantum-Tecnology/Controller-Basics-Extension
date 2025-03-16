@@ -11,13 +11,20 @@ class Decoder
 {
     /**
      * Handle an incoming request.
-     *
      */
     public static function run(Request $request)
     {
-        // Decode Headers - TODO: Disable in future.
+        self::decodeHeaders($request);
+        self::decodeRouteParams($request);
+        self::decodeRouteInputs($request);
+
+        return $request;
+    }
+
+    private static function decodeHeaders(Request $request): void
+    {
         foreach ($request->headers as $key => $value) {
-            if (preg_match('/^(X-Admin|X-Agent|X-User)/i', $key)) {
+            if (preg_match(config('hashids.headers.regex'), $key)) {
                 $encodedIds = $value[0];
                 $decodedIds = [];
                 foreach (explode(',', $encodedIds) as $unit) {
@@ -32,13 +39,14 @@ class Decoder
                 }
             }
         }
+    }
 
-        // Decode Route Params
+    private static function decodeRouteParams(Request $request): void
+    {
         foreach (($request->route()?->parameters() ?? []) as $key => $value) {
             if (self::isIdentifierFromPath($key)) {
                 throw_if(!self::hashIsValid($value), NotFoundHttpException::class);
                 $decoded = current(Hashids::decode($value));
-
                 if (self::wasDecoded($decoded)) {
                     $request->route()->setParameter($key, $decoded);
                 } elseif (!config('app.debug')) {
@@ -46,12 +54,14 @@ class Decoder
                 }
             }
         }
+    }
 
-        // Decode Input Params
+    private static function decodeRouteInputs(Request $request): void
+    {
         $inputs = $request->all();
 
         array_walk($inputs, function (&$value, $key): void {
-            if ($value && self::isIdentifierFromBody($key) && is_array($value)) {
+            if ($value && self::isIdentifier($key) && is_array($value)) {
                 $value = collect($value)->transform(function ($unit) {
                     return current(Hashids::decode($unit));
                 })->filter(function ($decoded) {
@@ -61,7 +71,7 @@ class Decoder
         });
 
         array_walk_recursive($inputs, function (&$value, $key): void {
-            if ($value && self::isIdentifierFromBody($key)) {
+            if ($value && self::isIdentifier($key)) {
                 $value = collect(explode(',', $value))->transform(function ($unit) {
                     return current(Hashids::decode($unit));
                 })->filter(function ($decoded) {
@@ -79,8 +89,6 @@ class Decoder
         });
 
         $request->merge($inputs);
-
-        return $request;
     }
 
     /**
@@ -96,17 +104,7 @@ class Decoder
      */
     private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
-        return 'id' === $paramKey || preg_match($regexp, $paramKey);
-    }
-
-    private static function isIdentifierFromPath(string $paramKey): bool
-    {
-        return self::isIdentifier($paramKey, '/Id$/');
-    }
-
-    private static function isIdentifierFromBody(string $paramKey): bool
-    {
-        return self::isIdentifier($paramKey, '/_id$/');
+        return preg_match(config('hashids.regex'), $paramKey) || preg_match($regexp, $paramKey);
     }
 
     private static function hashIsValid(string $key): bool

@@ -1,13 +1,24 @@
 # CHANGE LOG
 
+## V2.4.0 (16/03/2025)
+
+# PT-BR
+
+- implementado uma nova configuração customizavel para headers e inputs por regex   @GustavoSantarosa
+
+# EN
+
+- Implemented a new customizable configuration for headers and inputs using regex @GustavoSantarosa
+
 ## V2.3.2 (16/03/2025)
 
 # PT-BR
 
-- Introduzido suporte ao pacote vinkla/hashids:^11.0 para adequar o pacote para o laravel ^10.0  @GustavoSantarosa
+- Introduzido suporte ao pacote vinkla/hashids:^11.0 para adequar o pacote para o laravel ^10.0 @GustavoSantarosa
 
 # EN
-- Introduced support for the vinkla/hashids:^11.0 package to adapt the package for Laravel ^10.0 @GustavoSantarosa@GustavoSantarosa
+
+- Introduced support for the vinkla/hashids:^11.0 package to adapt the package for Laravel ^10.0 @GustavoSantarosa
 
 ## V2.3.1 (13/03/2025)
 
@@ -16,6 +27,7 @@
 - Criado o BaseControllerExample e recriado o BaseController @GustavoSantarosa
 
 # EN
+
 - Created the BaseControllerExample and recreated the BaseController @GustavoSantarosa
 
 ## V2.3.0 (12/03/2025)
