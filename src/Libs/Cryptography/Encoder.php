@@ -38,8 +38,8 @@ class Encoder
     /**
      * Check if parameter is an identifier.
      */
-    private static function isIdentifier(string $paramKey): bool
+    private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
-        return 'id' === $paramKey || preg_match('/_id$/', $paramKey);
+        return preg_match(config('hashids.regex'), $paramKey) || preg_match($regexp, $paramKey);
     }
 }
