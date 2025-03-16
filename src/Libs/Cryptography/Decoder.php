@@ -44,7 +44,7 @@ class Decoder
     private static function decodeRouteParams(Request $request): void
     {
         foreach (($request->route()?->parameters() ?? []) as $key => $value) {
-            if (self::isIdentifierFromPath($key)) {
+            if (self::isIdentifier($key)) {
                 throw_if(!self::hashIsValid($value), NotFoundHttpException::class);
                 $decoded = current(Hashids::decode($value));
                 if (self::wasDecoded($decoded)) {
