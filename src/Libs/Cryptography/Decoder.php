@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography;
 
 use Illuminate\Http\Request;
@@ -27,13 +29,16 @@ class Decoder
             if (preg_match(config('hashids.headers.regex'), $key)) {
                 $encodedIds = $value[0];
                 $decodedIds = [];
+
                 foreach (explode(',', $encodedIds) as $unit) {
                     $decoded = current(Hashids::decode($unit));
+
                     if (self::wasDecoded($decoded)) {
                         $decodedIds[] = $decoded;
                     }
                 }
                 $decoded = implode(',', $decodedIds);
+
                 if ($decoded) {
                     request()->headers->set($key, $decoded);
                 }
@@ -47,6 +52,7 @@ class Decoder
             if (self::isIdentifier($key)) {
                 throw_if(!self::hashIsValid($value), NotFoundHttpException::class);
                 $decoded = current(Hashids::decode($value));
+
                 if (self::wasDecoded($decoded)) {
                     $request->route()->setParameter($key, $decoded);
                 } elseif (!config('app.debug')) {
@@ -104,7 +110,7 @@ class Decoder
      */
     private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
-        return preg_match(config('hashids.regex'), $paramKey) || preg_match($regexp, $paramKey);
+        return preg_match(config('hashids.regex', ''), $paramKey) || preg_match($regexp, $paramKey) || in_array($paramKey, config('hashids.attributes', []));
     }
 
     private static function hashIsValid(string $key): bool

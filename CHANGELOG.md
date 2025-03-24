@@ -1,10 +1,20 @@
 # CHANGE LOG
 
+## V2.4.1 (16/03/2025)
+
+# PT-BR
+
+- Realizado algumas correções e criado uma config de attributes para o hash validar alem do regex @GustavoSantarosa
+
+# EN
+
+- Implemented a new customizable configuration for headers and inputs using regex @GustavoSantarosa
+
 ## V2.4.0 (16/03/2025)
 
 # PT-BR
 
-- implementado uma nova configuração customizavel para headers e inputs por regex   @GustavoSantarosa
+- implementado uma nova configuração customizavel para headers e inputs por regex @GustavoSantarosa
 
 # EN
 

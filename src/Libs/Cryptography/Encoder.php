@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography;
 
 use Illuminate\Http\JsonResponse;
@@ -27,7 +29,7 @@ class Encoder
     public static function encodeArray($responseData): array
     {
         array_walk_recursive($responseData, function (&$value, $key): void {
-            if (self::isIdentifier($key)) {
+            if (self::isIdentifier((string) $key)) {
                 $value = Hashids::encode($value);
             }
         });
@@ -40,6 +42,6 @@ class Encoder
      */
     private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
-        return preg_match(config('hashids.regex'), $paramKey) || preg_match($regexp, $paramKey);
+        return preg_match(config('hashids.regex'), $paramKey) || preg_match($regexp, $paramKey) || in_array($paramKey, config('hashids.attributes', []));
     }
 }

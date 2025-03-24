@@ -56,7 +56,7 @@ return [
     | manager class.
     |
     */
-    'regex' => '/id$|_id$|Id$|_ids$/', // Default
+    'regex' => env('HASHID_REGEX', '/id$|_id$|Id$|_ids$/'), // Default
 
     /*
     |--------------------------------------------------------------------------
@@ -69,7 +69,7 @@ return [
     |
     */
     'headers' => [
-        'regex' => '/^(X-Admin|X-Agent|X-User)/i',
+        'regex' => env('HASHID_HEADER_REGEX', '/^(X-Admin|X-Agent|X-User)/i'),
     ],
 
     /*
@@ -85,9 +85,9 @@ return [
 
     'connections' => [
         'main' => [
-            'salt'   => '',
-            'length' => 0,
-            // 'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+            'salt'     => 'example',
+            'length'   => 0,
+            'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
         ],
     ],
 ];
