@@ -9,9 +9,11 @@ trait IndexControllerTrait
     public function index(): JsonResponse
     {
         $this->checkIncludes();
+        $result = $this->getService()->index();
 
         return $this->okResponse(
-            data: $this->getResource()::collection($this->getService()->index()),
+            message: $result->message,
+            data: $this->getResource()::collection($result->data),
             allowedInclude: true,
             allowedFilters: true,
         );
