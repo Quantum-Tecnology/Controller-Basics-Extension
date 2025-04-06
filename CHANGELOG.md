@@ -1,5 +1,16 @@
 # CHANGE LOG
 
+## V2.5.0 (06/04/2025)
+
+# PT-BR
+
+- Atualizado o composer. @GustavoSantarosa
+- Implementado o retorno por Data. @GustavoSantarosa
+
+# EN
+
+- Implemented a new customizable configuration for headers and inputs using regex @GustavoSantarosa
+
 ## V2.4.1 (16/03/2025)
 
 # PT-BR
