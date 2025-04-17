@@ -1,15 +1,32 @@
 # CHANGE LOG
 
+## V2.5.1 (17/04/2025)
+
+# PT-BR
+
+- Implementado o filtersAllowed para ser startado. @GustavoSantarosa
+- Feito Composer update. @GustavoSantarosa
+
+# EN
+
+- Implemented the filtersAllowed to be initialized. @GustavoSantarosa
+- Performed Composer update. @GustavoSantarosa
+
 ## V2.5.0 (06/04/2025)
 
 # PT-BR
 
 - Atualizado o composer. @GustavoSantarosa
 - Implementado o retorno por Data. @GustavoSantarosa
+- Implementado o simple pagination. @GustavoSantarosa
+- Implementado 2 novas traits para o crud, sendo elas: WhenLoadedFilterTrait e WhenLoadedTrait. @GustavoSantarosa
 
 # EN
 
-- Implemented a new customizable configuration for headers and inputs using regex @GustavoSantarosa
+- Updated the composer. @GustavoSantarosa
+- Implemented return by Date. @GustavoSantarosa
+- Implemented simple pagination. @GustavoSantarosa
+- Implemented 2 new traits for CRUD: WhenLoadedFilterTrait and WhenLoadedTrait. @GustavoSantarosa
 
 ## V2.4.1 (16/03/2025)
 

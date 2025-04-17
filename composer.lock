@@ -1255,16 +1255,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.7.2",
+            "version": "v12.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "a4ba76e06fe6dd02312359f8184ab259900a7780"
+                "reference": "3db59aa0f382c349c78a92f3e5b5522e00e3301b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/a4ba76e06fe6dd02312359f8184ab259900a7780",
-                "reference": "a4ba76e06fe6dd02312359f8184ab259900a7780",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/3db59aa0f382c349c78a92f3e5b5522e00e3301b",
+                "reference": "3db59aa0f382c349c78a92f3e5b5522e00e3301b",
                 "shasum": ""
             },
             "require": {
@@ -1373,7 +1373,7 @@
                 "league/flysystem-sftp-v3": "^3.25.1",
                 "mockery/mockery": "^1.6.10",
                 "orchestra/testbench-core": "^10.0.0",
-                "pda/pheanstalk": "^5.0.6",
+                "pda/pheanstalk": "^5.0.6|^7.0.0",
                 "php-http/discovery": "^1.15",
                 "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^10.5.35|^11.5.3|^12.0.1",
@@ -1466,7 +1466,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-04-03T18:00:49+00:00"
+            "time": "2025-04-16T15:44:19+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -3201,16 +3201,16 @@
         },
         {
             "name": "quantumtecnology/handler-basics-extension",
-            "version": "2.0.7",
+            "version": "2.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension.git",
-                "reference": "a1c363ee13740f928b8a2639eb80f4505502d00e"
+                "reference": "f2d8300b82fc5103d58853f53fe32ff9d9f48719"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/a1c363ee13740f928b8a2639eb80f4505502d00e",
-                "reference": "a1c363ee13740f928b8a2639eb80f4505502d00e",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Handler-Basics-Extension/zipball/f2d8300b82fc5103d58853f53fe32ff9d9f48719",
+                "reference": "f2d8300b82fc5103d58853f53fe32ff9d9f48719",
                 "shasum": ""
             },
             "require": {
@@ -3247,22 +3247,22 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.7"
+                "source": "https://github.com/Quantum-Tecnology/Handler-Basics-Extension/tree/2.0.9"
             },
-            "time": "2025-04-06T15:50:17+00:00"
+            "time": "2025-04-17T20:28:01+00:00"
         },
         {
             "name": "quantumtecnology/model-basics-extension",
-            "version": "2.2.2",
+            "version": "2.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Model-Basics-Extension.git",
-                "reference": "7d6e33de9f5bc28cf3767441b57333475f38caa2"
+                "reference": "fc8bccbe6e98ab862d9fb66b144b24bb51bb590d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/7d6e33de9f5bc28cf3767441b57333475f38caa2",
-                "reference": "7d6e33de9f5bc28cf3767441b57333475f38caa2",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Model-Basics-Extension/zipball/fc8bccbe6e98ab862d9fb66b144b24bb51bb590d",
+                "reference": "fc8bccbe6e98ab862d9fb66b144b24bb51bb590d",
                 "shasum": ""
             },
             "require": {
@@ -3298,22 +3298,22 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.2.2"
+                "source": "https://github.com/Quantum-Tecnology/Model-Basics-Extension/tree/2.2.3"
             },
-            "time": "2025-03-22T18:25:47+00:00"
+            "time": "2025-04-06T23:52:10+00:00"
         },
         {
             "name": "quantumtecnology/perpage-trait",
-            "version": "2.1.1",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/PerPage-Trait.git",
-                "reference": "b02e6904cfdd18dc223116aed67aea7ecdb4317c"
+                "reference": "3fe65980410210a1a7d0060ae8ec5d6b1717e81b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/PerPage-Trait/zipball/b02e6904cfdd18dc223116aed67aea7ecdb4317c",
-                "reference": "b02e6904cfdd18dc223116aed67aea7ecdb4317c",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/PerPage-Trait/zipball/3fe65980410210a1a7d0060ae8ec5d6b1717e81b",
+                "reference": "3fe65980410210a1a7d0060ae8ec5d6b1717e81b",
                 "shasum": ""
             },
             "require": {
@@ -3355,22 +3355,22 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/PerPage-Trait/issues",
-                "source": "https://github.com/Quantum-Tecnology/PerPage-Trait/tree/2.1.1"
+                "source": "https://github.com/Quantum-Tecnology/PerPage-Trait/tree/2.2.0"
             },
-            "time": "2025-04-06T15:37:01+00:00"
+            "time": "2025-04-10T14:03:23+00:00"
         },
         {
             "name": "quantumtecnology/service-basics-extension",
-            "version": "2.3.0",
+            "version": "2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Service-Basics-Extension.git",
-                "reference": "d7305a04963ac7fe47cb91df86e1d830bf89d861"
+                "reference": "285dbbfce531c8e4ccd7eee38efd279800d47422"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/d7305a04963ac7fe47cb91df86e1d830bf89d861",
-                "reference": "d7305a04963ac7fe47cb91df86e1d830bf89d861",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Service-Basics-Extension/zipball/285dbbfce531c8e4ccd7eee38efd279800d47422",
+                "reference": "285dbbfce531c8e4ccd7eee38efd279800d47422",
                 "shasum": ""
             },
             "require": {
@@ -3413,27 +3413,28 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/issues",
-                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.3.0"
+                "source": "https://github.com/Quantum-Tecnology/Service-Basics-Extension/tree/2.4.2"
             },
-            "time": "2025-04-06T15:54:09+00:00"
+            "time": "2025-04-17T14:36:39+00:00"
         },
         {
             "name": "quantumtecnology/validate-trait",
-            "version": "2.1.1",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Quantum-Tecnology/Validate-Trait.git",
-                "reference": "6996e773f1f69a92a07afb1960d98a627e05c4a1"
+                "reference": "6297d79a2116b8eab1e03c49a491575e06c9314f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/6996e773f1f69a92a07afb1960d98a627e05c4a1",
-                "reference": "6996e773f1f69a92a07afb1960d98a627e05c4a1",
+                "url": "https://api.github.com/repos/Quantum-Tecnology/Validate-Trait/zipball/6297d79a2116b8eab1e03c49a491575e06c9314f",
+                "reference": "6297d79a2116b8eab1e03c49a491575e06c9314f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^v10|^v11|^v12",
-                "laravel/framework": "^10.0 | ^11.0 | ^12.0",
+                "illuminate/contracts": "^10.0 || ^11.0 || ^12.0",
+                "illuminate/http": "^10.0 || ^11.0 || ^12.0",
+                "illuminate/support": "^10.0 || ^11.0 || ^12.0",
                 "php": "^8.0"
             },
             "type": "library",
@@ -3468,9 +3469,9 @@
             "support": {
                 "email": "gustavo-computacao@hotmail.com",
                 "issues": "https://github.com/Quantum-Tecnology/Validate-Trait/issues",
-                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.1.1"
+                "source": "https://github.com/Quantum-Tecnology/Validate-Trait/tree/2.2.0"
             },
-            "time": "2025-02-23T21:35:02+00:00"
+            "time": "2025-04-13T01:24:04+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -3686,16 +3687,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.10.0",
+            "version": "4.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "2af937d47d8aadb8dab0b1d7b9557e495dd12856"
+                "reference": "ebf67deb9902b6da58a4b3383cbd12fed3f4f555"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/2af937d47d8aadb8dab0b1d7b9557e495dd12856",
-                "reference": "2af937d47d8aadb8dab0b1d7b9557e495dd12856",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/ebf67deb9902b6da58a4b3383cbd12fed3f4f555",
+                "reference": "ebf67deb9902b6da58a4b3383cbd12fed3f4f555",
                 "shasum": ""
             },
             "require": {
@@ -3759,7 +3760,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.10.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.11.0"
             },
             "funding": [
                 {
@@ -3771,7 +3772,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-11-06T07:44:19+00:00"
+            "time": "2025-04-14T09:04:23+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
