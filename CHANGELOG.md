@@ -1,5 +1,16 @@
 # CHANGE LOG
 
+## X.X.X
+
+# PT-BR
+
+- Ao inves de verificar a comparação do item, vamos comparar a relação @bhcosta90
+
+# EN
+
+- Instead of checking the item comparison, let's compare the relationship @bhcosta90
+
+
 ## V2.5.1 (17/04/2025)
 
 # PT-BR
