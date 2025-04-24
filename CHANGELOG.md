@@ -1,14 +1,14 @@
 # CHANGE LOG
 
-## X.X.X
+## V2.5.2 (24/04/2025)
 
 # PT-BR
 
-- Ao inves de verificar a comparação do item, vamos comparar a relação @bhcosta90
+- Ao inves de verificar a comparação do item, vamos comparar a relação. @bhcosta90 https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/5
 
 # EN
 
-- Instead of checking the item comparison, let's compare the relationship @bhcosta90
+- Instead of checking the item comparison, let's compare the relationship. @bhcosta90 https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/5
 
 
 ## V2.5.1 (17/04/2025)
