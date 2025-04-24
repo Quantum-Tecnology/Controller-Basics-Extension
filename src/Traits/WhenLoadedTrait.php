@@ -10,7 +10,7 @@ trait WhenLoadedTrait
     {
         return $this->when(
             collect(explode(',', request()->input('include', '')))
-                ->contains(fn ($item) => str_contains($item, $relationship)),
+                ->contains(fn ($item) => str_contains($relationship, $item)),
             parent::whenLoaded($relationship, $value, $default)
         );
     }
