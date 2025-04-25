@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.5.4 (24/04/2025)
+
+# PT-BR
+
+- Ajustado alguns problemas para evitar dynamic properties. @GustavoSantarosa
+
+# EN
+
+- Adjusted some issues to avoid dynamic properties. @GustavoSantarosa
+
 ## V2.5.3 (24/04/2025)
 
 # PT-BR
