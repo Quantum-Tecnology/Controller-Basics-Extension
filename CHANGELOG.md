@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.5.3 (24/04/2025)
+
+# PT-BR
+
+- Removido uma trait que nao deveria existir, pois é do pacote service. @GustavoSantarosa
+
+# EN
+
+- Removed a trait that shouldn't exist, as it belongs to the service package. @GustavoSantarosa
+
 ## V2.5.2 (24/04/2025)
 
 # PT-BR
