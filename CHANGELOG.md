@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.5.5 (29/04/2025)
+
+# PT-BR
+
+- Ajustado os namespace das traits whenloaded e whenloadedfilter. @GustavoSantarosa
+
+# EN
+
+- Adjusted the namespaces of the whenloaded and whenloadedfilter traits. @GustavoSantarosa
+
 ## V2.5.4 (24/04/2025)
 
 # PT-BR

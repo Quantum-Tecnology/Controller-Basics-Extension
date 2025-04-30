@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits;
+namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 trait WhenLoadedTrait
 {
