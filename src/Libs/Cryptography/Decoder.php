@@ -77,7 +77,7 @@ class Decoder
         });
 
         array_walk_recursive($inputs, function (&$value, $key): void {
-            if ($value && self::isIdentifier($key)) {
+            if ($value && is_string($value) && self::isIdentifier($key)) {
                 $value = collect(explode(',', $value))->transform(function ($unit) {
                     return current(Hashids::decode($unit));
                 })->filter(function ($decoded) {

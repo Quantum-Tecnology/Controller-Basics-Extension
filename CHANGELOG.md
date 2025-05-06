@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.5.6 (06/05/2025)
+
+# PT-BR
+
+- Acrescentado uma nova validação no decoder para quando o input é um array sem index. @GustavoSantarosa
+
+# EN
+
+- Added a new validation in the decoder for when the input is an array without an index. @GustavoSantarosa
+
 ## V2.5.5 (29/04/2025)
 
 # PT-BR
