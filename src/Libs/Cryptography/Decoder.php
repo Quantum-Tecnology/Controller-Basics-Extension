@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography;
 
@@ -66,6 +66,12 @@ class Decoder
     {
         $inputs = $request->all();
 
+        abort_if(
+            collect($inputs)->flatten()->contains(fn ($value) => is_int($value)),
+            Response::HTTP_BAD_REQUEST,
+            __('Non-decodable values found in the request inputs.')
+        );
+
         array_walk($inputs, function (&$value, $key): void {
             if ($value && self::isIdentifier($key) && is_array($value)) {
                 $value = collect($value)->transform(function ($unit) {
@@ -115,9 +121,9 @@ class Decoder
 
     private static function hashIsValid(string $key): bool
     {
-        $alphabet = config('hashids.connections.'.config('hashids.default').'.alphabet');
-        $length   = config('hashids.connections.'.config('hashids.default').'.length');
-        $pattern  = '/^(?!undefined)['.preg_quote($alphabet, '/').']{1,'.$length.'}$/';
+        $alphabet = config('hashids.connections.' . config('hashids.default') . '.alphabet');
+        $length   = config('hashids.connections.' . config('hashids.default') . '.length');
+        $pattern  = '/^(?!undefined)[' . preg_quote($alphabet, '/') . ']{1,' . $length . '}$/';
 
         return (bool) preg_match($pattern, $key);
     }

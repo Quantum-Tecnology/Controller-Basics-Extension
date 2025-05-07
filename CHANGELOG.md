@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.5.7 (06/05/2025)
+
+# PT-BR
+
+- Ajustado um erro, onde era permitido passar valores inteiros para o decoder. @GustavoSantarosa
+
+# EN
+
+- Fixed an error where it was allowed to pass integer values to the decoder. @GustavoSantarosa
+
 ## V2.5.6 (06/05/2025)
 
 # PT-BR
