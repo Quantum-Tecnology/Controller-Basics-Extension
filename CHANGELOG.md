@@ -1,14 +1,14 @@
 # CHANGE LOG
 
-## X.X 
+## V2.5.8 (12/05/2025)
 
 # PT-BR
 
-- Somente verificar a chave que esta identificada
+- Somente verificar a chave que esta identificada. @bhcosta90 https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/6
 
 # EN
 
-- Only verify if the the key is identify
+- Only verify if the the key is identify. @bhcosta90 https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/6
 
 ## V2.5.7 (06/05/2025)
 
