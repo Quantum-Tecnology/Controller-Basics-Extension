@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## X.X 
+
+# PT-BR
+
+- Somente verificar a chave que esta identificada
+
+# EN
+
+- Only verify if the the key is identify
+
 ## V2.5.7 (06/05/2025)
 
 # PT-BR
