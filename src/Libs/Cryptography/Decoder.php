@@ -66,12 +66,6 @@ class Decoder
     {
         $inputs = $request->all();
 
-        abort_if(
-            collect($inputs)->flatten()->contains(fn ($value) => is_int($value)),
-            Response::HTTP_BAD_REQUEST,
-            __('Non-decodable values found in the request inputs.')
-        );
-
         array_walk($inputs, function (&$value, $key): void {
             if ($value && self::isIdentifier($key) && is_array($value)) {
                 $value = collect($value)->transform(function ($unit) {
@@ -83,6 +77,12 @@ class Decoder
         });
 
         array_walk_recursive($inputs, function (&$value, $key): void {
+            abort_if(
+                is_int($value) && self::isIdentifier($key),
+                Response::HTTP_BAD_REQUEST,
+                __('Non-decodable values found in the request inputs.')
+            );
+
             if ($value && is_string($value) && self::isIdentifier($key)) {
                 $value = collect(explode(',', $value))->transform(function ($unit) {
                     return current(Hashids::decode($unit));
