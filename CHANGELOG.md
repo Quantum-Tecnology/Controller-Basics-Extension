@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.6.0 (16/05/2025)
+
+# PT-BR
+
+- Implementado uma trait para bind de atributos. @GustavoSantarosa
+
+# EN
+
+- Implemented a trait for attribute binding. @GustavoSantarosa
+
 ## V2.5.8 (12/05/2025)
 
 # PT-BR

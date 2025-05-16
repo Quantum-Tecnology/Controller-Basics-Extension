@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 /**
- * TODO: Provavelmente esta trait vai ser reutilizada para outra finalidade, que é fazer o bind de atributos.
+ * @deprecated foi substituido pelo BindAttributesTrait
+ * @see BindAttributesTrait
+ * @since 2.5.8
  */
 trait FkChangeTrait
 {
