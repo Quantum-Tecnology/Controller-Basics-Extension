@@ -1,12 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
-/**
- * TODO: Provavelmente esta trait vai ser reutilizada para outra finalidade, que é fazer o bind de atributos.
- */
 trait BindAttributesTrait
 {
     public static function bootBindAttributesTrait(): void
@@ -15,12 +12,27 @@ trait BindAttributesTrait
             return;
         }
 
-        static::retrieved(function ($model) {
-            collect($model->getAttributes())->each(function ($value, $key) use ($model) {
-                if (($attribute = config("bind.attributes.{$key}")) !== null) {
-                    $model->setAttribute($attribute, $value);
-                }
-            });
+        static::retrieved(fn ($model) => $model->addBindAttributes());
+        static::saving(fn ($model) => $model->removeBindAttributes());
+    }
+
+    protected function addBindAttributes(): void
+    {
+        collect($this->getAttributes())->each(function ($value, $key) use ($this) {
+            if (($attribute = config("bind.attributes.{$key}")) !== null) {
+                $this->setAttribute($attribute, $value);
+            }
         });
+    }
+
+    protected function removeBindAttributes(): void
+    {
+        foreach (config('bind.attributes') as $key => $value) {
+            if (in_array($key, array_keys($this->getAttributes()))) {
+                $this->setAttribute($key, $this->getAttribute($value));
+                $this->{$key} = $this->getAttribute($value);
+                unset($this->{$value});
+            }
+        }
     }
 }
