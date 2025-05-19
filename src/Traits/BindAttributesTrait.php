@@ -18,7 +18,7 @@ trait BindAttributesTrait
 
     protected function addBindAttributes(): void
     {
-        collect($this->getAttributes())->each(function ($value, $key) use ($this) {
+        collect($this->getAttributes())->each(function ($value, $key) {
             if (($attribute = config("bind.attributes.{$key}")) !== null) {
                 $this->setAttribute($attribute, $value);
             }

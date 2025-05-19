@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.6.1 (19/05/2025)
+
+# PT-BR
+
+- Ajustado um erro que estava ocorrendo na trait bind. @gustavosantarosa
+
+# EN
+
+- Fixed an error that was occurring in the bind trait. @gustavosantarosa
+
 ## V2.6.0 (16/05/2025)
 
 # PT-BR
