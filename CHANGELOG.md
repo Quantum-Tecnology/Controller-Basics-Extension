@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.6.2 (19/05/2025)
+
+# PT-BR
+
+- Fixado um ajuste no removebind de bind trait. @gustavosantarosa
+
+# EN
+
+- Fixed an adjustment in the removebind of the bind trait. @gustavosantarosa
+
 ## V2.6.1 (19/05/2025)
 
 # PT-BR

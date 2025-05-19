@@ -28,7 +28,7 @@ trait BindAttributesTrait
     protected function removeBindAttributes(): void
     {
         foreach (config('bind.attributes') as $key => $value) {
-            if (in_array($key, array_keys($this->getAttributes()))) {
+            if (in_array($value, array_keys($this->getAttributes()))) {
                 $this->setAttribute($key, $this->getAttribute($value));
                 $this->{$key} = $this->getAttribute($value);
                 unset($this->{$value});
