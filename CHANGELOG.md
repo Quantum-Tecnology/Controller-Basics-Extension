@@ -14,6 +14,26 @@
 - Updated phpcsfixer rules to match other packages. @GustavoSantarosa
 - Dropped support for PHP 8.2, now requires PHP 8.3 or higher. @GustavoSantarosa
 
+## V2.6.2 (19/05/2025)
+
+# PT-BR
+
+- Fixado um ajuste no removebind de bind trait. @gustavosantarosa
+
+# EN
+
+- Fixed an adjustment in the removebind of the bind trait. @gustavosantarosa
+
+## V2.6.1 (19/05/2025)
+
+# PT-BR
+
+- Ajustado um erro que estava ocorrendo na trait bind. @gustavosantarosa
+
+# EN
+
+- Fixed an error that was occurring in the bind trait. @gustavosantarosa
+
 ## V2.6.0 (16/05/2025)
 
 # PT-BR
