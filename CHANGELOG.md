@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## X.X.X
+
+# PT-BR
+
+- Corrigindo a chave que busca o when loaded para includes, conforme o padrão @bhcosta90
+
+# EN
+
+- Fixing the key that searches for when loaded for includes, as per the standard
+
 ## V2.7.0 (20/05/2025)
 
 # PT-BR
