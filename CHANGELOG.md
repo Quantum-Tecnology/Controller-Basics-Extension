@@ -1,5 +1,13 @@
 # CHANGE LOG
 
+## X.X.X
+
+# PT-BR
+- Corrigindo a validação do decoder para headers, params e body @bhcosta90
+
+# EN
+- Correcting Decoder Validation for Headers, Params and Body @bhcosta90
+
 ## V2.6.0 (16/05/2025)
 
 # PT-BR
