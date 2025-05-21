@@ -1,5 +1,19 @@
 # CHANGE LOG
 
+## V2.7.0 (20/05/2025)
+
+# PT-BR
+
+- Corrigindo a validação do decoder para headers, params e body. @bhcosta90
+- Atualizado as regras do phpcsixer para se adequar aos demais pacotes. @GustavoSantarosa
+- O pacote, perdeu suporte para o php 8.2, agora somente para php 8.3 ou superior. @GustavoSantarosa
+
+# EN
+
+- Correcting Decoder Validation for Headers, Params and Body @bhcosta90
+- Updated phpcsfixer rules to match other packages. @GustavoSantarosa
+- Dropped support for PHP 8.2, now requires PHP 8.3 or higher. @GustavoSantarosa
+
 ## V2.6.0 (16/05/2025)
 
 # PT-BR
@@ -79,7 +93,6 @@
 # EN
 
 - Instead of checking the item comparison, let's compare the relationship. @bhcosta90 https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/5
-
 
 ## V2.5.1 (17/04/2025)
 

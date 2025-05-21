@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Controllers;
 
@@ -22,13 +22,13 @@ use QuantumTecnology\ControllerBasicsExtension\Traits\UpdateControllerTrait;
  */
 abstract class BaseController extends Controller implements ControllerInterface
 {
+    use BootControllerTrait;
+    use DestroyControllerTrait;
     use IndexControllerTrait;
+    use RestoreControllerTrait;
     use ShowControllerTrait;
     use StoreControllerTrait;
     use UpdateControllerTrait;
-    use DestroyControllerTrait;
-    use RestoreControllerTrait;
-    use BootControllerTrait;
 
     /*
      * Example.

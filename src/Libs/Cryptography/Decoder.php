@@ -16,14 +16,23 @@ class Decoder
      */
     public static function run(Request $request)
     {
-        self::decodeHeaders($request);
+        self::decodeHeaderParams($request);
         self::decodeRouteParams($request);
         self::decodeRouteInputs($request);
 
         return $request;
     }
 
-    private static function decodeHeaders(Request $request): void
+    protected static function abortIfInvalidIdentifier($key, $value, $sttribute): void
+    {
+        abort_if(
+            self::isIdentifier($key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
+            Response::HTTP_BAD_REQUEST,
+            __('Non-decodable values found in the request ' . $sttribute . '.')
+        );
+    }
+
+    private static function decodeHeaderParams(Request $request): void
     {
         foreach ($request->headers as $key => $value) {
             if (preg_match(config('hashids.headers.regex'), $key)) {
@@ -31,6 +40,8 @@ class Decoder
                 $decodedIds = [];
 
                 foreach (explode(',', $encodedIds) as $unit) {
+                    self::abortIfInvalidIdentifier($key, $unit, 'header-params');
+
                     $decoded = current(Hashids::decode($unit));
 
                     if (self::wasDecoded($decoded)) {
@@ -51,6 +62,7 @@ class Decoder
         foreach (($request->route()?->parameters() ?? []) as $key => $value) {
             if (self::isIdentifier($key)) {
                 throw_if(!self::hashIsValid($value), NotFoundHttpException::class);
+                self::abortIfInvalidIdentifier($key, $value, 'route-params');
                 $decoded = current(Hashids::decode($value));
 
                 if (self::wasDecoded($decoded)) {
@@ -77,11 +89,7 @@ class Decoder
         });
 
         array_walk_recursive($inputs, function (&$value, $key): void {
-            abort_if(
-                is_int($value) && self::isIdentifier($key),
-                Response::HTTP_BAD_REQUEST,
-                __('Non-decodable values found in the request inputs.')
-            );
+            self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
             if ($value && is_string($value) && self::isIdentifier($key)) {
                 $value = collect(explode(',', $value))->transform(function ($unit) {
@@ -116,7 +124,10 @@ class Decoder
      */
     private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
-        return preg_match(config('hashids.regex', ''), $paramKey) || preg_match($regexp, $paramKey) || in_array($paramKey, config('hashids.attributes', []));
+        return preg_match(config('hashids.regex', ''), $paramKey)
+            || preg_match(config('hashids.headers.regex', ''), $paramKey)
+            || preg_match($regexp, $paramKey)
+            || in_array($paramKey, config('hashids.attributes', []));
     }
 
     private static function hashIsValid(string $key): bool
