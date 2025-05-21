@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
  * Helpers.
  */
@@ -44,7 +46,7 @@ if (!function_exists('formatCnpjCpf')) {
             return $cnpjCpf = 'Não informado';
         }
 
-        if (11 === strlen($cnpjCpf)) {
+        if (11 === mb_strlen($cnpjCpf)) {
             return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", '$1.$2.$3-$4', $cnpjCpf);
         }
 
@@ -63,6 +65,7 @@ if (!function_exists('isSequentialValues')) {
         sort($arr);
 
         $indice = 0;
+
         for ($i = min($arr); $i <= max($arr); ++$i) {
             if ($i != $arr[$indice]) {
                 return false;
@@ -116,7 +119,7 @@ if (!function_exists('database')) {
     function database(
         bool $active = true,
         bool $refresh = false,
-    ): Illuminate\Database\Eloquent\Model|false {
+    ): Illuminate\Database\Eloquent\Model | false {
         return auth()->database(
             active: $active,
             refresh: $refresh,
@@ -147,9 +150,10 @@ if (!function_exists('getCardBrand')) {
             return 'amex';
         } elseif (preg_match($discover, $cardNumber)) {
             return 'discover';
-        } else {
-            return 'unknown';
         }
+
+        return 'unknown';
+
     }
 }
 
@@ -161,6 +165,7 @@ if (!function_exists('is_base64')) {
         }
 
         $decoded = base64_decode($s, true);
+
         if (false === $decoded) {
             return false;
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Http\JsonResponse;

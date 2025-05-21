@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Routing\Router;
@@ -24,7 +26,7 @@ class ControllerBasicsExtensionProvider extends ServiceProvider
     public function boot(Router $router)
     {
         $this->publishes([
-            __DIR__.'/../config/hashids.php' => config_path('hashids.php'),
+            __DIR__ . '/../config/hashids.php' => config_path('hashids.php'),
         ], 'config');
 
         /*

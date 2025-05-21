@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace QuantumTecnology\ControllerBasicsExtension\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
+use JsonException;
 use QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography\Decoder;
 use QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography\Encoder;
 use QuantumTecnology\HandlerBasicsExtension\Traits\ApiResponseTrait;
@@ -14,9 +18,9 @@ class CryptographyMiddleware
     /**
      * Handle an incoming request.
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
-    public function handle(Request $request, \Closure $next, bool $asLocal = false)
+    public function handle(Request $request, Closure $next, bool $asLocal = false)
     {
         // Run before application.
         $enabledForCryptography = $this->isEnabledForCryptography($request);

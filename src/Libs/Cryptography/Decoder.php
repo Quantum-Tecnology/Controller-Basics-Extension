@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography;
 
@@ -21,6 +21,15 @@ class Decoder
         self::decodeRouteInputs($request);
 
         return $request;
+    }
+
+    protected static function abortIfInvalidIdentifier($key, $value, $sttribute): void
+    {
+        abort_if(
+            self::isIdentifier($key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
+            Response::HTTP_BAD_REQUEST,
+            __('Non-decodable values found in the request ' . $sttribute . '.')
+        );
     }
 
     private static function decodeHeaderParams(Request $request): void
@@ -123,19 +132,10 @@ class Decoder
 
     private static function hashIsValid(string $key): bool
     {
-        $alphabet = config('hashids.connections.'.config('hashids.default').'.alphabet');
-        $length   = config('hashids.connections.'.config('hashids.default').'.length');
-        $pattern  = '/^(?!undefined)['.preg_quote($alphabet, '/').']{1,'.$length.'}$/';
+        $alphabet = config('hashids.connections.' . config('hashids.default') . '.alphabet');
+        $length   = config('hashids.connections.' . config('hashids.default') . '.length');
+        $pattern  = '/^(?!undefined)[' . preg_quote($alphabet, '/') . ']{1,' . $length . '}$/';
 
         return (bool) preg_match($pattern, $key);
-    }
-
-    protected static function abortIfInvalidIdentifier($key, $value, $sttribute): void
-    {
-        abort_if(
-            self::isIdentifier($key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
-            Response::HTTP_BAD_REQUEST,
-            __('Non-decodable values found in the request '.$sttribute.'.')
-        );
     }
 }

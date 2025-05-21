@@ -1,11 +1,29 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Routing\ResourceRegistrar as BaseResourceRegistrar;
 
 class EnhancedResourceProvider extends BaseResourceRegistrar
 {
+    /**
+     * Add the default resource routes to the router.
+     *
+     * @param string $name
+     * @param string $controller
+     *
+     * @return void
+     */
+    public function register($name, $controller, array $options = [])
+    {
+        parent::register($name, $controller, $options);
+
+        $this->addResourceRestore($name, $this->getResourceWildcard($name), $controller, $options);
+        $this->addResourceSummary($name, $this->getResourceWildcard($name), $controller, $options);
+    }
+
     /**
      * Add the restore method for a resource.
      *
@@ -40,21 +58,5 @@ class EnhancedResourceProvider extends BaseResourceRegistrar
             'as'   => "{$name}.summary",
             'uses' => "{$controller}@summary",
         ]);
-    }
-
-    /**
-     * Add the default resource routes to the router.
-     *
-     * @param string $name
-     * @param string $controller
-     *
-     * @return void
-     */
-    public function register($name, $controller, array $options = [])
-    {
-        parent::register($name, $controller, $options);
-
-        $this->addResourceRestore($name, $this->getResourceWildcard($name), $controller, $options);
-        $this->addResourceSummary($name, $this->getResourceWildcard($name), $controller, $options);
     }
 }

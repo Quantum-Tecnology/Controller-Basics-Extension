@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
+use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -19,8 +20,8 @@ trait BootControllerTrait
     use DispatchesJobs;
     use ValidatesRequests;
 
-    private string|BaseService $defaultService = DefaultService::class;
-    private string $defaultResource            = DefaultResource::class;
+    private string | BaseService $defaultService = DefaultService::class;
+    private string $defaultResource              = DefaultResource::class;
 
     public function booted(): void
     {
@@ -42,12 +43,12 @@ trait BootControllerTrait
 
         throw_if(
             empty($this->getResource()),
-            new \Exception('Resource must be defined in the '.request()->route()->getAction('controller').'.')
+            new Exception('Resource must be defined in the ' . request()->route()->getAction('controller') . '.')
         );
 
         throw_if(
             empty($this->getService()),
-            new \Exception('Service must be defined in the '.request()->route()->getAction('controller').'.')
+            new Exception('Service must be defined in the ' . request()->route()->getAction('controller') . '.')
         );
     }
 
