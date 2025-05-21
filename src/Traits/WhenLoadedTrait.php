@@ -8,8 +8,10 @@ trait WhenLoadedTrait
 {
     protected function whenLoaded($relationship, $value = null, $default = null): mixed
     {
+        $field = 'includes';
+
         return $this->when(
-            collect(explode(',', request()->input('include', '')))
+            request()->input($field) && collect(explode(',', request()->input($field, '')))
                 ->contains(fn ($item) => str_contains($relationship, $item)),
             parent::whenLoaded($relationship, $value, $default)
         );
