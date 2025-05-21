@@ -1,14 +1,14 @@
 # CHANGE LOG
 
-## X.X.X
+## V2.7.1 (21/05/2025)
 
 # PT-BR
 
-- Corrigindo a chave que busca o when loaded para includes, conforme o padrão @bhcosta90
+- Corrigindo a chave que busca o when loaded para includes, conforme o padrão. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/8
 
 # EN
 
-- Fixing the key that searches for when loaded for includes, as per the standard
+- Fixing the key that searches for when loaded for includes, as per the standard. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/8
 
 ## V2.7.0 (20/05/2025)
 
