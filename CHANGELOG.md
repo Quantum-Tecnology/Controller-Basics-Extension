@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.7.2 (24/05/2025)
+
+# PT-BR
+
+- Corrigindo um problema que ocorria no decoder, quando havia um array decodificavel de indice nao nominal. @GustavoSantarosa
+
+# EN
+
+- Fixing an issue that occurred in the decoder when there was a decodable array with a non-nominal index. @GustavoSantarosa
+
 ## V2.7.1 (21/05/2025)
 
 # PT-BR
