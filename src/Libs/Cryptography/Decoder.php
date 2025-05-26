@@ -26,7 +26,7 @@ class Decoder
     protected static function abortIfInvalidIdentifier($key, $value, $sttribute): void
     {
         abort_if(
-            self::isIdentifier((string) $key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
+            !blank($value) && self::isIdentifier($key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
             Response::HTTP_BAD_REQUEST,
             __('Non-decodable values found in the request ' . $sttribute . '.')
         );
@@ -78,10 +78,21 @@ class Decoder
     {
         $inputs = $request->all();
 
+        array_walk($inputs, function (&$value, $key): void {
+            if (!blank($value) && self::isIdentifier($key) && is_array($value)) {
+
+                $value = collect($value)->transform(function ($unit) {
+                    return current(Hashids::decode($unit));
+                })->filter(function ($decoded) {
+                    return self::wasDecoded($decoded);
+                })->all();
+            }
+        });
+
         array_walk_recursive($inputs, function (&$value, $key): void {
             self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
-            if ($value && is_string($value) && self::isIdentifier((string) $key)) {
+            if (!blank($value) && is_string($value) && self::isIdentifier($key)) {
                 $value = collect(explode(',', $value))->transform(function ($unit) {
                     return current(Hashids::decode($unit));
                 })->filter(function ($decoded) {
@@ -95,16 +106,6 @@ class Decoder
                 } elseif (!config('app.debug')) {
                     abort(Response::HTTP_BAD_REQUEST, "Error decoding hashids by Inputs ['{$key}': '{$value}'].");
                 }
-            }
-        });
-
-        array_walk($inputs, function (&$value, $key): void {
-            if ($value && self::isIdentifier($key) && is_array($value)) {
-                $value = collect($value)->transform(function ($unit) {
-                    return current(Hashids::decode($unit));
-                })->filter(function ($decoded) {
-                    return self::wasDecoded($decoded);
-                })->all();
             }
         });
 

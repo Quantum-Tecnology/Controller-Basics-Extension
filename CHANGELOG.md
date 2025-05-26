@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.7.3 (26/05/2025)
+
+# PT-BR
+
+- O hashid estava tentando decodificar null, e estava apresentando erro, corrigido, agora, ele só decodifica se for diferente de null. @GustavoSantarosa
+
+# EN
+
+- The hashid was trying to decode null and was throwing an error, fixed, now it only decodes if it is not null. @GustavoSantarosa
+
 ## V2.7.2 (24/05/2025)
 
 # PT-BR
