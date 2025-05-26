@@ -26,7 +26,7 @@ class Decoder
     protected static function abortIfInvalidIdentifier($key, $value, $sttribute): void
     {
         abort_if(
-            !blank($value) && self::isIdentifier($key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
+            !blank($value) && !is_int($value) && self::isIdentifier($key) && !($newValue = current(Hashids::decode($value))) && !is_int($newValue),
             Response::HTTP_BAD_REQUEST,
             __('Non-decodable values found in the request ' . $sttribute . '.')
         );
@@ -79,7 +79,7 @@ class Decoder
         $inputs = $request->all();
 
         array_walk($inputs, function (&$value, $key): void {
-            if (!blank($value) && self::isIdentifier($key) && is_array($value)) {
+            if (!blank($value) && !is_int($value) && self::isIdentifier($key) && is_array($value)) {
 
                 $value = collect($value)->transform(function ($unit) {
                     return current(Hashids::decode($unit));
@@ -123,7 +123,7 @@ class Decoder
     /**
      * Check if parameter is an identifier.
      */
-    private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
+    private static function isIdentifier(string|int $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
         return preg_match(config('hashids.regex', ''), $paramKey)
             || preg_match(config('hashids.headers.regex', ''), $paramKey)

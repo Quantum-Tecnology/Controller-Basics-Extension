@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.7.4 (26/05/2025)
+
+# PT-BR
+
+- Ajustado o decoder para quando for um array nao nomeado e existir algo. @GustavoSantarosa
+
+# EN
+
+- Adjusted the decoder for when it is an unnamed array and something exists. @GustavoSantarosa
+
 ## V2.7.3 (26/05/2025)
 
 # PT-BR
