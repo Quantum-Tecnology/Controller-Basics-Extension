@@ -1,6 +1,15 @@
 # CHANGE LOG
 
-## X.X.X
+## X.X.X 
+
+# PT-BR
+
+- condição em WhenLoadedTrait para verificar corretamente a contenção de relacionamento. @bhcosta90
+
+# EN
+
+- condition in WhenLoadedTrait to correctly check relationship containment. @bhcosta90
+
 
 ## V2.7.4 (26/05/2025)
 
