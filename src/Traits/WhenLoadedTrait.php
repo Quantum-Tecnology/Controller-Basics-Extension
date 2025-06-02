@@ -12,7 +12,7 @@ trait WhenLoadedTrait
 
         return $this->when(
             request()->input($field) && collect(explode(',', request()->input($field, '')))
-                ->contains(fn ($item) => str_contains($relationship, $item)),
+                ->contains(fn ($item) => str_contains($item, $relationship)),
             parent::whenLoaded($relationship, $value, $default)
         );
     }
