@@ -1,14 +1,14 @@
 # CHANGE LOG
 
-## X.X.X 
+## V2.7.5 (02/06/2025)
 
 # PT-BR
 
-- condição em WhenLoadedTrait para verificar corretamente a contenção de relacionamento. @bhcosta90
+- condição em WhenLoadedTrait para verificar corretamente a contenção de relacionamento. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/11
 
 # EN
 
-- condition in WhenLoadedTrait to correctly check relationship containment. @bhcosta90
+- condition in WhenLoadedTrait to correctly check relationship containment. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/11
 
 
 ## V2.7.4 (26/05/2025)
