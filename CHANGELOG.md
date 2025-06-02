@@ -1,14 +1,44 @@
 # CHANGE LOG
 
-## X.X.X
+## V2.7.4 (26/05/2025)
 
 # PT-BR
 
-- Corrigindo a chave que busca o when loaded para includes, conforme o padrão @bhcosta90
+- Ajustado o decoder para quando for um array nao nomeado e existir algo. @GustavoSantarosa
 
 # EN
 
-- Fixing the key that searches for when loaded for includes, as per the standard
+- Adjusted the decoder for when it is an unnamed array and something exists. @GustavoSantarosa
+
+## V2.7.3 (26/05/2025)
+
+# PT-BR
+
+- O hashid estava tentando decodificar null, e estava apresentando erro, corrigido, agora, ele só decodifica se for diferente de null. @GustavoSantarosa
+
+# EN
+
+- The hashid was trying to decode null and was throwing an error, fixed, now it only decodes if it is not null. @GustavoSantarosa
+
+## V2.7.2 (24/05/2025)
+
+# PT-BR
+
+- Corrigindo um problema que ocorria no decoder, quando havia um array decodificavel de indice nao nominal. @GustavoSantarosa
+
+# EN
+
+- Fixing an issue that occurred in the decoder when there was a decodable array with a non-nominal index. @GustavoSantarosa
+
+## V2.7.1 (21/05/2025)
+
+# PT-BR
+
+- Corrigindo a chave que busca o when loaded para includes, conforme o padrão. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/8
+
+# EN
+
+- Fixing the key that searches for when loaded for includes, as per the standard. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/8
 
 ## V2.7.0 (20/05/2025)
 
