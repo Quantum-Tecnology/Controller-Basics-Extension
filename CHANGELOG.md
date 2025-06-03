@@ -14,11 +14,11 @@
 
 # PT-BR
 
-- melhorar a lógica de ligação de atributos para excluir campos especificados. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/12
+- Melhorar a lógica de ligação de atributos para excluir campos especificados. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/12
 
 # EN
 
-- enhance attribute binding logic to exclude specified fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/12
+- Enhance attribute binding logic to exclude specified fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/12
 
 ## V2.7.5 (02/06/2025)
 
