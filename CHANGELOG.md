@@ -4,11 +4,21 @@
 
 # PT-BR
 
-- 
+-
 
 # EN
 
-- 
+-
+
+## V2.7.7 (03/06/2025)
+
+# PT-BR
+
+- Aprimorar o bindattributestestrait para se ligar condicionalmente atributos com base em campos preenchidos. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/13
+
+# EN
+
+- Enhance BindAttributesTrait to conditionally bind attributes based on fillable fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/13 
 
 ## V2.7.6 (03/06/2025)
 
