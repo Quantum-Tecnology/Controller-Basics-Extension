@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
+/**
+ * // TODO: Está em fase de desenvolvimento, não utilizar ainda. https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues/13
+ */
 trait BindAttributesTrait
 {
     public static function bootBindAttributesTrait(): void
@@ -29,8 +32,11 @@ trait BindAttributesTrait
     {
         foreach (config('bind.attributes') as $key => $value) {
             if (in_array($value, array_keys($this->getAttributes())) && !in_array($key, $this->exceptBindFields())) {
-                $this->setAttribute($key, $this->getAttribute($value));
-                $this->{$key} = $this->getAttribute($value);
+                if (in_array($value, $this->getFillable())) {
+                    $this->setAttribute($key, $this->getAttribute($value));
+                    $this->{$key} = $this->getAttribute($value);
+                }
+
                 unset($this->{$value});
             }
         }
@@ -39,5 +45,4 @@ trait BindAttributesTrait
     protected function exceptBindFields(): array {
         return [];
     }
-
 }
