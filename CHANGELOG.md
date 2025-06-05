@@ -1,14 +1,14 @@
 # CHANGE LOG
 
-## X.X.X
+## V2.7.8 (05/06/2025)
 
 # PT-BR
 
--
+- Corrigido um problema que ocorria no decoder, quando havia varios parametros separados por virgula, o decoder nao estava concluindo. @GustavoSantarosa
 
 # EN
 
--
+- Fixed an issue that occurred in the decoder when there were multiple parameters separated by commas, the decoder was not completing. @GustavoSantarosa
 
 ## V2.7.7 (03/06/2025)
 
