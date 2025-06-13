@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.7.9 (13/06/2025)
+
+# PT-BR
+
+- Feito um ajuste na bindAttributesTrait para lidar com atributos que não são preenchíveis. @bhcosta90
+
+# EN
+
+- Made an adjustment in the BindAttributesTrait to handle attributes that are not fillable. @bhcosta90
+
 ## V2.7.8 (05/06/2025)
 
 # PT-BR
