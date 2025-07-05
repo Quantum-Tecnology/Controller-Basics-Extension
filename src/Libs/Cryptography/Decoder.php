@@ -39,7 +39,7 @@ class Decoder
     private static function decodeHeaderParams(Request $request): void
     {
         foreach ($request->headers as $key => $value) {
-            if (preg_match(config('hashids.headers.regex'), $key)) {
+            if (preg_match(config('hashids.headers.regex'), (string) $key)) {
                 $encodedIds = $value[0];
                 $decodedIds = [];
 
@@ -129,9 +129,9 @@ class Decoder
      */
     private static function isIdentifier(string | int $paramKey, string $regexp = '/_id$|Id$/'): bool
     {
-        return preg_match(config('hashids.regex', ''), $paramKey)
-            || preg_match(config('hashids.headers.regex', ''), $paramKey)
-            || preg_match($regexp, $paramKey)
+        return preg_match(config('hashids.regex', ''), (string) $paramKey)
+            || preg_match(config('hashids.headers.regex', ''), (string) $paramKey)
+            || preg_match($regexp, (string) $paramKey)
             || in_array($paramKey, config('hashids.attributes', []));
     }
 
@@ -141,6 +141,6 @@ class Decoder
         $length   = config('hashids.connections.' . config('hashids.default') . '.length');
         $pattern  = '/^(?!undefined)[' . preg_quote($alphabet, '/') . ']{1,' . $length . '}$/';
 
-        return (bool) preg_match($pattern, $key);
+        return (bool) preg_match($pattern, (string) $key);
     }
 }

@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V2.7.10 (05/07/2025)
+
+# PT-BR
+
+- Corrigido um problema que ocorria no decoder, ao efetuar pregmatch, e era um array, estava tendo erro de tipagem. @GustavoSantarosa
+
+# EN
+
+- Fixed an issue that occurred in the decoder when performing pregmatch, and it was an array, there was a type error. @GustavoSantarosa
+
 ## V2.7.9 (13/06/2025)
 
 # PT-BR
