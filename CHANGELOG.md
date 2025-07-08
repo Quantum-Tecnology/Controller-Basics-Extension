@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## X.X.X
+
+# PT-BR
+
+- Alterando metodos protedigos para publico. @bhcosta90
+
+# EN
+
+- Change protected methods to public. @bhcosta90
+
 ## V2.7.10 (05/07/2025)
 
 # PT-BR
