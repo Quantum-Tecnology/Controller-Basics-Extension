@@ -6,24 +6,22 @@ namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Override;
 
-class ControllerBasicsExtensionProvider extends ServiceProvider
+final class ControllerBasicsExtensionProvider extends ServiceProvider
 {
     /**
      * Register services.
-     *
-     * @return void
      */
-    public function register()
+    #[Override]
+    public function register(): void
     {
     }
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
-    public function boot(Router $router)
+    public function boot(Router $router): void
     {
         $this->publishes([
             __DIR__ . '/../config/hashids.php' => config_path('hashids.php'),

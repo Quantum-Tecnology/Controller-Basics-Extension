@@ -5,36 +5,32 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Routing\ResourceRegistrar as BaseResourceRegistrar;
+use Override;
 
-class EnhancedResourceProvider extends BaseResourceRegistrar
+final class EnhancedResourceProvider extends BaseResourceRegistrar
 {
     /**
      * Add the default resource routes to the router.
      *
      * @param string $name
      * @param string $controller
-     *
-     * @return void
      */
-    public function register($name, $controller, array $options = [])
+    #[Override]
+    public function register($name, $controller, array $options = []): void
     {
         parent::register($name, $controller, $options);
 
-        $this->addResourceRestore($name, $this->getResourceWildcard($name), $controller, $options);
-        $this->addResourceSummary($name, $this->getResourceWildcard($name), $controller, $options);
+        $this->addResourceRestore($name, $controller);
+        $this->addResourceSummary($name, $controller);
     }
 
     /**
      * Add the restore method for a resource.
      *
      * @param string $name
-     * @param string $base
      * @param string $controller
-     * @param array  $options
-     *
-     * @return void
      */
-    protected function addResourceRestore($name, $base, $controller, $options)
+    private function addResourceRestore($name, $controller): void
     {
         $this->router->post("{$name}/{id}/restore", [
             'as'   => "{$name}.restore",
@@ -46,13 +42,9 @@ class EnhancedResourceProvider extends BaseResourceRegistrar
      * Add the summary method for a resource.
      *
      * @param string $name
-     * @param string $base
      * @param string $controller
-     * @param array  $options
-     *
-     * @return void
      */
-    protected function addResourceSummary($name, $base, $controller, $options)
+    private function addResourceSummary($name, $controller): void
     {
         $this->router->get("{$name}/summary", [
             'as'   => "{$name}.summary",
