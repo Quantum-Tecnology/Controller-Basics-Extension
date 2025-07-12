@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\QueryBuilder\GenerateQuery;
-use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginateSupport;
 use ReflectionClass;
 use stdClass;
@@ -217,14 +216,6 @@ final readonly class GenericPresenter
 
     public function getAllModelAttributes(Model $model): array
     {
-        if (!config('app.debug')) {
-            LogSupport::add(__('You cannot return all the attributes of the model: model', [
-                'model' => $model::class,
-            ]));
-
-            return [$model->getKeyName()];
-        }
-
         $attributes = $model->getAttributes();
 
         foreach ((new ReflectionClass($model))->getMethods() as $method) {
