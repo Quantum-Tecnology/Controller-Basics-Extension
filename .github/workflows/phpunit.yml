@@ -1,26 +1,38 @@
-name: PHPUnit
+name: "Run Tests - Current"
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  run:
+  test:
+
     runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
-        php: [8.3, 8.4]
+        php: [8.4, 8.3]
+        laravel: ["^12.0"]
+        dependency-version: [prefer-stable]
+        include:
+          - laravel: "^12.0"
+            testbench: 10.*
 
-    name: PHP ${{ matrix.php }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: xdebug
-      - run: composer install --prefer-dist --no-interaction
-      - run: vendor/bin/phpunit --coverage-text
+          extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.72.6" --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: vendor/bin/pest
