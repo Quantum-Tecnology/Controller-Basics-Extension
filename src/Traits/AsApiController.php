@@ -235,7 +235,11 @@ trait AsApiController
 
                 if ($model->{$key}() instanceof Relations\BelongsToMany) {
                     $belongsToMany = $model->{$key}()->getRelated();
-                    $ids[]         = $belongsToMany->create($value2);
+                    ksort($value2);
+
+                    if (!isset($ids[json_encode($value2)])) {
+                        $ids[json_encode($value2)] = $belongsToMany->create($value2);
+                    }
                 }
 
                 if (filled($dataArray)) {
