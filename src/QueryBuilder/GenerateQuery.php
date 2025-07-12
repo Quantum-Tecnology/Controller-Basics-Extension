@@ -7,7 +7,6 @@ namespace QuantumTecnology\ControllerBasicsExtension\QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
-use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GenericPresenter;
 
 final readonly class GenerateQuery
@@ -71,37 +70,5 @@ final readonly class GenerateQuery
                 };
             }
         }
-    }
-
-    /**
-     * Aplica filtro via whereHas para relacionamento aninhado.
-     *
-     * @param string $relationPath Exemplo: 'comments.commentsData'
-     * @param array  $values       Operadores e valores para filtro no relacionamento
-     */
-    private function addWhereHasFilter(Builder $query, string $relationPath, array $values): void
-    {
-        $segments = explode('.', $relationPath);
-        $field    = array_pop($segments);
-        $relation = implode('.', $segments);
-
-        $query->whereHas($relation, function (Builder $q) use ($field, $values): void {
-            foreach ($values as $operator => $data) {
-                $model = $q->getModel();
-                $table = $model->getTable();
-                $camel = Str::camel($field);
-
-                if (method_exists($model, $camel)) {
-                    // Se quiser, trate filtros ainda mais aninhados recursivamente aqui
-                    // Por simplicidade, ignoramos aqui para evitar complexidade
-                    continue;
-                }
-
-                match ($operator) {
-                    'in'    => $q->whereIn("{$table}.{$field}", $data),
-                    default => $q->where("{$table}.{$field}", $operator, $data),
-                };
-            }
-        });
     }
 }
