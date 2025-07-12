@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 
 use BackedEnum;
-use Carbon\CarbonImmutable;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
@@ -55,8 +55,8 @@ final readonly class GenericPresenter
                 $output[$field] = collect($value)->only($nested)->toArray();
             } else {
                 $output[$field] = match (true) {
-                    $value instanceof CarbonImmutable => $value->toDateTimeString(),
-                    $value instanceof BackedEnum      => [
+                    $value instanceof DateTimeInterface => $value->toDateTimeString(),
+                    $value instanceof BackedEnum        => [
                         'type'  => 'enum',
                         'value' => $value->value,
                         'key'   => $value->name,

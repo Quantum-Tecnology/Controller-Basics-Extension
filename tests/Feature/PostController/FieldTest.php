@@ -41,12 +41,29 @@ test('it returns a list of posts with selected author fields', function () {
 });
 
 test('a', function () {
-    Post::factory()->create();
-
-    config(['app.debug' => false]);
+    $post   = Post::factory()->create();
+    $author = $post->author;
 
     getJson(route('posts.index', [
         'fields' => 'author[*]',
     ]))
-        ->dump();
+        ->assertJson([
+            'data' => [
+                [
+                    'author' => [
+                        'id'         => $author->id,
+                        'name'       => $author->name,
+                        'created_at' => $author->created_at->toDateTimeString(),
+                        //                        'updated_at'  => $author->updated_at,
+                        'deleted_at'  => null,
+                        'use_factory' => null,
+                        'actions'     => [
+                            'can_delete' => true,
+                            'can_update' => false,
+                        ],
+                    ],
+                ],
+            ],
+        ])
+        ->assertOk();
 });
