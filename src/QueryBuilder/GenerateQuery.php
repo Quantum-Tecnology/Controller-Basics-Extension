@@ -27,10 +27,8 @@ final readonly class GenerateQuery
 
         $genericPresenter = app(GenericPresenter::class);
 
-        // Aplica os filtros corretamente (tratando filtros aninhados)
         $this->addWhereWithFilters($query, $filters[$this->model::class] ?? []);
 
-        // Pega os includes de relacionamentos (apenas strings, conforme ajuste anterior)
         if (filled($allIncludes = $genericPresenter->getIncludes(
             $this->model,
             $fields,
@@ -42,7 +40,6 @@ final readonly class GenerateQuery
             $query->with($allIncludes);
         }
 
-        // Pega os withCount para relacionamentos HasMany
         if (filled($allCount = $genericPresenter->getWithCount($this->model, $allIncludes))) {
             $query->withCount($allCount);
         }
@@ -51,7 +48,7 @@ final readonly class GenerateQuery
     }
 
     /**
-     * Aplica filtros no query builder, tratando filtros simples e filtros em relacionamentos aninhados via whereHas.
+     * Apply filters to Query Builder, treating simple filters and filters in nested relationships via whereHas.
      *
      * @param array $filters Exemplo: ['id' => ['=' => 5], 'comments.status' => ['in' => [1,2]], ...]
      */

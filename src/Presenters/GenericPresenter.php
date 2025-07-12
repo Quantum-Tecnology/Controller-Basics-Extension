@@ -122,9 +122,10 @@ final readonly class GenericPresenter
                     $offset               = ($page - 1) * $perPage;
                     $currentPathUnderline = str_replace('.', '_', $currentPath);
                     $filterOfInclude      = $filters[$currentPathUnderline] ?? [];
+                    $currentPathCamelCase = Str::camel($currentPath);
 
-                    if (!isset($processedPaths[$currentPath])) {
-                        $includes[$currentPath] = fn ($query) => ($this->getQueryCallable(
+                    if (!isset($processedPaths[$currentPathCamelCase])) {
+                        $includes[$currentPathCamelCase] = fn ($query) => ($this->getQueryCallable(
                             $query,
                             $classCallable,
                             $filterOfInclude,
