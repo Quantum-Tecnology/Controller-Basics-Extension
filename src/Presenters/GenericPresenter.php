@@ -6,6 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 
 use BackedEnum;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Support\Str;
@@ -345,7 +346,7 @@ final readonly class GenericPresenter
     }
 
     private function getQueryCallable(
-        \Illuminate\Database\Eloquent\Builder $query,
+        Builder | Relations\HasMany $query,
         ?object $classCallable,
         array $filters,
         ?string $action,
