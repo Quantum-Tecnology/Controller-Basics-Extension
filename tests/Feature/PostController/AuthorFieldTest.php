@@ -40,7 +40,7 @@ test('it returns a list of posts with selected author fields', function () {
         ->assertOk();
 });
 
-test('a', function () {
+test('it returns a list of posts with all author fields', function () {
     $post   = Post::factory()->create();
     $author = $post->author;
 
@@ -51,10 +51,10 @@ test('a', function () {
             'data' => [
                 [
                     'author' => [
-                        'id'         => $author->id,
-                        'name'       => $author->name,
-                        'created_at' => $author->created_at->toDateTimeString(),
-                        //                        'updated_at'  => $author->updated_at,
+                        'id'          => $author->id,
+                        'name'        => $author->name,
+                        'created_at'  => $author->created_at->toDateTimeString(),
+                        'updated_at'  => $author->updated_at->toDateTimeString(),
                         'deleted_at'  => null,
                         'use_factory' => null,
                         'actions'     => [
