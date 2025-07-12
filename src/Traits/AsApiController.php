@@ -248,7 +248,7 @@ trait AsApiController
             }
 
             if (filled($ids)) {
-                $model->{$key}()->sync($ids);
+                $model->{$key}()->attach($ids);
             }
         }
     }
