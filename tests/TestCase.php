@@ -34,7 +34,8 @@ abstract class TestCase extends BaseTestCase
 
         $schema->create('authors', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
+            $table->string('name');
+            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -42,6 +43,7 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('author_id')->constrained('authors');
             $table->string('title');
+            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -49,6 +51,7 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('post_id')->constrained('posts');
             $table->string('title');
+            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -56,6 +59,7 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('comment_id')->constrained('comments');
             $table->unsignedTinyInteger('like');
+            $table->timestamps();
             $table->softDeletes();
         });
 
@@ -63,12 +67,14 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('post_id')->constrained('posts');
             $table->unsignedTinyInteger('like');
+            $table->timestamps();
             $table->softDeletes();
         });
 
         $schema->create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->timestamps();
             $table->softDeletes();
         });
 
