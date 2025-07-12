@@ -140,7 +140,6 @@ final readonly class GenericPresenter
                             $currentPath,
                             $offset,
                             $limit,
-                            $relation,
                             $filters,
                             $relationsFromFields,
                         ) {
@@ -152,27 +151,19 @@ final readonly class GenericPresenter
                                 $currentPath
                             ) ?: $query;
 
-                            if (
-                                $relation instanceof Relations\HasMany
-                                || $relation instanceof Relations\HasOne
-                                || $relation instanceof Relations\BelongsToMany
-                            ) {
-                                if ('comments' === $currentPath) {
-                                    $filtered      = array_filter($relationsFromFields, fn ($item) => str_starts_with($item, 'comments.'));
-                                    $withoutPrefix = array_map(fn ($item) => Str::after(Str::camel($item), 'comments.'), $filtered);
+                            $filtered      = array_filter($relationsFromFields, fn ($item): bool => str_starts_with($item, $currentPath . '.'));
+                            $withoutPrefix = array_map(fn ($item) => Str::after(Str::camel($item), $currentPath . '.'), $filtered);
 
-                                    foreach ($withoutPrefix as $value) {
-                                        $query->withCount([
-                                            Str::camel($value) => fn ($query) => $this->getQueryCallable(
-                                                $query,
-                                                $classCallable,
-                                                $filters[$currentPath . '_' . Str::snake($value)] ?? [],
-                                                $action,
-                                                $currentPath . '_' . Str::snake($value)
-                                            ),
-                                        ]);
-                                    }
-                                }
+                            foreach ($withoutPrefix as $value) {
+                                $query->withCount([
+                                    Str::camel($value) => fn ($query): null => $this->getQueryCallable(
+                                        $query,
+                                        $classCallable,
+                                        $filters[$currentPath . '_' . Str::snake($value)] ?? [],
+                                        $action,
+                                        $currentPath . '_' . Str::snake($value)
+                                    ),
+                                ]);
                             }
 
                             return $query->offset($offset)->limit($limit);
@@ -241,7 +232,7 @@ final readonly class GenericPresenter
                 if ($relation instanceof Relations\HasMany
                     || $relation instanceof Relations\HasOne
                     || $relation instanceof Relations\BelongsToMany) {
-                    $withCount[$relationPath] = fn ($query) => $this->getQueryCallable(
+                    $withCount[$relationPath] = fn ($query): null => $this->getQueryCallable(
                         $query,
                         $this,
                         $filters[$relationPath] ?? [],

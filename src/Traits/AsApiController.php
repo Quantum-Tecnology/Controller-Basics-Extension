@@ -154,7 +154,7 @@ trait AsApiController
                 }
 
                 // Normalize values
-                $parsedValues = array_map(static function ($v) {
+                $parsedValues = array_map(static function ($v): int | string {
                     $v = mb_trim((string) $v);
 
                     return is_numeric($v) ? (int) $v : $v;
@@ -186,9 +186,9 @@ trait AsApiController
             foreach ($fields as $field => &$operators) {
                 foreach ($operators as $operator => &$values) {
                     // Remove empty/null/blank values from the values array
-                    $values = array_filter($values, fn ($v) => !(null === $v || '' === $v || [] === $v));
+                    $values = array_filter($values, fn ($v): bool => !(null === $v || '' === $v || [] === $v));
 
-                    if (empty($values)) {
+                    if ([] === $values) {
                         unset($operators[$operator]);
                     } else {
                         $operators[$operator] = array_values($values); // reindex
