@@ -6,6 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\QueryBuilder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GenericPresenter;
 
@@ -52,8 +53,10 @@ final readonly class GenerateQuery
      *
      * @param array $filters Exemplo: ['id' => ['=' => 5], 'comments.status' => ['in' => [1,2]], ...]
      */
-    public function addWhereWithFilters(Builder $query, array $filters = []): void
-    {
+    public function addWhereWithFilters(
+        Builder | Relations\HasMany | Relations\BelongsToMany $query,
+        array $filters = []
+    ): void {
         foreach ($filters as $field => $values) {
             if (str_contains($field, '.')) {
                 // Campo em relacionamento aninhado — usa whereHas
