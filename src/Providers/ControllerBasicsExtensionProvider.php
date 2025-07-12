@@ -6,7 +6,6 @@ namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
-use Override;
 use QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware;
 
 final class ControllerBasicsExtensionProvider extends ServiceProvider
@@ -14,7 +13,6 @@ final class ControllerBasicsExtensionProvider extends ServiceProvider
     /**
      * Register services.
      */
-    #[Override]
     public function register(): void
     {
         foreach ([

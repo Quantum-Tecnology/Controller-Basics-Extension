@@ -5,13 +5,12 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 
 use BackedEnum;
-use Carbon\CarbonImmutable;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\QueryBuilder\GenerateQuery;
-use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginateSupport;
 use ReflectionClass;
 use stdClass;
@@ -56,8 +55,8 @@ final readonly class GenericPresenter
                 $output[$field] = collect($value)->only($nested)->toArray();
             } else {
                 $output[$field] = match (true) {
-                    $value instanceof CarbonImmutable => $value->toDateTimeString(),
-                    $value instanceof BackedEnum      => [
+                    $value instanceof DateTimeInterface => $value->toDateTimeString(),
+                    $value instanceof BackedEnum        => [
                         'type'  => 'enum',
                         'value' => $value->value,
                         'key'   => $value->name,
@@ -134,15 +133,41 @@ final readonly class GenericPresenter
                     $currentPathCamelCase = Str::camel($currentPath);
 
                     if (!isset($processedPaths[$currentPathCamelCase])) {
-                        $includes[$currentPathCamelCase] = fn ($query) => ($this->getQueryCallable(
-                            $query,
+                        $includes[$currentPathCamelCase] = function ($query) use (
                             $classCallable,
                             $filterOfInclude,
                             $action,
                             $currentPath,
-                        ) ?: $query)
-                            ->offset($offset)
-                            ->limit($limit);
+                            $offset,
+                            $limit,
+                            $filters,
+                            $relationsFromFields,
+                        ) {
+                            $query = $this->getQueryCallable(
+                                $query,
+                                $classCallable,
+                                $filterOfInclude,
+                                $action,
+                                $currentPath
+                            ) ?: $query;
+
+                            $filtered      = array_filter($relationsFromFields, fn ($item): bool => str_starts_with($item, $currentPath . '.'));
+                            $withoutPrefix = array_map(fn ($item) => Str::after(Str::camel($item), $currentPath . '.'), $filtered);
+
+                            foreach ($withoutPrefix as $value) {
+                                $query->withCount([
+                                    Str::camel($value) => fn ($query): null => $this->getQueryCallable(
+                                        $query,
+                                        $classCallable,
+                                        $filters[$currentPath . '_' . Str::snake($value)] ?? [],
+                                        $action,
+                                        $currentPath . '_' . Str::snake($value)
+                                    ),
+                                ]);
+                            }
+
+                            return $query->offset($offset)->limit($limit);
+                        };
                         $processedPaths[$currentPath] = true;
                     }
                 } elseif (!in_array($currentPath, $includes, true) && !isset($processedPaths[$currentPath])) {
@@ -188,7 +213,7 @@ final readonly class GenericPresenter
         return $includes;
     }
 
-    public function getWithCount(Model $model, array $allIncludes): array
+    public function getWithCount(Model $model, array $allIncludes, array $filters): array
     {
         $withCount = [];
 
@@ -207,7 +232,13 @@ final readonly class GenericPresenter
                 if ($relation instanceof Relations\HasMany
                     || $relation instanceof Relations\HasOne
                     || $relation instanceof Relations\BelongsToMany) {
-                    $withCount[] = $relationPath;
+                    $withCount[$relationPath] = fn ($query): null => $this->getQueryCallable(
+                        $query,
+                        $this,
+                        $filters[$relationPath] ?? [],
+                        'getWithCount',
+                        $relationPath,
+                    );
                 }
             }
         }
@@ -217,14 +248,6 @@ final readonly class GenericPresenter
 
     public function getAllModelAttributes(Model $model): array
     {
-        if (!config('app.debug')) {
-            LogSupport::add(__('You cannot return all the attributes of the model: model', [
-                'model' => $model::class,
-            ]));
-
-            return [$model->getKeyName()];
-        }
-
         $attributes = $model->getAttributes();
 
         foreach ((new ReflectionClass($model))->getMethods() as $method) {
@@ -268,7 +291,7 @@ final readonly class GenericPresenter
             }
         }
 
-        return $relationsFromFields;
+        return array_values(array_unique($relationsFromFields));
     }
 
     private function handleIncludePath(Model | stdClass $model, array &$output, $fields, array $pagination, $segments, $pathSoFar): void

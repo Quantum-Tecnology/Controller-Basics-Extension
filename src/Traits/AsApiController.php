@@ -97,18 +97,18 @@ trait AsApiController
             'classCallable' => $this,
             'action'        => $action,
         ])->execute(
-            fields: $data['fields'] ?? [],
+            fields: $data['fields'] ?? '',
             pagination: app(PaginateSupport::class)->extractPagination($data),
             filters: $this->extractFilter($data),
         );
 
         if (config('app.debug')) {
             match (true) {
-                request()->has('dd')       => $query->dd(),
-                request()->has('dump')     => $query->dump(),
-                request()->has('dd_raw')   => $query->ddRawSql(),
-                request()->has('dump_raw') => $query->dumpRawSql(),
-                default                    => false,
+                $request->has('dd')       => $query->dd(),
+                $request->has('dump')     => $query->dump(),
+                $request->has('dd_raw')   => $query->ddRawSql(),
+                $request->has('dump_raw') => $query->dumpRawSql(),
+                default                   => false,
             };
         }
 
@@ -139,77 +139,74 @@ trait AsApiController
         $filters = [];
 
         foreach ($input as $key => $value) {
-            if (preg_match('/^filter_(.+?)(?:\[(.+)\])?$/', $key, $matches)) {
-                $rawPath  = $matches[1];
-                $operator = $matches[2] ?? null;
+            if (preg_match('/^filter_([^\(]+)\(([^\),]+)(?:,([^\)]+))?\)$/', $key, $matches)) {
+                $relationPath = $matches[1];
+                $field        = $matches[2];
+                $operator     = $matches[3] ?? '=';
 
-                $segments     = explode('_', $rawPath);
-                $field        = array_pop($segments);
-                $isBy         = 'by' === end($segments);
-                $relationPath = in_array(implode('_', $segments), ['', '0'], true) ? $this->model()::class : implode('_', $segments);
-
-                if ($isBy) {
-                    $field        = 'by_' . $field;
-                    $relationPath = mb_substr($relationPath, 0, -3);
-                }
-
-                if (is_array($value) && null === $operator) {
-                    foreach ($value as $op => $val) {
-                        $parsedValues = is_string($val)
-                            ? explode('|', $val)
-                            : (array) $val;
-
-                        $parsedValues = array_map(function ($v): int | string {
-                            $v = mb_trim($v);
-
-                            return is_numeric($v) ? (int) $v : $v;
-                        }, $parsedValues);
-
-                        $filters[$relationPath][$field][$op] = $parsedValues;
-                    }
+                // Split values by comma or pipe
+                if (is_string($value)) {
+                    $parsedValues = preg_split('/[,\|]/', $value);
+                } elseif (is_array($value)) {
+                    $parsedValues = $value;
                 } else {
-                    if (is_array($value)) {
-                        $parsedValues = $value;
-                    } elseif (is_string($value)) {
-                        $parsedValues = explode('|', $value);
-                    } else {
-                        $parsedValues = [$value];
-                    }
-
-                    $parsedValues = array_map(function ($v): int | string {
-                        $v = mb_trim($v ?: '');
-
-                        return is_numeric($v) ? (int) $v : $v;
-                    }, $parsedValues);
-
-                    $filters[$relationPath][$field][$operator ?? 'in'] = $parsedValues;
+                    $parsedValues = [$value];
                 }
+
+                // Normalize values
+                $parsedValues = array_map(static function ($v): int | string {
+                    $v = mb_trim((string) $v);
+
+                    return is_numeric($v) ? (int) $v : $v;
+                }, $parsedValues);
+
+                $filters[$relationPath][$field][$operator] = $parsedValues;
             }
         }
 
         return $this->cleanFilters($filters);
-
     }
 
+    /**
+     * filter_comments_comments_data(post_id,>=) = 1,2
+     * filter_comments(id) = 3,4
+     * filter(id) = 10,20
+     * filter_comments_comments_data(post_id,<=) = 3,4.
+     *
+     * devo retornar assim para mim
+     * [
+     * "comments_comments_data" => ["post_id" => ["<=" => [1, 2], ">=" => [3, 4]]],
+     * "comments" => ["id" => ["=" => [1]]]
+     * "__default__" => ["id" => ["=" => [10,20]]]
+     * ]
+     */
     protected function cleanFilters(array $filters): array
     {
-        foreach ($filters as $relation => $fields) {
-            foreach ($fields as $field => $operators) {
-                foreach ($operators as $operator => $values) {
-                    if (empty($values) || (is_array($values) && 0 === count(array_filter($values, fn ($v): bool => null !== $v && '' !== $v && [] !== $v)))) {
-                        unset($filters[$relation][$field][$operator]);
+        foreach ($filters as $relation => &$fields) {
+            foreach ($fields as $field => &$operators) {
+                foreach ($operators as $operator => &$values) {
+                    // Remove empty/null/blank values from the values array
+                    $values = array_filter($values, fn ($v): bool => !(null === $v || '' === $v || [] === $v));
+
+                    if ([] === $values) {
+                        unset($operators[$operator]);
+                    } else {
+                        $operators[$operator] = array_values($values); // reindex
                     }
                 }
+                unset($values);
 
-                if (empty($filters[$relation][$field])) {
-                    unset($filters[$relation][$field]);
+                if (empty($operators)) {
+                    unset($fields[$field]);
                 }
             }
+            unset($operators);
 
-            if (empty($filters[$relation])) {
+            if (empty($fields)) {
                 unset($filters[$relation]);
             }
         }
+        unset($fields);
 
         return $filters;
     }

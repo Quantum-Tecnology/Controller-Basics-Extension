@@ -6,7 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\QueryBuilder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GenericPresenter;
 
 final readonly class GenerateQuery
@@ -40,7 +40,7 @@ final readonly class GenerateQuery
             $query->with($allIncludes);
         }
 
-        if (filled($allCount = $genericPresenter->getWithCount($this->model, $allIncludes))) {
+        if (filled($allCount = $genericPresenter->getWithCount($this->model, $allIncludes, $filters))) {
             $query->withCount($allCount);
         }
 
@@ -52,64 +52,23 @@ final readonly class GenerateQuery
      *
      * @param array $filters Exemplo: ['id' => ['=' => 5], 'comments.status' => ['in' => [1,2]], ...]
      */
-    public function addWhereWithFilters(Builder $query, array $filters = []): void
-    {
-        foreach ($filters as $field => $values) {
-            if (str_contains($field, '.')) {
-                // Campo em relacionamento aninhado — usa whereHas
-                $this->addWhereHasFilter($query, $field, $values);
+    public function addWhereWithFilters(
+        Builder | Relations\HasMany | Relations\BelongsToMany $query,
+        array $filters = []
+    ): void {
+        if (blank($filters)) {
+            return;
+        }
+        $model = $query->getModel();
+        $table = $model->getTable();
 
-                continue;
-            }
-
-            foreach ($values as $operator => $data) {
-                $model = $query->getModel();
-                $table = $model->getTable();
-                $camel = Str::camel($field);
-
-                if (method_exists($model, $camel)) {
-                    // Aqui você pode implementar filtro via método de relacionamento, se quiser.
-                    // Por segurança, ignoramos para não chamar método direto.
-                    continue;
-                }
-
+        foreach ($filters as $column => $value) {
+            foreach ($value as $operator => $data) {
                 match ($operator) {
-                    'in'    => $query->whereIn("{$table}.{$field}", $data),
-                    default => $query->where("{$table}.{$field}", $operator, $data),
+                    '='     => $query->whereIn("{$table}.{$column}", $data),
+                    default => $query->where("{$table}.{$column}", $operator, $data[0]),
                 };
             }
         }
-    }
-
-    /**
-     * Aplica filtro via whereHas para relacionamento aninhado.
-     *
-     * @param string $relationPath Exemplo: 'comments.commentsData'
-     * @param array  $values       Operadores e valores para filtro no relacionamento
-     */
-    private function addWhereHasFilter(Builder $query, string $relationPath, array $values): void
-    {
-        $segments = explode('.', $relationPath);
-        $field    = array_pop($segments);
-        $relation = implode('.', $segments);
-
-        $query->whereHas($relation, function (Builder $q) use ($field, $values): void {
-            foreach ($values as $operator => $data) {
-                $model = $q->getModel();
-                $table = $model->getTable();
-                $camel = Str::camel($field);
-
-                if (method_exists($model, $camel)) {
-                    // Se quiser, trate filtros ainda mais aninhados recursivamente aqui
-                    // Por simplicidade, ignoramos aqui para evitar complexidade
-                    continue;
-                }
-
-                match ($operator) {
-                    'in'    => $q->whereIn("{$table}.{$field}", $data),
-                    default => $q->where("{$table}.{$field}", $operator, $data),
-                };
-            }
-        });
     }
 }
