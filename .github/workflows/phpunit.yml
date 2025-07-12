@@ -3,7 +3,29 @@ name: Run Tests - Current
 on: [push, pull_request]
 
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Run Rector
+        run: vendor/bin/rector process
+      - name: Fix styling issues
+        uses: aglipanci/laravel-pint-action@0.1.0
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Fix styling
   test:
+    needs: format
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
