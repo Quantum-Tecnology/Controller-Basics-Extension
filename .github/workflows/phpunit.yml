@@ -11,15 +11,15 @@ jobs:
       matrix:
         php: [8.4, 8.3, 8.2]
         laravel: ["^12.0", "^11.0", "^10.0"]
-        dependency-version: [prefer-stable]
-        #dependency-version: [prefer-lowest, prefer-stable]
+        #dependency-version: [ prefer-lowest, prefer-stable ]
+        dependency-version: [ prefer-stable ]
         include:
           - laravel: "^12.0"
-            test-orchestra: 10.*
+            testbench: 10.*
           - laravel: "^11.0"
-            test-orchestra: 9.*
+            testbench: 9.*
           - laravel: "^10.0"
-            test-orchestra: 8.*
+            testbench: 8.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -34,9 +34,13 @@ jobs:
           extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, iconv
           coverage: none
 
+      - name: Install dependencies (remove passport)
+        run: composer remove --dev laravel/passport --no-interaction --no-update
+        if: matrix.laravel == '^8.12'
+
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/test-orchestra:${{ matrix.test-orchestra }}" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.72.6" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "symfony/console:>=4.3.4" "mockery/mockery:^1.3.2" "nesbot/carbon:>=2.72.6" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Execute tests
