@@ -4,7 +4,7 @@
   "homepage": "http://www.gustavosantarosa.esy.es/",
   "description": "Controller Basics Extension",
   "require": {
-    "php": "^8.3",
+    "php": "^8.2",
     "quantumtecnology/service-basics-extension": "^2.0 | ^2.1",
     "vinkla/hashids": "^13.0 | ^12.0"
   },

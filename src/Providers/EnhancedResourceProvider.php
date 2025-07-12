@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Routing\ResourceRegistrar as BaseResourceRegistrar;
-use Override;
 
 class EnhancedResourceProvider extends BaseResourceRegistrar
 {
@@ -15,7 +14,6 @@ class EnhancedResourceProvider extends BaseResourceRegistrar
      * @param string $name
      * @param string $controller
      */
-    #[Override]
     public function register($name, $controller, array $options = []): void
     {
         parent::register($name, $controller, $options);
