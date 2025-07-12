@@ -19,7 +19,7 @@ trait AsApiController
 {
     abstract protected function model(): Model;
 
-    final public function index(Request $request, PaginateSupport $paginateSupport): AnonymousResourceCollection
+    public function index(Request $request, PaginateSupport $paginateSupport): AnonymousResourceCollection
     {
         $query = $this->queryModel($request, __FUNCTION__);
 
@@ -31,7 +31,7 @@ trait AsApiController
         return GenericResource::collection($models);
     }
 
-    final public function store(): GenericResource
+    public function store(): GenericResource
     {
         $request = app($this->getNamespaceRequest('store'));
 
@@ -57,12 +57,12 @@ trait AsApiController
         });
     }
 
-    final public function show(Request $request): GenericResource
+    public function show(Request $request): GenericResource
     {
         return new GenericResource($this->findByOne($request));
     }
 
-    final public function update(): GenericResource
+    public function update(): GenericResource
     {
         $request = app($this->getNamespaceRequest('update'));
         $model   = $this->findByOne($request);
@@ -72,7 +72,7 @@ trait AsApiController
         return new GenericResource(tap($model)->update($request->validated()));
     }
 
-    final public function destroy(Request $request): JsonResponse
+    public function destroy(Request $request): JsonResponse
     {
         $this->findByOne($request)->delete();
 
