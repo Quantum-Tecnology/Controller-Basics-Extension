@@ -16,6 +16,11 @@
       "QuantumTecnology\\ControllerBasicsExtension\\": "src/"
     }
   },
+  "autoload-dev": {
+      "psr-4": {
+          "QuantumTecnology\\ControllerBasicsExtension\\Tests\\": "tests/"
+      }
+  },
   "scripts": {
     "format": [
       "@php vendor/bin/rector",
@@ -47,13 +52,15 @@
   },
   "config": {
     "allow-plugins": {
-      "php-http/discovery": true
+      "php-http/discovery": true,
+      "pestphp/pest-plugin": true
     }
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.70",
     "laravel/pint": "^1.13",
     "rector/rector": "^2.1",
-    "orchestra/testbench": "^10.4"
+    "orchestra/testbench": "^10.4",
+    "pestphp/pest": "^3.8"
   }
 }
