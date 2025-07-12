@@ -54,6 +54,20 @@ abstract class TestCase extends BaseTestCase
             $table->softDeletes();
         });
 
+        $schema->create('comment_likes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->foreignId('comment_id')->constrained('comments');
+            $table->unsignedTinyInteger('like');
+            $table->softDeletes();
+        });
+
+        $schema->create('post_likes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->foreignId('post_id')->constrained('posts');
+            $table->unsignedTinyInteger('like');
+            $table->softDeletes();
+        });
+
         $schema->create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -68,6 +82,12 @@ abstract class TestCase extends BaseTestCase
         $schema->create('comment_tag', function (Blueprint $table) {
             $table->foreignId('comment_id')->constrained('comments');
             $table->foreignId('tag_id')->constrained('tags');
+        });
+
+        $schema->create('media', function (Blueprint $table) {
+            $table->increments('id');
+            $table->morphs('media_able');
+            $table->string('name');
         });
     }
 

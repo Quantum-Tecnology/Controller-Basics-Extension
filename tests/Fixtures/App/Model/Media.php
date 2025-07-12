@@ -6,14 +6,14 @@ namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories\PostFactory;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories\LikeFactory;
 
-class Post extends Model
+final class Media extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): PostFactory
+    protected static function newFactory(): LikeFactory
     {
-        return PostFactory::new();
+        return LikeFactory::new();
     }
 }
