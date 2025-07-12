@@ -22,7 +22,7 @@ jobs:
             vinkla: 12.*
           - laravel: "^10.0"
             testbench: 8.*
-            vinkla: 12.*
+            vinkla: 11.*
         exclude:
           - laravel: "^10.0"
             php: 8.4
