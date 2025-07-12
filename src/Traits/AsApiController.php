@@ -37,7 +37,7 @@ trait AsApiController
 
         abort_unless($request->authorize(), 403, 'This action is unauthorized.');
 
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request): GenericResource {
             $data       = $request->validated();
             $modelClass = $this->model();
 
@@ -146,7 +146,7 @@ trait AsApiController
                 $segments     = explode('_', $rawPath);
                 $field        = array_pop($segments);
                 $isBy         = 'by' === end($segments);
-                $relationPath = implode('_', $segments) ?: $this->model()::class;
+                $relationPath = in_array(implode('_', $segments), ['', '0'], true) ? $this->model()::class : implode('_', $segments);
 
                 if ($isBy) {
                     $field        = 'by_' . $field;
@@ -159,7 +159,7 @@ trait AsApiController
                             ? explode('|', $val)
                             : (array) $val;
 
-                        $parsedValues = array_map(function ($v) {
+                        $parsedValues = array_map(function ($v): int | string {
                             $v = mb_trim($v);
 
                             return is_numeric($v) ? (int) $v : $v;
@@ -176,7 +176,7 @@ trait AsApiController
                         $parsedValues = [$value];
                     }
 
-                    $parsedValues = array_map(function ($v) {
+                    $parsedValues = array_map(function ($v): int | string {
                         $v = mb_trim($v ?: '');
 
                         return is_numeric($v) ? (int) $v : $v;
@@ -196,7 +196,7 @@ trait AsApiController
         foreach ($filters as $relation => $fields) {
             foreach ($fields as $field => $operators) {
                 foreach ($operators as $operator => $values) {
-                    if (empty($values) || (is_array($values) && 0 === count(array_filter($values, fn ($v) => null !== $v && '' !== $v && [] !== $v)))) {
+                    if (empty($values) || (is_array($values) && 0 === count(array_filter($values, fn ($v): bool => null !== $v && '' !== $v && [] !== $v)))) {
                         unset($filters[$relation][$field][$operator]);
                     }
                 }

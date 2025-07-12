@@ -11,10 +11,11 @@ use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\QueryBuilder\GenerateQuery;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginateSupport;
+use stdClass;
 
-final class GenericPresenter
+final readonly class GenericPresenter
 {
-    public function __construct(protected PaginateSupport $paginateSupport)
+    public function __construct(private PaginateSupport $paginateSupport)
     {
     }
 
@@ -63,7 +64,7 @@ final class GenericPresenter
         }
 
         return collect($output)
-            ->partition(fn ($value, $key) => str_starts_with($key, 'can_'))
+            ->partition(fn ($value, $key): bool => str_starts_with((string) $key, 'can_'))
             ->pipe(function ($partitions) {
                 [$can, $rest] = $partitions;
                 $metaActions  = $can->all();
@@ -91,7 +92,7 @@ final class GenericPresenter
         $relationsFromFields = $this->getIncludesByFields($fields);
 
         foreach (array_unique($relationsFromFields) as $relationPath) {
-            $segments     = explode('.', $relationPath);
+            $segments     = explode('.', (string) $relationPath);
             $currentModel = $model;
             $pathSoFar    = [];
 
@@ -115,11 +116,9 @@ final class GenericPresenter
                         (string) ($pagination[$currentPath]['per_page'] ?? ''),
                         $currentPath
                     );
-
-                    $page    = ($pagination[$currentPath]['page'] ?? 1);
-                    $perPage = ($pagination[$currentPath]['per_page'] ?? $limit);
-                    $offset  = ($page - 1) * $perPage;
-
+                    $page                 = ($pagination[$currentPath]['page'] ?? 1);
+                    $perPage              = ($pagination[$currentPath]['per_page'] ?? $limit);
+                    $offset               = ($page - 1) * $perPage;
                     $currentPathUnderline = str_replace('.', '_', $currentPath);
                     $filterOfInclude      = $filters[$currentPathUnderline] ?? [];
 
@@ -135,17 +134,14 @@ final class GenericPresenter
                             ->limit($limit);
                         $processedPaths[$currentPath] = true;
                     }
-
-                } else {
-                    if (!in_array($currentPath, $includes, true) && !isset($processedPaths[$currentPath])) {
-                        $includes[]                   = $currentPath;
-                        $processedPaths[$currentPath] = true;
-                    }
+                } elseif (!in_array($currentPath, $includes, true) && !isset($processedPaths[$currentPath])) {
+                    $includes[]                   = $currentPath;
+                    $processedPaths[$currentPath] = true;
                 }
 
                 if ($relation instanceof Relations\BelongsTo) {
                     $childFields = collect($relationsFromFields)
-                        ->filter(fn ($p) => Str::startsWith($p, $currentPath . '.') && mb_substr_count($p, '.') > mb_substr_count($currentPath, '.'))
+                        ->filter(fn ($p): bool => Str::startsWith($p, $currentPath . '.') && mb_substr_count((string) $p, '.') > mb_substr_count($currentPath, '.'))
                         ->map(fn ($p) => Str::after($p, $currentPath . '.'))
                         ->unique()
                         ->values()
@@ -188,7 +184,7 @@ final class GenericPresenter
         foreach ($allIncludes as $key => $value) {
             $relationPath = is_int($key) ? $value : $key;
 
-            if (str_contains($relationPath, '.')) {
+            if (str_contains((string) $relationPath, '.')) {
                 continue;
             }
 
@@ -235,7 +231,7 @@ final class GenericPresenter
         return $relationsFromFields;
     }
 
-    private function handleIncludePath($model, &$output, $fields, $pagination, $segments, $pathSoFar): void
+    private function handleIncludePath(Model | stdClass $model, array &$output, $fields, array $pagination, $segments, $pathSoFar): void
     {
         $relation = array_shift($segments);
         $camelRel = Str::camel($relation);
@@ -257,12 +253,10 @@ final class GenericPresenter
             $countAttribute = $relation . '_count';
 
             $output[$relation] = [
-                'data' => $related->map(function ($item) use ($fields, $fullPath, $pagination) {
-                    return $this->transform($item, [
-                        'include'    => '',
-                        'pagination' => $pagination,
-                    ], fields: $this->transformArrayToString($fields[$fullPath] ?? []));
-                }),
+                'data' => $related->map(fn ($item): array => $this->transform($item, [
+                    'include'    => '',
+                    'pagination' => $pagination,
+                ], fields: $this->transformArrayToString($fields[$fullPath] ?? []))),
                 'meta' => [
                     'total_items'    => $model->{$countAttribute} ?? null,
                     'items_returned' => $related->count(),
@@ -283,9 +277,9 @@ final class GenericPresenter
             ], fields: $this->transformArrayToString($fields[$fullPath] ?? []));
         }
 
-        if (!empty($segments)) {
+        if ([] !== $segments) {
             if (isset($output[$relation]['data'])) {
-                $output[$relation]['data'] = collect($output[$relation]['data'])->map(function ($item) use ($segments, $fields, $pagination, $pathSoFar, $relation) {
+                $output[$relation]['data'] = collect($output[$relation]['data'])->map(function ($item) use ($segments, $fields, $pagination, $pathSoFar, $relation): array {
                     $this->handleIncludePath((object) $item, $item, $fields, $pagination, $segments, [...$pathSoFar, $relation]);
 
                     return $item;
@@ -302,7 +296,11 @@ final class GenericPresenter
         $result = [];
 
         foreach (explode(',', $raw) as $field) {
-            if (!$field = mb_trim($field)) {
+            if (($field = mb_trim($field)) === '') {
+                continue;
+            }
+
+            if (($field = mb_trim($field)) === '0') {
                 continue;
             }
 
@@ -322,8 +320,8 @@ final class GenericPresenter
         $result = [];
 
         foreach ($fields as $field) {
-            if (str_contains($field, '.')) {
-                [$parent, $child]  = explode('.', $field, 2);
+            if (str_contains((string) $field, '.')) {
+                [$parent, $child]  = explode('.', (string) $field, 2);
                 $result[$parent][] = $child;
             } else {
                 $result[$field] = true;
@@ -347,14 +345,14 @@ final class GenericPresenter
     }
 
     private function getQueryCallable(
-        $query,
+        \Illuminate\Database\Eloquent\Builder $query,
         ?object $classCallable,
         array $filters,
         ?string $action,
         string $relationPath
-    ) {
+    ): null {
         if ($classCallable) {
-            if ($action) {
+            if (null !== $action && '' !== $action && '0' !== $action) {
                 $method = 'query' . Str::studly(str_replace('.', '_', $action . ' ' . $relationPath));
 
                 if (method_exists($classCallable, $method)) {

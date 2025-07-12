@@ -6,10 +6,12 @@ namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
+use Override;
 use QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware;
 
 final class ControllerGraphQL extends ServiceProvider
 {
+    #[Override]
     public function register(): void
     {
         $this->mergeConfigFrom(

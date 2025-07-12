@@ -8,7 +8,7 @@ final class LogSupport
 {
     private static array $messages = [];
 
-    public static function add($message): void
+    public static function add(string $message): void
     {
         if (config('app.debug')) {
             $stackTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);

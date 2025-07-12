@@ -22,15 +22,15 @@ final class LogMiddleware
         $response = $next($request);
 
         match (true) {
-            $response instanceof JsonResponse => (function () use (&$response, $enableQueryLog) {
+            $response instanceof JsonResponse => (function () use (&$response, $enableQueryLog): void {
                 $data = $response->getData(true);
 
-                if ($messages = LogSupport::getMessages()) {
+                if (($messages = LogSupport::getMessages()) !== []) {
                     $data['quantum_log'] = $messages;
                 }
 
                 if ($enableQueryLog) {
-                    $data['query_log'] = array_map(function ($entry) {
+                    $data['query_log'] = array_map(function (array $entry) {
                         $entry['query'] = str_replace(['\\', '"'], ['', ''], $entry['query']);
 
                         return $entry;

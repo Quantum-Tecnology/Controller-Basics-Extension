@@ -9,12 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GenericPresenter;
 
-final class GenerateQuery
+final readonly class GenerateQuery
 {
     public function __construct(
-        protected ?Model $model = null,
-        protected ?object $classCallable = null,
-        protected ?string $action = null,
+        private ?Model $model = null,
+        private ?object $classCallable = null,
+        private ?string $action = null,
     ) {
     }
 
@@ -96,7 +96,7 @@ final class GenerateQuery
         $field    = array_pop($segments);
         $relation = implode('.', $segments);
 
-        $query->whereHas($relation, function (Builder $q) use ($field, $values) {
+        $query->whereHas($relation, function (Builder $q) use ($field, $values): void {
             foreach ($values as $operator => $data) {
                 $model = $q->getModel();
                 $table = $model->getTable();
