@@ -20,12 +20,14 @@ final readonly class GenericPresenter
     {
     }
 
+    // id,title,comments[id,body],comments.comments_data[id],comments.comments_data.comments_data2[id],title
     public function transform(
         Model $model,
         array $options = [],
         string $fields = ''
     ): array {
         $pagination     = $this->paginateSupport->extractPagination($options);
+        $fields         = $this->simplifyString($fields);
         $internalFields = $this->parseFields($fields);
         $includes       = $this->getIncludesByFields($fields);
 
@@ -380,5 +382,27 @@ final readonly class GenericPresenter
         }
 
         return null;
+    }
+
+    private function simplifyString(?string $input): string
+    {
+        $groups = explode(';', $input);
+        $result = [];
+
+        foreach ($groups as $group) {
+            if (preg_match('/^([^\[]+)\[([^\]]+)\]$/', $group, $matches)) {
+                $prefix = $matches[1];
+                $fields = explode(',', $matches[2]);
+
+                foreach ($fields as $field) {
+                    $result[] = $prefix . '.' . $field;
+                }
+            } else {
+                // Sem colchetes, adiciona direto
+                $result[] = $group;
+            }
+        }
+
+        return implode(',', $result);
     }
 }
