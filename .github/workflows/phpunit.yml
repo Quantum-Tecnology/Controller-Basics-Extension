@@ -23,6 +23,9 @@ jobs:
           - laravel: "^10.0"
             testbench: 8.*
             vinkla: 12.*
+        exclude:
+          - laravel: "^10.0"
+            php: 8.4
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
