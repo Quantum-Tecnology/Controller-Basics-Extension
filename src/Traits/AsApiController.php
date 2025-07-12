@@ -104,11 +104,11 @@ trait AsApiController
 
         if (config('app.debug')) {
             match (true) {
-                request()->has('dd')       => $query->dd(),
-                request()->has('dump')     => $query->dump(),
-                request()->has('dd_raw')   => $query->ddRawSql(),
-                request()->has('dump_raw') => $query->dumpRawSql(),
-                default                    => false,
+                $request->has('dd')       => $query->dd(),
+                $request->has('dump')     => $query->dump(),
+                $request->has('dd_raw')   => $query->ddRawSql(),
+                $request->has('dump_raw') => $query->dumpRawSql(),
+                default                   => false,
             };
         }
 

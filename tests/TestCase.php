@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Console\AboutCommand;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Controller\PostController;
 
 abstract class TestCase extends BaseTestCase
@@ -97,6 +98,6 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUpRoute($app): void
     {
-        $app['router']->apiResource('posts', PostController::class);
+        $app['router']->withoutMiddleware([LogMiddleware::class])->apiResource('posts', PostController::class);
     }
 }
