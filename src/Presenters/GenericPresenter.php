@@ -141,6 +141,8 @@ final readonly class GenericPresenter
                             $offset,
                             $limit,
                             $relation,
+                            $filters,
+                            $relationsFromFields,
                         ) {
                             $query = $this->getQueryCallable(
                                 $query,
@@ -155,8 +157,21 @@ final readonly class GenericPresenter
                                 || $relation instanceof Relations\HasOne
                                 || $relation instanceof Relations\BelongsToMany
                             ) {
-                                if ('comments' == $currentPath) {
-                                    $query->withCount('commentsData');
+                                if ('comments' === $currentPath) {
+                                    $filtered      = array_filter($relationsFromFields, fn ($item) => str_starts_with($item, 'comments.'));
+                                    $withoutPrefix = array_map(fn ($item) => Str::after(Str::camel($item), 'comments.'), $filtered);
+
+                                    foreach ($withoutPrefix as $value) {
+                                        $query->withCount([
+                                            Str::camel($value) => fn ($query) => $this->getQueryCallable(
+                                                $query,
+                                                $classCallable,
+                                                $filters[$currentPath . '_' . Str::snake($value)] ?? [],
+                                                $action,
+                                                $currentPath . '_' . Str::snake($value)
+                                            ),
+                                        ]);
+                                    }
                                 }
                             }
 
@@ -285,7 +300,7 @@ final readonly class GenericPresenter
             }
         }
 
-        return $relationsFromFields;
+        return array_values(array_unique($relationsFromFields));
     }
 
     private function handleIncludePath(Model | stdClass $model, array &$output, $fields, array $pagination, $segments, $pathSoFar): void
