@@ -51,7 +51,7 @@ trait AsApiController
             }
 
             $model = $modelClass->create($data);
-            $this->saveChildren($model, $dataArray);
+            $this->saveStoreChildren($model, $dataArray);
 
             return new GenericResource($this->queryModel(request(), 'store')->find($model->id));
         });
@@ -214,7 +214,7 @@ trait AsApiController
         return $filters;
     }
 
-    protected function saveChildren(Model $model, array $children): void
+    protected function saveStoreChildren(Model $model, array $children): void
     {
         foreach ($children as $key => $value) {
             $ids = [];
@@ -243,7 +243,7 @@ trait AsApiController
                 }
 
                 if (isset($newModel) && filled($dataArray)) {
-                    $this->saveChildren($newModel, $dataArray);
+                    $this->saveStoreChildren($newModel, $dataArray);
                 }
             }
 
