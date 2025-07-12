@@ -133,15 +133,35 @@ final readonly class GenericPresenter
                     $currentPathCamelCase = Str::camel($currentPath);
 
                     if (!isset($processedPaths[$currentPathCamelCase])) {
-                        $includes[$currentPathCamelCase] = fn ($query) => ($this->getQueryCallable(
-                            $query,
+                        $includes[$currentPathCamelCase] = function ($query) use (
                             $classCallable,
                             $filterOfInclude,
                             $action,
                             $currentPath,
-                        ) ?: $query)
-                            ->offset($offset)
-                            ->limit($limit);
+                            $offset,
+                            $limit,
+                            $relation,
+                        ) {
+                            $query = $this->getQueryCallable(
+                                $query,
+                                $classCallable,
+                                $filterOfInclude,
+                                $action,
+                                $currentPath
+                            ) ?: $query;
+
+                            if (
+                                $relation instanceof Relations\HasMany
+                                || $relation instanceof Relations\HasOne
+                                || $relation instanceof Relations\BelongsToMany
+                            ) {
+                                if ('comments' == $currentPath) {
+                                    $query->withCount('commentsData');
+                                }
+                            }
+
+                            return $query->offset($offset)->limit($limit);
+                        };
                         $processedPaths[$currentPath] = true;
                     }
                 } elseif (!in_array($currentPath, $includes, true) && !isset($processedPaths[$currentPath])) {
@@ -187,7 +207,7 @@ final readonly class GenericPresenter
         return $includes;
     }
 
-    public function getWithCount(Model $model, array $allIncludes): array
+    public function getWithCount(Model $model, array $allIncludes, array $filters): array
     {
         $withCount = [];
 
@@ -206,7 +226,13 @@ final readonly class GenericPresenter
                 if ($relation instanceof Relations\HasMany
                     || $relation instanceof Relations\HasOne
                     || $relation instanceof Relations\BelongsToMany) {
-                    $withCount[] = $relationPath;
+                    $withCount[$relationPath] = fn ($query) => $this->getQueryCallable(
+                        $query,
+                        $this,
+                        $filters[$relationPath] ?? [],
+                        'getWithCount',
+                        $relationPath,
+                    );
                 }
             }
         }

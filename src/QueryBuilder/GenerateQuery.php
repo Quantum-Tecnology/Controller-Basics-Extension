@@ -41,7 +41,7 @@ final readonly class GenerateQuery
             $query->with($allIncludes);
         }
 
-        if (filled($allCount = $genericPresenter->getWithCount($this->model, $allIncludes))) {
+        if (filled($allCount = $genericPresenter->getWithCount($this->model, $allIncludes, $filters))) {
             $query->withCount($allCount);
         }
 
@@ -57,28 +57,17 @@ final readonly class GenerateQuery
         Builder | Relations\HasMany | Relations\BelongsToMany $query,
         array $filters = []
     ): void {
-        foreach ($filters as $field => $values) {
-            if (str_contains($field, '.')) {
-                // Campo em relacionamento aninhado — usa whereHas
-                $this->addWhereHasFilter($query, $field, $values);
+        if (blank($filters)) {
+            return;
+        }
+        $model = $query->getModel();
+        $table = $model->getTable();
 
-                continue;
-            }
-
-            foreach ($values as $operator => $data) {
-                $model = $query->getModel();
-                $table = $model->getTable();
-                $camel = Str::camel($field);
-
-                if (method_exists($model, $camel)) {
-                    // Aqui você pode implementar filtro via método de relacionamento, se quiser.
-                    // Por segurança, ignoramos para não chamar método direto.
-                    continue;
-                }
-
+        foreach ($filters as $column => $value) {
+            foreach ($value as $operator => $data) {
                 match ($operator) {
-                    'in'    => $query->whereIn("{$table}.{$field}", $data),
-                    default => $query->where("{$table}.{$field}", $operator, $data),
+                    '='     => $query->whereIn("{$table}.{$column}", $data),
+                    default => $query->where("{$table}.{$column}", $operator, $data[0]),
                 };
             }
         }
