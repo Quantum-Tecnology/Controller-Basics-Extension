@@ -6,7 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -41,17 +41,17 @@ trait AsApiController
             $data       = $request->validated();
             $modelClass = $this->model();
 
-            $hasMany = [];
+            $dataArray = [];
 
             foreach ($data as $key => $value) {
-                if (is_array($value) && $modelClass->{$key}() instanceof HasMany) {
-                    $hasMany[$key] = $value;
+                if (is_array($value)) {
+                    $dataArray[$key] = $value;
                     unset($data[$key]);
                 }
             }
 
             $model = $modelClass->create($data);
-            $this->saveChildren($model, $hasMany);
+            $this->saveChildren($model, $dataArray);
 
             return new GenericResource($this->queryModel(request(), 'store')->find($model->id));
         });
@@ -217,23 +217,34 @@ trait AsApiController
     protected function saveChildren(Model $model, array $children): void
     {
         foreach ($children as $key => $value) {
+            $ids = [];
+
             foreach ($value as $value2) {
-                $hasMany = [];
+                $dataArray = [];
 
                 foreach ($value2 as $key3 => $value3) {
                     if (is_array($value3)) {
-                        $hasMany[$key3] = $value3;
+                        $dataArray[$key3] = $value3;
                         unset($value2[$key3]);
                     }
                 }
 
-                if ($model->{$key}() instanceof HasMany) {
+                if ($model->{$key}() instanceof Relations\HasMany) {
                     $newModel = $model->{$key}()->create($value2);
-
-                    if (filled($hasMany)) {
-                        $this->saveChildren($newModel, $hasMany);
-                    }
                 }
+
+                if ($model->{$key}() instanceof Relations\BelongsToMany) {
+                    $belongsToMany = $model->{$key}()->getRelated();
+                    $ids[]         = $belongsToMany->create($value2);
+                }
+
+                if (filled($dataArray)) {
+                    $this->saveChildren($newModel, $dataArray);
+                }
+            }
+
+            if (filled($ids)) {
+                $model->{$key}()->sync($ids);
             }
         }
     }

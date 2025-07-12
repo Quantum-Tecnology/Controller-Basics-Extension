@@ -98,7 +98,7 @@ final readonly class GenericPresenter
     ): array {
         $includes            = [];
         $processedPaths      = [];
-        $relationsFromFields = $this->getIncludesByFields($fields);
+        $relationsFromFields = $this->getIncludesByFields($this->simplifyString($fields));
 
         foreach (array_unique($relationsFromFields) as $relationPath) {
             $segments     = explode('.', (string) $relationPath);
@@ -120,11 +120,12 @@ final readonly class GenericPresenter
                     break;
                 }
 
-                if ($relation instanceof Relations\HasMany) {
+                if ($relation instanceof Relations\HasMany || $relation instanceof Relations\BelongsToMany) {
                     $limit = $this->paginateSupport->calculatePerPage(
                         (string) ($pagination[$currentPath]['per_page'] ?? ''),
                         $currentPath
                     );
+
                     $page                 = ($pagination[$currentPath]['page'] ?? 1);
                     $perPage              = ($pagination[$currentPath]['per_page'] ?? $limit);
                     $offset               = ($page - 1) * $perPage;
@@ -204,7 +205,8 @@ final readonly class GenericPresenter
                 $relation = $model->$method();
 
                 if ($relation instanceof Relations\HasMany
-                    || $relation instanceof Relations\HasOne) {
+                    || $relation instanceof Relations\HasOne
+                    || $relation instanceof Relations\BelongsToMany) {
                     $withCount[] = $relationPath;
                 }
             }
@@ -281,7 +283,7 @@ final readonly class GenericPresenter
 
         $relationObject = $model->$camelRel();
 
-        if ($relationObject instanceof Relations\HasMany) {
+        if ($relationObject instanceof Relations\HasMany || $relationObject instanceof Relations\BelongsToMany) {
             $related = $model->$camelRel;
 
             if (!$related) {
@@ -383,7 +385,7 @@ final readonly class GenericPresenter
     }
 
     private function getQueryCallable(
-        Builder | Relations\HasMany $query,
+        Builder | Relations\HasMany | Relations\BelongsToMany $query,
         ?object $classCallable,
         array $filters,
         ?string $action,
@@ -420,6 +422,7 @@ final readonly class GenericPresenter
 
     private function simplifyString(?string $input): string
     {
+        $input  = mb_trim($input ?? '');
         $groups = explode(';', $input);
         $result = [];
 
@@ -432,7 +435,6 @@ final readonly class GenericPresenter
                     $result[] = $prefix . '.' . $field;
                 }
             } else {
-                // Sem colchetes, adiciona direto
                 $result[] = $group;
             }
         }
