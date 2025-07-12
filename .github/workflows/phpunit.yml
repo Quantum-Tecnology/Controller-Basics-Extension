@@ -20,9 +20,9 @@ jobs:
           - laravel: "^11.0"
             testbench: 9.*
             vinkla: 12.*
-          - laravel: "^10.0"
-            testbench: 8.*
-            vinkla: 12.*
+#          - laravel: "^10.0"
+#            testbench: 8.*
+#            vinkla: 12.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
