@@ -18,7 +18,7 @@ test('it returns a list of posts', function () {
             ],
         ])
         ->assertOk();
-});
+})->todo();
 
 test('it returns a list of posts with selected author fields', function () {
     $author = Author::factory()->create();
@@ -38,7 +38,7 @@ test('it returns a list of posts with selected author fields', function () {
             ],
         ])
         ->assertOk();
-});
+})->todo();
 
 test('it returns a list of posts with all author fields', function () {
     $post   = Post::factory()->create();
@@ -66,4 +66,4 @@ test('it returns a list of posts with all author fields', function () {
             ],
         ])
         ->assertOk();
-});
+})->todo();

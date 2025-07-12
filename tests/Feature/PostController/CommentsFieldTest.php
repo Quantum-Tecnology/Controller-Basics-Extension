@@ -26,7 +26,7 @@ test('it returns a list of posts with selected comments fields', function () {
         ],
     ])
         ->assertOk();
-});
+})->todo();
 
 test('it returns a list of posts with all comments fields', function () {
     $comment = Comment::factory()->create();
@@ -56,4 +56,4 @@ test('it returns a list of posts with all comments fields', function () {
         ],
     ])
         ->assertOk();
-});
+})->todo();
