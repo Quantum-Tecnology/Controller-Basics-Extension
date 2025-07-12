@@ -2,10 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace QuantumTecnology\ControllerBasicsExtension\resources;
+namespace QuantumTecnology\ControllerBasicsExtension\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
+use Override;
 
 class DefaultResource extends JsonResource
 {
@@ -16,6 +17,7 @@ class DefaultResource extends JsonResource
      *
      * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
+    #[Override]
     public function toArray($request)
     {
         return $this->resource->toArray();

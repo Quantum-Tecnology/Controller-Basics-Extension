@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 /**
- * // TODO: Está em fase de desenvolvimento, não utilizar ainda. https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues/13
+ * // TODO: Está em fase de desenvolvimento, não utilizar ainda. https://github.com/Quantum-Tecnology/Controller-Basics-Extension/issues/13.
  */
 trait BindAttributesTrait
 {
@@ -21,7 +21,7 @@ trait BindAttributesTrait
 
     protected function addBindAttributes(): void
     {
-        collect($this->getAttributes())->each(function ($value, $key) {
+        collect($this->getAttributes())->each(function ($value, $key): void {
             if (($attribute = config("bind.attributes.{$key}")) !== null && !in_array($attribute, $this->exceptBindFields())) {
                 $this->setAttribute($attribute, $value);
             }
@@ -31,19 +31,20 @@ trait BindAttributesTrait
     protected function removeBindAttributes(): void
     {
         collect($this->getAttributes())
-            ->each(function ($value, $key){
-            if (
-                ($attribute = config("bind.attributes.{$key}")) !== null
-                && !in_array($attribute, $this->exceptBindFields())
-            ) {
-                $this->setAttribute($key, $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null);
-                $this->{$key} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
-                unset($this->{$attribute});
-            }
-        });
+            ->each(function ($value, $key): void {
+                if (
+                    ($attribute = config("bind.attributes.{$key}")) !== null
+                    && !in_array($attribute, $this->exceptBindFields())
+                ) {
+                    $this->setAttribute($key, $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null);
+                    $this->{$key} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
+                    unset($this->{$attribute});
+                }
+            });
     }
 
-    protected function exceptBindFields(): array {
+    protected function exceptBindFields(): array
+    {
         return [];
     }
 }

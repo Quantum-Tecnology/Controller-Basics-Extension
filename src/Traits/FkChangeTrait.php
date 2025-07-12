@@ -13,8 +13,8 @@ trait FkChangeTrait
 {
     public static function bootFkChangeTrait(): void
     {
-        static::retrieved(function ($model) {
-            collect($model->getAttributes())->each(function ($value, $key) use ($model) {
+        static::retrieved(function ($model): void {
+            collect($model->getAttributes())->each(function ($value, $key) use ($model): void {
                 $attributes = config('translate.attributes');
 
                 if (array_key_exists($key, $attributes)) {
