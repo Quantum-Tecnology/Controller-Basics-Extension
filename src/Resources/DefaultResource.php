@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace QuantumTecnology\ControllerBasicsExtension\resources;
+namespace QuantumTecnology\ControllerBasicsExtension\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
