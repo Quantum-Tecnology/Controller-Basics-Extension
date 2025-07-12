@@ -9,19 +9,19 @@ final class PaginateSupport
     public function calculatePerPage(?string $perPage, string $path): int
     {
         if (blank($perPage)) {
-            $perPage = config('quantum-controller-graphql.per_page');
+            $perPage = config('page.per_page');
         }
 
-        if ($perPage > config('quantum-controller-graphql.max_page')) {
+        if ($perPage > config('page.max_page')) {
             LogSupport::add(
                 __('The :field value (:per_page) exceeds the maximum allowed (:max_page). It has been set to the maximum value of :max_page.', [
                     'per_page' => $perPage,
-                    'max_page' => config('quantum-controller-graphql.max_page'),
+                    'max_page' => config('page.max_page'),
                     'field'    => 'per_page_' . str_replace('.', '_', $path),
                 ])
             );
 
-            $perPage = config('quantum-controller-graphql.max_page');
+            $perPage = config('page.max_page');
         }
 
         return (int) ($perPage ?: 1);

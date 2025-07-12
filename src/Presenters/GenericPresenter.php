@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\QueryBuilder\GenerateQuery;
+use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginateSupport;
+use ReflectionClass;
 use stdClass;
 
 final readonly class GenericPresenter
@@ -32,6 +34,10 @@ final readonly class GenericPresenter
         $includes       = $this->getIncludesByFields($fields);
 
         $output = [];
+
+        if (($internalFields['__self'][0] ?? null) === '*') {
+            $internalFields['__self'] = $this->getAllModelAttributes($model);
+        }
 
         $selfFields = $internalFields['__self'] ?? [];
 
@@ -205,6 +211,34 @@ final readonly class GenericPresenter
         }
 
         return array_unique($withCount);
+    }
+
+    public function getAllModelAttributes(Model $model): array
+    {
+        if (!config('app.debug')) {
+            LogSupport::add(__('You cannot return all the attributes of the model: model', [
+                'model' => $model::class,
+            ]));
+
+            return [$model->getKeyName()];
+        }
+
+        $attributes = $model->getAttributes();
+
+        foreach ((new ReflectionClass($model))->getMethods() as $method) {
+            if (preg_match('/^get(.+)Attribute$/', $method->name, $matches)) {
+                $key              = Str::snake($matches[1]);
+                $attributes[$key] = $model->{$key};
+            }
+        }
+
+        foreach ($model->getMutatedAttributes() as $key) {
+            if (!array_key_exists($key, $attributes)) {
+                $attributes[$key] = $model->{$key};
+            }
+        }
+
+        return array_keys($attributes);
     }
 
     private function getIncludesByFields(string $fields): array
