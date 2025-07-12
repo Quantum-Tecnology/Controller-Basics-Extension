@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model;
 
-use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories\POstLikeFactory;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories\PostLikeFactory;
 
 final class PostLike extends BaseModel
 {
-    protected static function newFactory(): POstLikeFactory
+    protected static function newFactory(): PostLikeFactory
     {
-        return POstLikeFactory::new();
+        return PostLikeFactory::new();
     }
 }
