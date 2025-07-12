@@ -11,8 +11,6 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Controller\Pos
 
 abstract class TestCase extends BaseTestCase
 {
-    protected static $migration;
-
     protected function setUp(): void
     {
         parent::setUp();
