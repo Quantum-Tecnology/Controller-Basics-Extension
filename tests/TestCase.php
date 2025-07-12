@@ -51,7 +51,7 @@ abstract class TestCase extends BaseTestCase
         $schema->create('comments', function (Blueprint $table) {
             $table->increments('id');
             $table->foreignId('post_id')->constrained('posts');
-            $table->string('title');
+            $table->string('body');
             $table->timestamps();
             $table->softDeletes();
         });
