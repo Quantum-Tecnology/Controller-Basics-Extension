@@ -13,10 +13,8 @@ class EnhancedResourceProvider extends BaseResourceRegistrar
      *
      * @param string $name
      * @param string $controller
-     *
-     * @return void
      */
-    public function register($name, $controller, array $options = [])
+    public function register($name, $controller, array $options = []): void
     {
         parent::register($name, $controller, $options);
 
