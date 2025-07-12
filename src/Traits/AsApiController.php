@@ -242,7 +242,7 @@ trait AsApiController
                     }
                 }
 
-                if (filled($dataArray)) {
+                if (isset($newModel) && filled($dataArray)) {
                     $this->saveChildren($newModel, $dataArray);
                 }
             }
