@@ -61,6 +61,9 @@
     "laravel/pint": "^1.13",
     "rector/rector": "^2.1",
     "orchestra/testbench": "^10.4",
-    "pestphp/pest": "^3.8"
+    "pestphp/pest": "^3.8",
+    "pestphp/pest-plugin-faker": "^3.0",
+    "pestphp/pest-plugin-laravel": "^3.2",
+    "pestphp/pest-plugin-watch": "^3.0"
   }
 }

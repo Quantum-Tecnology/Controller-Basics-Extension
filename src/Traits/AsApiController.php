@@ -97,7 +97,7 @@ trait AsApiController
             'classCallable' => $this,
             'action'        => $action,
         ])->execute(
-            fields: $data['fields'] ?? [],
+            fields: $data['fields'] ?? '',
             pagination: app(PaginateSupport::class)->extractPagination($data),
             filters: $this->extractFilter($data),
         );
