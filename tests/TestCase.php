@@ -2,6 +2,7 @@
 
 namespace QuantumTecnology\ControllerBasicsExtension\Tests;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Console\AboutCommand;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -17,6 +18,12 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUpDatabase($app): void {
         $schema = $app['db']->connection()->getSchemaBuilder();
+
+        $schema->create('posts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->softDeletes();
+        });
     }
 
     protected function tearDown(): void
