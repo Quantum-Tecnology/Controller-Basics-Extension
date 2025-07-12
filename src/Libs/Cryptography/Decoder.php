@@ -9,12 +9,12 @@ use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Vinkla\Hashids\Facades\Hashids;
 
-final class Decoder
+class Decoder
 {
     /**
      * Handle an incoming request.
      */
-    public static function run(Request $request): Request
+    public static function run(Request $request)
     {
         self::decodeHeaderParams($request);
         self::decodeRouteParams($request);
@@ -23,11 +23,11 @@ final class Decoder
         return $request;
     }
 
-    private static function abortIfInvalidIdentifier($key, $value, string $sttribute): void
+    protected static function abortIfInvalidIdentifier($key, $value, $sttribute): void
     {
         $value = collect(is_string($value) ? explode(',', $value) : $value);
 
-        $value->each(function ($unit) use ($key, $sttribute): void {
+        $value->each(function ($unit) use ($key, $sttribute) {
             abort_if(
                 !blank($unit) && !is_int($unit) && self::isIdentifier($key) && !($newValue = current(Hashids::decode($unit))) && !is_int($newValue),
                 Response::HTTP_BAD_REQUEST,
@@ -39,11 +39,11 @@ final class Decoder
     private static function decodeHeaderParams(Request $request): void
     {
         foreach ($request->headers as $key => $value) {
-            if (preg_match(config('hashids.headers.regex'), $key)) {
+            if (preg_match(config('hashids.headers.regex'), (string) $key)) {
                 $encodedIds = $value[0];
                 $decodedIds = [];
 
-                foreach (explode(',', (string) $encodedIds) as $unit) {
+                foreach (explode(',', $encodedIds) as $unit) {
                     self::abortIfInvalidIdentifier($key, $unit, 'header-params');
 
                     $decoded = current(Hashids::decode($unit));
@@ -54,7 +54,7 @@ final class Decoder
                 }
                 $decoded = implode(',', $decodedIds);
 
-                if ('' !== $decoded && '0' !== $decoded) {
+                if ($decoded) {
                     request()->headers->set($key, $decoded);
                 }
             }
@@ -85,7 +85,11 @@ final class Decoder
         array_walk($inputs, function (&$value, $key): void {
             if (!blank($value) && !is_int($value) && self::isIdentifier($key) && is_array($value)) {
 
-                $value = collect($value)->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(fn ($decoded): bool => self::wasDecoded($decoded))->all();
+                $value = collect($value)->transform(function ($unit) {
+                    return current(Hashids::decode($unit));
+                })->filter(function ($decoded) {
+                    return self::wasDecoded($decoded);
+                })->all();
             }
         });
 
@@ -93,7 +97,11 @@ final class Decoder
             self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
             if (!blank($value) && is_string($value) && self::isIdentifier($key)) {
-                $value = collect(explode(',', $value))->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(fn ($decoded): bool => self::wasDecoded($decoded))->implode(',');
+                $value = collect(explode(',', $value))->transform(function ($unit) {
+                    return current(Hashids::decode($unit));
+                })->filter(function ($decoded) {
+                    return self::wasDecoded($decoded);
+                })->implode(',');
 
                 $decoded = current(Hashids::decode($value));
 
@@ -131,8 +139,8 @@ final class Decoder
     {
         $alphabet = config('hashids.connections.' . config('hashids.default') . '.alphabet');
         $length   = config('hashids.connections.' . config('hashids.default') . '.length');
-        $pattern  = '/^(?!undefined)[' . preg_quote((string) $alphabet, '/') . ']{1,' . $length . '}$/';
+        $pattern  = '/^(?!undefined)[' . preg_quote($alphabet, '/') . ']{1,' . $length . '}$/';
 
-        return (bool) preg_match($pattern, $key);
+        return (bool) preg_match($pattern, (string) $key);
     }
 }

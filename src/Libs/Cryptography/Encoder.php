@@ -11,7 +11,7 @@ use const JSON_THROW_ON_ERROR;
 use JsonException;
 use Vinkla\Hashids\Facades\Hashids;
 
-final class Encoder
+class Encoder
 {
     /**
      * Handle an incoming request.

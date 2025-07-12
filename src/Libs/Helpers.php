@@ -21,10 +21,12 @@ if (!function_exists('cleanExceptNumber')) {
      * Limpa tudo da variavel com exceção numero.
      *
      * @param string|null $v1 variavel a ser limpada
+     *
+     * @return void
      */
-    function cleanExceptNumber(?string $v1 = null): ?string
+    function cleanExceptNumber(?string $v1 = null)
     {
-        return preg_replace('/[^0-9]/i', '', (string) $v1);
+        return preg_replace('/[^0-9]/i', '', $v1);
     }
 }
 
@@ -38,7 +40,7 @@ if (!function_exists('formatCnpjCpf')) {
      */
     function formatCnpjCpf($cnpjCpf)
     {
-        $cnpjCpf = preg_replace("/\D/", '', (string) $cnpjCpf);
+        $cnpjCpf = preg_replace("/\D/", '', $cnpjCpf);
 
         if ('' == $cnpjCpf) {
             return $cnpjCpf = 'Não informado';
@@ -80,10 +82,12 @@ if (!function_exists('unaccent')) {
      * Formatar para CPF||CNPJ.
      *
      * @param $str string a ser formatada
+     *
+     * @return string
      */
-    function unaccent($str): ?string
+    function unaccent($str)
     {
-        return preg_replace(['/(á|à|ã|â|ä)/', '/(Á|À|Ã|Â|Ä)/', '/(é|è|ê|ë)/', '/(É|È|Ê|Ë)/', '/(í|ì|î|ï)/', '/(Í|Ì|Î|Ï)/', '/(ó|ò|õ|ô|ö)/', '/(Ó|Ò|Õ|Ô|Ö)/', '/(ú|ù|û|ü)/', '/(Ú|Ù|Û|Ü)/', '/(ñ)/', '/(Ñ)/', '/(-)/'], explode(' ', 'a A e E i I o O u U n N '), (string) $str);
+        return preg_replace(['/(á|à|ã|â|ä)/', '/(Á|À|Ã|Â|Ä)/', '/(é|è|ê|ë)/', '/(É|È|Ê|Ë)/', '/(í|ì|î|ï)/', '/(Í|Ì|Î|Ï)/', '/(ó|ò|õ|ô|ö)/', '/(Ó|Ò|Õ|Ô|Ö)/', '/(ú|ù|û|ü)/', '/(Ú|Ù|Û|Ü)/', '/(ñ)/', '/(Ñ)/', '/(-)/'], explode(' ', 'a A e E i I o O u U n N '), $str);
     }
 }
 
@@ -105,7 +109,7 @@ if (!function_exists('toObject')) {
      *
      * @return object
      */
-    function toObject($arr): mixed
+    function toObject($arr)
     {
         return json_decode(json_encode($arr));
     }
@@ -133,24 +137,18 @@ if (!function_exists('getCardBrand')) {
     {
         $cardNumber = preg_replace('/\D/', '', $cardNumber);
 
-        $visa       = '/^4\d{12}(?:\d{3})?$/';
-        $mastercard = '/^5[1-5]\d{14}$/';
-        $amex       = '/^3[47]\d{13}$/';
-        $discover   = '/^6(?:011|5\d{2})\d{12}$/';
+        $visa       = '/^4[0-9]{12}(?:[0-9]{3})?$/';
+        $mastercard = '/^5[1-5][0-9]{14}$/';
+        $amex       = '/^3[47][0-9]{13}$/';
+        $discover   = '/^6(?:011|5[0-9]{2})[0-9]{12}$/';
 
-        if (preg_match($visa, (string) $cardNumber)) {
+        if (preg_match($visa, $cardNumber)) {
             return 'visa';
-        }
-
-        if (preg_match($mastercard, (string) $cardNumber)) {
+        } elseif (preg_match($mastercard, $cardNumber)) {
             return 'mastercard';
-        }
-
-        if (preg_match($amex, (string) $cardNumber)) {
+        } elseif (preg_match($amex, $cardNumber)) {
             return 'amex';
-        }
-
-        if (preg_match($discover, (string) $cardNumber)) {
+        } elseif (preg_match($discover, $cardNumber)) {
             return 'discover';
         }
 
@@ -162,16 +160,20 @@ if (!function_exists('getCardBrand')) {
 if (!function_exists('is_base64')) {
     function is_base64($s)
     {
-        if (in_array(preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', (string) $s), [0, false], true)) {
+        if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $s)) {
             return false;
         }
 
-        $decoded = base64_decode((string) $s, true);
+        $decoded = base64_decode($s, true);
 
         if (false === $decoded) {
             return false;
         }
 
-        return base64_encode($decoded) == $s;
+        if (base64_encode($decoded) != $s) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -6,6 +6,6 @@ namespace QuantumTecnology\ControllerBasicsExtension\Services;
 
 use QuantumTecnology\ServiceBasicsExtension\BaseService;
 
-final class DefaultService extends BaseService
+class DefaultService extends BaseService
 {
 }

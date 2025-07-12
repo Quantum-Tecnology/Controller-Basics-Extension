@@ -11,7 +11,7 @@ use QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography\Decoder;
 use QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography\Encoder;
 use QuantumTecnology\HandlerBasicsExtension\Traits\ApiResponseTrait;
 
-final class CryptographyMiddleware
+class CryptographyMiddleware
 {
     use ApiResponseTrait;
 
@@ -20,7 +20,7 @@ final class CryptographyMiddleware
      *
      * @throws JsonException
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, bool $asLocal = false)
     {
         // Run before application.
         $enabledForCryptography = $this->isEnabledForCryptography($request);
@@ -40,7 +40,7 @@ final class CryptographyMiddleware
         return $response;
     }
 
-    private function isEnabledForCryptography(Request $request): bool
+    private function isEnabledForCryptography($request): bool
     {
         return config('hashids.enable_cryptography', false) && ($request->beenEncrypted ?? true);
     }

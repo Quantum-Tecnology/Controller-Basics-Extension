@@ -8,7 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-final class CheckRouteLevelMiddleware
+class CheckRouteLevelMiddleware
 {
     /**
      * Handle an incoming request.
