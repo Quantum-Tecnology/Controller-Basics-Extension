@@ -1,17 +1,19 @@
-name: "Run Tests - Current"
+name: Run Tests - Current
 
-on: [push, pull_request]
+on:
+  workflow_run:
+    workflows: ["Fix Styling"]
+    types:
+      - completed
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php: [8.4, 8.3, 8.2]
         laravel: ["^12.0", "^11.0"]
-#        dependency-version: [ prefer-lowest, prefer-stable ]
         dependency-version: [ prefer-stable ]
         include:
           - laravel: "^12.0"
