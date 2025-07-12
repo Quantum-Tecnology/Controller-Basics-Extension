@@ -3,14 +3,11 @@
 declare(strict_types = 1);
 putenv('PHP_CS_FIXER_IGNORE_ENV=1');
 
-use PhpCsFixer\Config;
-use PhpCsFixer\Finder;
-
-$finder = Finder::create()
+$finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude(['public', '.data']);
 
-return (new Config())
+return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR12'                                      => true,
@@ -56,22 +53,19 @@ return (new Config())
         'protected_to_private'                        => true,
         'self_accessor'                               => true,
         'self_static_accessor'                        => true,
-        'final_class'                                 => true,
-        'final_internal_class'                        => true,
-        'final_public_method_for_abstract_class'      => true,
         'array_syntax'                                => [
             'syntax' => 'short',
         ],
-        'global_namespace_import'                     => [
+        'global_namespace_import' => [
             'import_classes'   => true,
             'import_constants' => true,
             'import_functions' => true,
         ],
-        'types_spaces'                                => [
+        'types_spaces' => [
             'space'                => 'single',
             'space_multiple_catch' => 'single',
         ],
-        'binary_operator_spaces'                      => [
+        'binary_operator_spaces' => [
             'default'   => 'single_space',
             'operators' => [
                 '='  => 'align_single_space_minimal',
@@ -80,13 +74,13 @@ return (new Config())
                 '-=' => 'align_single_space_minimal',
             ],
         ],
-        'concat_space'                                => [
+        'concat_space' => [
             'spacing' => 'one',
         ],
-        'declare_equal_normalize'                     => [
+        'declare_equal_normalize' => [
             'space' => 'single',
         ],
-        'blank_line_before_statement'                 => [
+        'blank_line_before_statement' => [
             'statements' => [
                 'break',
                 'continue',
@@ -94,6 +88,7 @@ return (new Config())
                 'return',
                 'throw',
                 'try',
+                'continue',
                 'do',
                 'exit',
                 'for',
@@ -105,8 +100,8 @@ return (new Config())
                 'require_once',
             ],
         ],
-        'ordered_class_elements'                      => [
-            'order'          => [
+        'ordered_class_elements' => [
+            'order' => [
                 'use_trait',
                 'case',
                 'constant',
