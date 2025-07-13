@@ -47,7 +47,7 @@ test('fields starting with can_ go to meta', function (): void {
                             'id'   => $this->comment->id,
                             'body' => $this->comment->body,
                         ],
-                        'meta' => [
+                        'actions' => [
                             'can_delete' => true,
                         ],
                     ],
@@ -74,7 +74,7 @@ test('asterisk returns all fields and accessors', function (): void {
                 'deleted_at'  => $this->comment->deleted_at,
                 'use_factory' => null,
             ],
-            'meta' => [
+            'actions' => [
                 'can_delete' => true,
                 'can_update' => false,
             ],

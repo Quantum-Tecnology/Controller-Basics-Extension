@@ -26,8 +26,8 @@ test('fields starting with can_ go to meta', function (): void {
     $fields = ['id', 'can_delete', 'can_update'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->toBe([
-        'data' => ['id' => $this->post->id],
-        'meta' => [
+        'data'    => ['id' => $this->post->id],
+        'actions' => [
             'can_delete' => true,
             'can_update' => false,
         ],
@@ -53,7 +53,7 @@ test('asterisk returns all fields and accessors', function (): void {
             'created_at' => $this->post->created_at->toDateTimeString(),
             'updated_at' => $this->post->created_at->toDateTimeString(),
         ])
-        ->and($result['meta'])->toMatchArray([
+        ->and($result['actions'])->toMatchArray([
             'can_delete' => true,
             'can_update' => false,
         ]);
@@ -76,7 +76,7 @@ test('includes accessors', function (): void {
 test('includes mutated attributes', function (): void {
     $fields = ['can_update'];
     $result = $this->presenter->execute($this->post, $fields);
-    expect($result['meta'])->toHaveKey('can_update', false);
+    expect($result['actions'])->toHaveKey('can_update', false);
 });
 
 test('handles empty fields array', function (): void {

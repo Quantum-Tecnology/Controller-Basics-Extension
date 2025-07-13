@@ -26,7 +26,7 @@ class GraphQLPresenter
 
     protected function generate(Model $model, array $fields, array $pagination = [], ?string $relationFullName = null): array
     {
-        $meta            = [];
+        $actions         = [];
         $data            = [];
         $attributesModel = $this->getAllModelAttributes($model);
 
@@ -55,7 +55,7 @@ class GraphQLPresenter
             };
 
             if (str_starts_with((string) $field, 'can_')) {
-                $meta[$field] = $valueField;
+                $actions[$field] = $valueField;
             } else {
                 $data[$field] = $valueField;
             }
@@ -74,8 +74,8 @@ class GraphQLPresenter
             $response = ['data' => $data];
         }
 
-        if ([] !== $meta) {
-            $response['meta'] = $meta;
+        if ([] !== $actions) {
+            $response['actions'] = $actions;
         }
 
         foreach (array_keys($relations) as $key) {
@@ -121,7 +121,7 @@ class GraphQLPresenter
                 $pagination['page'] ?? 1,
                 [
                     'path'     => LengthAwarePaginator::resolveCurrentPath(),
-                    'pageName' => 'page_' . $pageName,
+                    'pageName' => preg_replace('/_+/', '_', 'page_' . $pageName),
                 ]
             );
 

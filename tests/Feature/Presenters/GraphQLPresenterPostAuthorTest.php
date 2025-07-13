@@ -35,8 +35,8 @@ test('fields starting with can_ go to meta', function (): void {
     expect($result)->toBe([
         'data' => [
             'author' => [
-                'data' => ['id' => $this->author->id],
-                'meta' => [
+                'data'    => ['id' => $this->author->id],
+                'actions' => [
                     'can_delete' => true,
                     'can_update' => false,
                 ],
@@ -58,7 +58,7 @@ test('asterisk returns all fields and accessors', function (): void {
                 'deleted_at'  => null,
                 'use_factory' => null,
             ],
-            'meta' => [
+            'actions' => [
                 'can_delete' => true,
                 'can_update' => false,
             ],

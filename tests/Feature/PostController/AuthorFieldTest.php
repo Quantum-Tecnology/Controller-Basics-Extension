@@ -18,52 +18,76 @@ test('it returns a list of posts', function (): void {
             ],
         ])
         ->assertOk();
-})->todo();
+});
 
 test('it returns a list of posts with selected author fields', function (): void {
     $author = Author::factory()->create();
     Post::factory()->for($author)->create();
 
     getJson(route('posts.index', [
-        'fields' => 'author[id,name]',
+        'fields' => 'author{id name}',
     ]))
         ->assertJson([
             'data' => [
                 [
-                    'author' => [
-                        'id'   => $author->id,
-                        'name' => $author->name,
+                    'data' => [
+                        'author' => [
+                            'data' => [
+                                'id'   => $author->id,
+                                'name' => $author->name,
+                            ],
+                        ],
                     ],
                 ],
             ],
+            'meta' => [
+                'per_page'       => 10,
+                'current_page'   => 1,
+                'has_more_pages' => false,
+                'page_name'      => 'page',
+                'total'          => 1,
+                'last_page'      => 1,
+            ],
         ])
         ->assertOk();
-})->todo();
+});
 
 test('it returns a list of posts with all author fields', function (): void {
     $post   = Post::factory()->create();
     $author = $post->author;
 
     getJson(route('posts.index', [
-        'fields' => 'author[*]',
+        'fields' => 'author{*}',
     ]))
         ->assertJson([
             'data' => [
                 [
-                    'author' => [
-                        'id'          => $author->id,
-                        'name'        => $author->name,
-                        'created_at'  => $author->created_at->toDateTimeString(),
-                        'updated_at'  => $author->updated_at->toDateTimeString(),
-                        'deleted_at'  => null,
-                        'use_factory' => null,
-                        'actions'     => [
-                            'can_delete' => true,
-                            'can_update' => false,
+                    'data' => [
+                        'author' => [
+                            'data' => [
+                                'id'          => $author->id,
+                                'name'        => $author->name,
+                                'created_at'  => $author->created_at->toDateTimeString(),
+                                'updated_at'  => $author->updated_at->toDateTimeString(),
+                                'deleted_at'  => null,
+                                'use_factory' => null,
+                            ],
+                            'actions' => [
+                                'can_delete' => true,
+                                'can_update' => false,
+                            ],
                         ],
                     ],
                 ],
             ],
+            'meta' => [
+                'per_page'       => 10,
+                'current_page'   => 1,
+                'has_more_pages' => false,
+                'page_name'      => 'page',
+                'total'          => 1,
+                'last_page'      => 1,
+            ],
         ])
         ->assertOk();
-})->todo();
+});
