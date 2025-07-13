@@ -50,11 +50,12 @@ test('8', function () {
 
     expect($response)->toBe([
         'data' => [
-            'id'         => $model->id,
-            'title'      => $model->title,
-            'created_at' => $model->created_at->toDateTimeString(),
-            'updated_at' => $model->updated_at->toDateTimeString(),
-            'deleted_at' => null,
+            'author_id'   => $model->author_id,
+            'title'       => $model->title,
+            'created_at'  => $model->created_at->toDateTimeString(),
+            'updated_at'  => $model->updated_at->toDateTimeString(),
+            'id'          => $model->id,
+            'use_factory' => null,
         ],
         'meta' => [
             'can_delete' => $model->can_delete,
