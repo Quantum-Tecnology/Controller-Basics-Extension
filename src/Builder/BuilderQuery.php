@@ -37,9 +37,9 @@ final class BuilderQuery
             $includeCamel      = Str::camel($include);
 
             foreach ($includeChildren as $child) {
-                $childCamel = Str::camel($child);
-
-                $withCountChildren[$childCamel] = fn ($query) => $this->filters($query, $filters[$child] ?? []);
+                $childCamel                     = Str::camel($child);
+                $filterChildren                 = $filters["{$include}_{$child}"] ?? [];
+                $withCountChildren[$childCamel] = fn ($query) => $this->filters($query, $filterChildren);
             }
 
             $offset = ($page - 1) * $limit;

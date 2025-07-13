@@ -88,16 +88,19 @@ final class GraphQLPresenter
             if (in_array($model->{$keyCamel}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
                 foreach ($model->{$keyCamel} as $value) {
                     $response['data'][$key]['data'][] = $this->generate(
-                        $value, $fields[$key],
+                        $value,
+                        $fields[$key],
                         $pagination[$key] ?? [],
                         null !== $relationFullName && '' !== $relationFullName && '0' !== $relationFullName ? $key . '.' . $relationFullName . '.' : $key
                     );
-                    $response['data'][$key]['meta'] = $this->generatePagination(
-                        $model, $key,
-                        $pagination[$key] ?? [],
-                        $relationFullName
-                    );
                 }
+
+                $response['data'][$key]['meta'] = $this->generatePagination(
+                    $model,
+                    $key,
+                    $pagination[$key] ?? [],
+                    $relationFullName
+                );
             }
         }
 
@@ -113,19 +116,21 @@ final class GraphQLPresenter
         $relationCamel = Str::camel($relation);
 
         $total = $model->{$relationCamel}->count();
+        $limit = $this->paginationSupport->calculatePerPage($pagination['per_page'] ?? null, $relation);
+
+        $pageNameRelation = Str::snake(str_replace('.', '_', $fullRelationName . '.' . $relation));
+        $pageName         = preg_replace('/_+/', '_', 'page_' . $pageNameRelation);
 
         if (($totalRelation = $model->{"{$relation}_count"}) > 0) {
-
-            $pageName = Str::snake(str_replace('.', '_', $fullRelationName . '.' . $relation));
 
             $paginator = new LengthAwarePaginator(
                 [],
                 $totalRelation,
-                $this->paginationSupport->calculatePerPage($pagination['per_page'] ?? null, $relation),
+                $limit,
                 $pagination['page'] ?? 1,
                 [
                     'path'     => LengthAwarePaginator::resolveCurrentPath(),
-                    'pageName' => preg_replace('/_+/', '_', 'page_' . $pageName),
+                    'pageName' => $pageName,
                 ]
             );
 
@@ -140,7 +145,12 @@ final class GraphQLPresenter
         }
 
         return [
-            'total' => $total,
+            'total'          => $total,
+            'per_page'       => $limit,
+            'current_page'   => 1,
+            'last_page'      => 1,
+            'has_more_pages' => false,
+            'page_name'      => $pageName,
         ];
     }
 
