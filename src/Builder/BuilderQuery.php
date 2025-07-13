@@ -28,9 +28,11 @@ final class BuilderQuery
                 $withCount[$include] = fn ($query) => $this->filters($query, $filter);
             }
 
-            $paginate = data_get($pagination, $include);
-            $limit    = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
-            $page     = $paginate['page'] ?? 1;
+            //            dump(str_replace('.', '_', $include));
+            $paginate = data_get($pagination, str_replace('.', '_', $include));
+
+            $limit = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
+            $page  = $paginate['page'] ?? 1;
 
             $withCountChildren = [];
             $includeChildren   = $this->getIncludesWithCount($includes, $include);

@@ -82,7 +82,7 @@ final class GraphQLPresenter
             $keyCamel = Str::camel($key);
 
             if (in_array($model->{$keyCamel}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
-                $response['data'][$key] = $this->generate($model->{$keyCamel}, $fields[$key], $pagination[$key] ?? []);
+                $response['data'][$key] = $this->generate($model->{$keyCamel}, $fields[$key]);
             }
 
             if (in_array($model->{$keyCamel}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
@@ -90,8 +90,8 @@ final class GraphQLPresenter
                     $response['data'][$key]['data'][] = $this->generate(
                         $value,
                         $fields[$key],
-                        $pagination[$key] ?? [],
-                        null !== $relationFullName && '' !== $relationFullName && '0' !== $relationFullName ? $key . '.' . $relationFullName . '.' : $key
+                        $pagination,
+                        null !== $relationFullName && '' !== $relationFullName && '0' !== $relationFullName ? $key . '.' . $relationFullName . '.' : "{$key}."
                     );
                 }
 

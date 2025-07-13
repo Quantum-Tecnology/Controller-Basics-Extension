@@ -12,12 +12,12 @@ use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-class GraphQlService
+final class GraphQlService
 {
     public function __construct(
-        protected BuilderQuery $builderQuery,
-        protected GraphQLPresenter $presenter,
-        protected PaginationSupport $paginationSupport,
+        private BuilderQuery $builderQuery,
+        private GraphQLPresenter $presenter,
+        private PaginationSupport $paginationSupport,
     ) {
     }
 
@@ -32,7 +32,7 @@ class GraphQlService
     ): Collection {
         $limit = $this->paginationSupport->calculatePerPage($perPage, $model::class);
 
-        $builder = $this->builderQuery->execute($model, $fields, $filters)->paginate(
+        $builder = $this->builderQuery->execute($model, $fields, $filters, $pagination)->paginate(
             perPage: $limit,
             pageName: null !== $pageName && '' !== $pageName && '0' !== $pageName ? $pageName : 'page',
             page: $page,
@@ -52,7 +52,7 @@ class GraphQlService
     ): Collection {
         $limit = $this->paginationSupport->calculatePerPage($perPage, $model::class);
 
-        $builder = $this->builderQuery->execute($model, $fields, $filters)->simplePaginate(
+        $builder = $this->builderQuery->execute($model, $fields, $filters, $pagination)->simplePaginate(
             perPage: $limit,
             pageName: null !== $pageName && '' !== $pageName && '0' !== $pageName ? $pageName : 'page',
             page: $page,
@@ -75,7 +75,7 @@ class GraphQlService
         return collect($this->unique($item, $fields, $pagination));
     }
 
-    protected function formatPaginatedResponse(
+    private function formatPaginatedResponse(
         Paginator $builder,
         array $fields,
         array $pagination
@@ -104,7 +104,7 @@ class GraphQlService
         ]);
     }
 
-    protected function unique(Model $model, array $fields, array $pagination = []): array
+    private function unique(Model $model, array $fields, array $pagination = []): array
     {
         return $this->presenter->execute($model, $fields, $pagination);
     }
