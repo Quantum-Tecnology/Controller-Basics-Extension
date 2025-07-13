@@ -23,12 +23,13 @@ trait AsGraphQLController
         FilterSupport $filterSupport,
         PaginationSupport $paginationSupport,
     ): JsonResponse {
-        $queries = $request->query();
-
+        $queries  = $request->query();
+        $params   = $request->route()?->parameters() ?: [];
+        $filters  = $filterSupport->parse($queries + $this->filterRouteParams($params));
         $response = $graphQlService->paginate(
             $this->model(),
             $fieldSupport->parse($queries['fields'] ?? ''),
-            $filterSupport->parse($queries),
+            $filters,
             $paginationSupport->parse($queries),
         );
 
@@ -42,18 +43,27 @@ trait AsGraphQLController
         FilterSupport $filterSupport,
         PaginationSupport $paginationSupport,
     ): JsonResponse {
-        $queries = $request->query();
         $p       = $request->route()?->parameters() ?: [];
         $key     = $this->model()->getKeyName();
-        $id      = end($p);
+        $id      = array_pop($p);
+        $queries = ["filter({$key})" => $id] + $request->query();
+
+        $filters = $filterSupport->parse($queries + $this->filterRouteParams($p));
 
         $response = $graphQlService->sole(
             $this->model(),
             $fieldSupport->parse($queries['fields'] ?? ''),
-            [$key => $id] + $filterSupport->parse($queries),
+            $filters,
             $paginationSupport->parse($queries),
         );
 
         return response()->json($response);
+    }
+
+    protected function filterRouteParams(array $data): array
+    {
+        return collect($data)
+            ->mapWithKeys(fn ($value, $key) => ['filter(' . $key . ')' => $value])
+            ->all();
     }
 }

@@ -15,7 +15,7 @@ class BuilderQuery
     {
         $paginationSupport = app(PaginationSupport::class);
 
-        $query     = $model->newQuery();
+        $query     = $this->filters($model->newQuery(), $filters['[__model__]'] ?? []);
         $with      = [];
         $includes  = $this->nestedDotPaths($fields);
         $withCount = [];
