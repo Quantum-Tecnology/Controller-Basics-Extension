@@ -80,12 +80,6 @@ class GraphQLPresenter
             }
         }
 
-        foreach ($model->getMutatedAttributes() as $key) {
-            if (!array_key_exists($key, $attributes)) {
-                $attributes[$key] = $model->{$key};
-            }
-        }
-
         return array_keys($attributes);
     }
 }
