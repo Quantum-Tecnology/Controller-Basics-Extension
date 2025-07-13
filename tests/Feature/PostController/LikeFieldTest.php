@@ -16,16 +16,18 @@ test('it returns post with comments and likes counts', function (): void {
     });
 
     $response = getJson(route('posts.index', [
-        'fields' => 'id,title;comments[id];comments.likes[id]',
+        'fields' => 'id title comments {likes{id}}',
     ]))
         ->assertJsonStructure([
             'data' => [
                 '*' => [
-                    'comments' => [
-                        'data' => [
-                            '*' => [
-                                'likes' => [
-                                    'data',
+                    'data' => [
+                        'comments' => [
+                            'data' => [
+                                '*' => [
+                                    'data' => [
+                                        'likes',
+                                    ],
                                 ],
                             ],
                         ],
@@ -35,7 +37,7 @@ test('it returns post with comments and likes counts', function (): void {
         ])
         ->json('data')[0];
 
-    expect($response['comments']['meta']['total_items'])
+    expect($response['data']['comments']['meta']['total'])
         ->toBe(3)
-        ->and($response['comments']['data'][0]['likes']['meta']['total_items'])->toBe(5);
-})->todo();
+        ->and($response['data']['comments']['data'][0]['data']['likes']['meta']['total'])->toBe(5);
+});

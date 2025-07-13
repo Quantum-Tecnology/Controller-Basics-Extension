@@ -10,50 +10,89 @@ test('it returns a list of posts with selected comments fields', function (): vo
     $comment = Comment::factory()->create();
 
     getJson(route('posts.index', [
-        'fields' => 'comments[id,body]',
+        'fields' => 'comments{ id,body }',
     ]))->assertJson([
         'data' => [
             [
-                'comments' => [
-                    'data' => [
-                        [
-                            'id'   => $comment->id,
-                            'body' => $comment->body,
+                'data' => [
+                    'comments' => [
+                        'data' => [
+                            [
+                                'data' => [
+                                    'id'   => $comment->id,
+                                    'body' => $comment->body,
+                                ],
+                            ],
+                        ],
+                        'meta' => [
+                            'total'          => 1,
+                            'per_page'       => 10,
+                            'current_page'   => 1,
+                            'last_page'      => 1,
+                            'has_more_pages' => false,
+                            'page_name'      => 'page_comments',
                         ],
                     ],
                 ],
             ],
         ],
+        'meta' => [
+            'per_page'       => 10,
+            'current_page'   => 1,
+            'has_more_pages' => false,
+            'page_name'      => 'page',
+            'total'          => 1,
+            'last_page'      => 1,
+        ],
     ])
         ->assertOk();
-})->todo();
+});
 
 test('it returns a list of posts with all comments fields', function (): void {
     $comment = Comment::factory()->create();
 
     getJson(route('posts.index', [
-        'fields' => 'comments[*]',
+        'fields' => 'comments{*}',
     ]))->assertJson([
         'data' => [
             [
-                'comments' => [
-                    'data' => [
-                        [
-                            'id'          => $comment->id,
-                            'body'        => $comment->body,
-                            'created_at'  => $comment->created_at->toDateTimeString(),
-                            'updated_at'  => $comment->updated_at->toDateTimeString(),
-                            'deleted_at'  => null,
-                            'use_factory' => null,
-                            'actions'     => [
-                                'can_delete' => true,
-                                'can_update' => false,
+                'data' => [
+                    'comments' => [
+                        'data' => [
+                            [
+                                'data' => [
+                                    'id'          => $comment->id,
+                                    'body'        => $comment->body,
+                                    'created_at'  => $comment->created_at->toDateTimeString(),
+                                    'updated_at'  => $comment->updated_at->toDateTimeString(),
+                                    'deleted_at'  => null,
+                                    'use_factory' => null,
+                                ],
+                                'actions' => [
+                                    'can_delete' => true,
+                                    'can_update' => false,
+                                ],
                             ],
+                        ],
+                        'meta' => [
+                            'total'          => 1,
+                            'per_page'       => 10,
+                            'current_page'   => 1,
+                            'last_page'      => 1,
+                            'has_more_pages' => false,
+                            'page_name'      => 'page_comments',
                         ],
                     ],
                 ],
             ],
         ],
-    ])
-        ->assertOk();
-})->todo();
+        'meta' => [
+            'per_page'       => 10,
+            'current_page'   => 1,
+            'has_more_pages' => false,
+            'page_name'      => 'page',
+            'total'          => 1,
+            'last_page'      => 1,
+        ],
+    ])->assertOk();
+});
