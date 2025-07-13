@@ -6,6 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 
 class GraphQLPresenter
@@ -32,9 +33,9 @@ class GraphQLPresenter
 
         $relations = [];
 
-        foreach ($fields as $field) {
+        foreach ($fields as $key => $field) {
             if (is_array($field)) {
-                $relations[] = $field;
+                $relations[$key] = $field;
 
                 continue;
             }
@@ -63,6 +64,12 @@ class GraphQLPresenter
 
         if ($meta) {
             $response['meta'] = $meta;
+        }
+
+        foreach ($relations as $key => $relation) {
+            if (in_array($model->{$key}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
+                $response['data'][$key] = $this->generate($model->{$key}, $fields[$key], $pagination[$key] ?? []);
+            }
         }
 
         return $response;

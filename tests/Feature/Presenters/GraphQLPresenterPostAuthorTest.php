@@ -19,6 +19,12 @@ test('a', function () {
         'data' => [
             'id'        => $this->post->id,
             'author_id' => $this->post->author_id,
+            'author'    => [
+                'data' => [
+                    'id'   => $this->author->id,
+                    'name' => $this->author->name,
+                ],
+            ],
         ],
     ]);
 });
