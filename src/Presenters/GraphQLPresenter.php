@@ -125,11 +125,12 @@ class GraphQLPresenter
             );
 
             return [
-                'total'        => $paginator->total(),
-                'per_page'     => $paginator->perPage(),
-                'current_page' => $paginator->currentPage(),
-                'last_page'    => $paginator->lastPage(),
-                'page_name'    => $paginator->getOptions()['pageName'],
+                'total'          => $paginator->total(),
+                'per_page'       => $paginator->perPage(),
+                'current_page'   => $paginator->currentPage(),
+                'last_page'      => $paginator->lastPage(),
+                'has_more_pages' => $paginator->hasMorePages(),
+                'page_name'      => $paginator->getOptions()['pageName'],
             ];
         }
 
