@@ -17,6 +17,8 @@
             <directory>src/Support</directory>
             <directory>src/Presenters</directory>
             <directory>src/Builder</directory>
+            <file>src/Traits/AsGraphQLController.php</file>
+            <file>src/Services/GraphQlService.php</file>
         </include>
     </source>
     <php>
