@@ -18,8 +18,8 @@ beforeEach(function () {
 
 test('it returns paginated comments for post', function () {
     $fields = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
-    //    $result = $this->presenter->execute($this->builder->execute($this->post, $fields)->find($this->post->id), $fields);
-    //    expect($result['data']['comments']['data'])->toHaveCount(10);
+    $post   = $this->builder->execute($this->post, $fields)->where('id', $this->post->id)->sole();
+    expect($post->comments)->toHaveCount(10);
 });
 
 test('it paginates comments with per_page parameter', function () {
@@ -27,7 +27,36 @@ test('it paginates comments with per_page parameter', function () {
     $paginate = ['comments' => ['per_page' => 5]];
 
     /** @var Model $builder */
-    $builder = $this->builder->execute($this->post, $fields, $paginate)->find($this->post->id);
-    $result  = $this->presenter->execute($builder, $fields);
-    //    expect($result['data']['comments']['data'])->toHaveCount(5);
+    $post = $this->builder->execute($this->post, $fields, [], $paginate)->where('id', $this->post->id)->sole();
+    expect($post->comments)->toHaveCount(5);
+});
+
+test('it filters comments by id less than or equal to 3', function () {
+    $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
+    $filters = [
+        'comments' => [
+            'id' => [
+                '<=' => [3],
+            ],
+        ],
+    ];
+
+    /** @var Model $builder */
+    $post = $this->builder->execute($this->post, $fields, $filters)->where('id', $this->post->id)->sole();
+    expect($post->comments)->toHaveCount(3);
+});
+
+test('it filters comments by id less than or equal 3', function () {
+    $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
+    $filters = [
+        'comments' => [
+            'id' => [
+                '=' => [3],
+            ],
+        ],
+    ];
+
+    /** @var Model $builder */
+    $post = $this->builder->execute($this->post, $fields, $filters)->where('id', $this->post->id)->sole();
+    expect($post->comments)->toHaveCount(1);
 });

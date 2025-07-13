@@ -10,7 +10,7 @@ use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 class BuilderQuery
 {
-    public function execute(Model $model, array $fields, array $pagination = []): Builder
+    public function execute(Model $model, array $fields, array $filters = [], array $pagination = []): Builder
     {
         $paginationSupport = app(PaginationSupport::class);
 
@@ -19,11 +19,13 @@ class BuilderQuery
         $includes = $this->nestedDotPaths($fields);
 
         foreach ($includes as $include) {
+            $changePointUnderline = str_replace('.', '_', $include);
 
             $paginate = data_get($pagination, $include);
             $limit    = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
 
-            $with[$include] = fn ($query) => $query->limit((string) $limit);
+            $with[$include] = fn ($query) => $this->filters($query, $filters[$changePointUnderline] ?? [])
+                ->limit((string) $limit);
         }
 
         $query->with($with);
@@ -44,5 +46,26 @@ class BuilderQuery
         }
 
         return $paths;
+    }
+
+    protected function filters($query, array $filters = [])
+    {
+        if (blank($filters)) {
+            return $query;
+        }
+
+        $model = $query->getModel();
+        $table = $model->getTable();
+
+        foreach ($filters as $column => $value) {
+            foreach ($value as $operator => $data) {
+                match ($operator) {
+                    '='     => $query->whereIn("{$table}.{$column}", $data),
+                    default => $query->where("{$table}.{$column}", $operator, $data[0]),
+                };
+            }
+        }
+
+        return $query;
     }
 }
