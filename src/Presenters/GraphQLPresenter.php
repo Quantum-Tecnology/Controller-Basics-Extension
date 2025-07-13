@@ -60,7 +60,11 @@ class GraphQLPresenter
             }
         }
 
-        $response = compact('data');
+        $response = [];
+
+        if ($data) {
+            $response = compact('data');
+        }
 
         if ($meta) {
             $response['meta'] = $meta;

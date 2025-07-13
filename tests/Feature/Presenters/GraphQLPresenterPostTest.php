@@ -45,17 +45,18 @@ test('date fields are formatted', function () {
 test('asterisk returns all fields and accessors', function () {
     $fields = ['*'];
     $result = $this->presenter->execute($this->post, $fields);
-    expect($result['data'])->toMatchArray([
-        'id'         => $this->post->id,
-        'author_id'  => $this->post->author_id,
-        'title'      => $this->post->title,
-        'created_at' => $this->post->created_at->toDateTimeString(),
-        'updated_at' => $this->post->created_at->toDateTimeString(),
-    ]);
-    expect($result['meta'])->toMatchArray([
-        'can_delete' => true,
-        'can_update' => false,
-    ]);
+    expect($result['data'])
+        ->toMatchArray([
+            'id'         => $this->post->id,
+            'author_id'  => $this->post->author_id,
+            'title'      => $this->post->title,
+            'created_at' => $this->post->created_at->toDateTimeString(),
+            'updated_at' => $this->post->created_at->toDateTimeString(),
+        ])
+        ->and($result['meta'])->toMatchArray([
+            'can_delete' => true,
+            'can_update' => false,
+        ]);
 });
 
 test('meta omitted if empty', function () {
@@ -81,9 +82,9 @@ test('includes mutated attributes', function () {
 test('handles empty fields array', function () {
     $fields = [];
     $result = $this->presenter->execute($this->post, $fields);
-    expect($result['data'])
-        ->toBe([])
-        ->and($result)->not->toHaveKey('meta');
+    expect($result)
+        ->not->toHaveKey('data')
+        ->not->toHaveKey('meta');
 });
 
 test('handles non existent fields gracefully', function () {
