@@ -22,7 +22,7 @@ test('it returns paginated comments for post', function () {
     expect($result['data']['comments']['data'])->toHaveCount(10);
 });
 
-test('a', function () {
+test('it paginates comments with per_page parameter', function () {
     $fields   = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $paginate = ['comments' => ['per_page' => 5]];
 

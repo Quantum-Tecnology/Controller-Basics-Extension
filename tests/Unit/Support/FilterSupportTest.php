@@ -59,6 +59,39 @@ it('parses multiple filters', function () {
     ]);
 });
 
+it('ab', function () {
+    $data = [
+        'filter_user(name)'            => 'john',
+        'filter_user(age,>)'           => '18',
+        'filter_status(status)'        => 'active',
+        'filter_post_comments(status)' => 'active',
+    ];
+    $result = $this->support->parse($data);
+
+    expect($result)->toBe([
+        'user' => [
+            'name' => [
+                '=' => ['john'],
+            ],
+            'age' => [
+                '>' => [18],
+            ],
+        ],
+        'status' => [
+            'status' => [
+                '=' => ['active'],
+            ],
+        ],
+        'post_comments' => [
+            'status' => [
+                '=' => [
+                    0 => 'active',
+                ],
+            ],
+        ],
+    ]);
+});
+
 it('parses filter values as array', function () {
     $data   = ['filter_user(id)' => [1, 2, 3]];
     $result = $this->support->parse($data);
@@ -162,7 +195,7 @@ it('returns empty array for no matching filters', function () {
     expect($result)->toBe([]);
 });
 
-it('a', function () {
+it('parses filter for root model with default operator and multiple values', function () {
     $data   = ['filter(id)' => '1|2|3'];
     $result = $this->support->parse($data);
 
