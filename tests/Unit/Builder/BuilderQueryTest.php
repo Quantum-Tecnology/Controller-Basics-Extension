@@ -2,10 +2,10 @@
 
 declare(strict_types = 1);
 
-use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderGraphQl;
+use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 
 beforeEach(function () {
-    $this->builder = new BuilderGraphQl();
+    $this->builder = new BuilderQuery();
     $reflection    = new ReflectionClass($this->builder);
     $this->method  = $reflection->getMethod('nestedDotPaths');
     $this->method->setAccessible(true);

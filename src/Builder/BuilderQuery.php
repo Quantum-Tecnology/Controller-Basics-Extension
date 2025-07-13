@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-class BuilderGraphQl
+class BuilderQuery
 {
     public function execute(Model $model, array $fields, array $pagination = []): Builder
     {
