@@ -157,6 +157,10 @@ trait AsGraphQLController
         return self::getNamespaceRequest();
     }
 
+    /**
+     * @codeCoverageIgnore
+     * // TODO: Implement a method to save children models in a GraphQL context.
+     */
     protected function saveStoreChildren(Model $model, array $children): void
     {
         foreach ($children as $key => $value) {
