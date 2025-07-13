@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
+use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
 beforeEach(function () {
@@ -147,5 +148,6 @@ test('handles non existent fields gracefully', function () {
     $result = $this->presenter->execute($this->model, $fields);
     expect($result['data'])
         ->toHaveKey('id', 1)
-        ->and($result['data'])->toHaveKey('not_a_field', null);
+        ->and($result['data'])->toHaveKey('not_a_field', null)
+        ->and(LogSupport::getMessages())->toHaveCount(1);
 });

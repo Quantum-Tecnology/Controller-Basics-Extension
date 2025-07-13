@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use ReflectionClass;
 
 class GraphQLPresenter
@@ -39,6 +40,13 @@ class GraphQLPresenter
                 $meta[$field] = $valueField;
             } else {
                 $data[$field] = $valueField;
+            }
+
+            if (!in_array($field, $attributesModel, true)) {
+                LogSupport::add(__("The field ':field' does not exist in the model ':model'. Please check your fields.", [
+                    'field' => $field,
+                    'model' => $model->getTable(),
+                ]));
             }
         }
 
