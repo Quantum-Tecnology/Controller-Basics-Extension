@@ -6,9 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
-use ReflectionClass;
 
 class GraphQLPresenter
 {
@@ -63,20 +61,9 @@ class GraphQLPresenter
     {
         $attributes = $model->getAttributes();
 
-        foreach ((new ReflectionClass($model))->getMethods() as $method) {
-            if (preg_match('/^get(.+)Attribute$/', $method->name, $matches)) {
-                $key              = Str::snake($matches[1]);
+        foreach ($model->getMutatedAttributes() as $key) {
+            if (!array_key_exists($key, $attributes)) {
                 $attributes[$key] = $model->{$key};
-            }
-
-            if (0 === $method->getNumberOfParameters()) {
-                $returnType = $method->getReturnType();
-
-                if ($returnType && \Illuminate\Database\Eloquent\Casts\Attribute::class === $returnType->getName()) {
-                    $key              = Str::snake($method->name);
-                    $attribute        = $model->{$key};
-                    $attributes[$key] = $attribute;
-                }
             }
         }
 
