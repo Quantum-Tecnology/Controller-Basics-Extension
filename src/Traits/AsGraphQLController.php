@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -154,10 +155,44 @@ trait AsGraphQLController
         }
 
         return self::getNamespaceRequest();
-    }/*
- * @param  mixed  $request
- * @param  FilterSupport  $filterSupport
- * @param  BuilderQuery  $builderQuery
- * @return array
- */
+    }
+
+    protected function saveStoreChildren(Model $model, array $children): void
+    {
+        foreach ($children as $key => $value) {
+            $ids = [];
+
+            foreach ($value as $value2) {
+                $dataArray = [];
+
+                foreach ($value2 as $key3 => $value3) {
+                    if (is_array($value3)) {
+                        $dataArray[$key3] = $value3;
+                        unset($value2[$key3]);
+                    }
+                }
+
+                if ($model->{$key}() instanceof Relations\HasMany) {
+                    $newModel = $model->{$key}()->create($value2);
+                }
+
+                if ($model->{$key}() instanceof Relations\BelongsToMany) {
+                    $belongsToMany = $model->{$key}()->getRelated();
+                    ksort($value2);
+
+                    if (!isset($ids[json_encode($value2)])) {
+                        $ids[json_encode($value2)] = $belongsToMany->create($value2);
+                    }
+                }
+
+                if (isset($newModel) && filled($dataArray)) {
+                    $this->saveStoreChildren($newModel, $dataArray);
+                }
+            }
+
+            if (filled($ids)) {
+                $model->{$key}()->attach($ids);
+            }
+        }
+    }
 }
