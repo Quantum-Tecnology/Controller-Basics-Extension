@@ -22,7 +22,7 @@ class FieldSupport
 
     private function tokenize(string $input): array
     {
-        preg_match_all('/\w+|[{]|[}]/', $input, $matches);
+        preg_match_all('/\w+|\*|[{]|[}]/', $input, $matches);
 
         return $matches[0];
     }

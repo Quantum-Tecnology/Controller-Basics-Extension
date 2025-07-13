@@ -17,6 +17,14 @@ it('parses nested fields', function () {
     ]);
 });
 
+it('parses nested fields with all fields', function () {
+    $support = new FieldSupport();
+    $input   = 'user{*}';
+    expect($support->parse($input))->toBe([
+        'user' => ['*'],
+    ]);
+});
+
 it('parses multiple nested levels', function () {
     $support = new FieldSupport();
     $input   = 'user{name address{city zip}}';
