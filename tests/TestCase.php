@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware;
@@ -31,7 +32,7 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
-    protected function setUpDatabase(array $app): void
+    protected function setUpDatabase(Application $app): void
     {
         $schema = $app['db']->connection()->getSchemaBuilder();
 
@@ -98,8 +99,10 @@ abstract class TestCase extends BaseTestCase
         });
     }
 
-    protected function setUpRoute(array $app): void
+    protected function setUpRoute(Application $app): void
     {
-        $app['router']->withoutMiddleware([LogMiddleware::class])->apiResource('posts', PostController::class);
+        $app['router']
+            // ->withoutMiddleware([LogMiddleware::class])
+            ->apiResource('posts', PostController::class);
     }
 }
