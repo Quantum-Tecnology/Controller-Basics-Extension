@@ -36,14 +36,15 @@ test('it filters comments by id less than or equal to 3', function () {
     $filters = [
         'comments' => [
             'id' => [
-                '<=' => [3],
+                '<=' => [20],
             ],
         ],
     ];
 
     /** @var Model $builder */
     $post = $this->builder->execute($this->post, $fields, $filters)->where('id', $this->post->id)->sole();
-    expect($post->comments)->toHaveCount(3);
+    expect($post)->comments->toHaveCount(10)
+        ->comments_count->toBe(20);
 });
 
 test('it filters comments by id less than or equal 3', function () {

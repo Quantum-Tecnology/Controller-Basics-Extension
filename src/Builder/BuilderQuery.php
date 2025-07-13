@@ -6,6 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 class BuilderQuery
@@ -14,21 +15,34 @@ class BuilderQuery
     {
         $paginationSupport = app(PaginationSupport::class);
 
-        $query    = $model->newQuery();
-        $with     = [];
-        $includes = $this->nestedDotPaths($fields);
+        $query     = $model->newQuery();
+        $with      = [];
+        $includes  = $this->nestedDotPaths($fields);
+        $withCount = [];
 
         foreach ($includes as $include) {
             $changePointUnderline = str_replace('.', '_', $include);
+            $filter               = $filters[$changePointUnderline] ?? [];
+
+            if (!str_contains($include, '.')) {
+                $withCount[$include] = fn ($query) => $this->filters($query, $filter);
+            }
 
             $paginate = data_get($pagination, $include);
             $limit    = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
 
-            $with[$include] = fn ($query) => $this->filters($query, $filters[$changePointUnderline] ?? [])
+            $withCountChildren = [];
+            $includeChildren   = $this->getIncludesWithCount($includes, $include);
+
+            foreach ($includeChildren as $child) {
+                $withCountChildren[$child] = fn ($query) => $this->filters($query, $filter);
+            }
+
+            $with[$include] = fn ($query) => $this->filters($query->withCount($withCountChildren), $filter)
                 ->limit((string) $limit);
         }
 
-        $query->with($with);
+        $query->withCount($withCount)->with($with);
 
         return $query;
     }
@@ -67,5 +81,14 @@ class BuilderQuery
         }
 
         return $query;
+    }
+
+    protected function getIncludesWithCount(array $includes, string $include): array
+    {
+        return collect($includes)
+            ->filter(fn ($item) => Str::startsWith($item, $include . '.'))
+            ->map(fn ($item) => Str::after($item, $include . '.'))
+            ->values()
+            ->all();
     }
 }
