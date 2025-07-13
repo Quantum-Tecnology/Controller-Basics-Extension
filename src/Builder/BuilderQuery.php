@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-class BuilderQuery
+final class BuilderQuery
 {
     public function execute(Model $model, array $fields, array $filters = [], array $pagination = []): Builder
     {
@@ -34,14 +34,17 @@ class BuilderQuery
 
             $withCountChildren = [];
             $includeChildren   = $this->getIncludesWithCount($includes, $include);
+            $includeCamel      = Str::camel($include);
 
             foreach ($includeChildren as $child) {
-                $withCountChildren[$child] = fn ($query) => $this->filters($query, $filters[$child] ?? []);
+                $childCamel = Str::camel($child);
+
+                $withCountChildren[$childCamel] = fn ($query) => $this->filters($query, $filters[$child] ?? []);
             }
 
             $offset = ($page - 1) * $limit;
 
-            $with[$include] = fn ($query) => $this->filters($query->withCount($withCountChildren), $filter)
+            $with[$includeCamel] = fn ($query) => $this->filters($query->withCount($withCountChildren), $filter)
                 ->offset($offset)
                 ->limit((string) $limit);
         }
@@ -51,7 +54,7 @@ class BuilderQuery
         return $query;
     }
 
-    protected function nestedDotPaths(array $fields, string $prefix = ''): array
+    private function nestedDotPaths(array $fields, string $prefix = ''): array
     {
         $paths = [];
 
@@ -66,7 +69,7 @@ class BuilderQuery
         return $paths;
     }
 
-    protected function filters($query, array $filters = [])
+    private function filters($query, array $filters = [])
     {
         if (blank($filters)) {
             return $query;
@@ -87,7 +90,7 @@ class BuilderQuery
         return $query;
     }
 
-    protected function getIncludesWithCount(array $includes, string $include): array
+    private function getIncludesWithCount(array $includes, string $include): array
     {
         return collect($includes)
             ->filter(fn ($item) => Str::startsWith($item, $include . '.'))

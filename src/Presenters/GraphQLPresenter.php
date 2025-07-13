@@ -12,10 +12,10 @@ use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-class GraphQLPresenter
+final class GraphQLPresenter
 {
     public function __construct(
-        protected PaginationSupport $paginationSupport,
+        private PaginationSupport $paginationSupport,
     ) {
     }
 
@@ -24,7 +24,7 @@ class GraphQLPresenter
         return $this->generate($model, $fields, $pagination);
     }
 
-    protected function generate(Model $model, array $fields, array $pagination = [], ?string $relationFullName = null): array
+    private function generate(Model $model, array $fields, array $pagination = [], ?string $relationFullName = null): array
     {
         $actions         = [];
         $data            = [];
@@ -79,12 +79,14 @@ class GraphQLPresenter
         }
 
         foreach (array_keys($relations) as $key) {
-            if (in_array($model->{$key}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
-                $response['data'][$key] = $this->generate($model->{$key}, $fields[$key], $pagination[$key] ?? []);
+            $keyCamel = Str::camel($key);
+
+            if (in_array($model->{$keyCamel}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
+                $response['data'][$key] = $this->generate($model->{$keyCamel}, $fields[$key], $pagination[$key] ?? []);
             }
 
-            if (in_array($model->{$key}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
-                foreach ($model->{$key} as $value) {
+            if (in_array($model->{$keyCamel}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
+                foreach ($model->{$keyCamel} as $value) {
                     $response['data'][$key]['data'][] = $this->generate(
                         $value, $fields[$key],
                         $pagination[$key] ?? [],
@@ -102,13 +104,15 @@ class GraphQLPresenter
         return $response;
     }
 
-    protected function generatePagination(
+    private function generatePagination(
         Model $model,
         string $relation,
         array $pagination,
         ?string $fullRelationName = null
     ): array {
-        $total = $model->{$relation}->count();
+        $relationCamel = Str::camel($relation);
+
+        $total = $model->{$relationCamel}->count();
 
         if (($totalRelation = $model->{"{$relation}_count"}) > 0) {
 
@@ -140,7 +144,7 @@ class GraphQLPresenter
         ];
     }
 
-    protected function getAllModelAttributes(Model $model): array
+    private function getAllModelAttributes(Model $model): array
     {
         $attributes = $model->getAttributes();
 
