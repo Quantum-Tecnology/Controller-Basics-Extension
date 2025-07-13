@@ -12,9 +12,13 @@ class GraphQLPresenter
 {
     public function execute(Model $model, array $fields, array $pagination = []): array
     {
-        $data = [];
-        $meta = [];
+        return $this->generate($model, $fields, $pagination);
+    }
 
+    protected function generate(Model $model, array $fields, array $pagination = [])
+    {
+        $meta            = [];
+        $data            = [];
         $attributesModel = $this->getAllModelAttributes($model);
 
         foreach ($fields as $key => $all) {
