@@ -88,7 +88,7 @@ class GraphQLPresenter
                     $response['data'][$key]['data'][] = $this->generate(
                         $value, $fields[$key],
                         $pagination[$key] ?? [],
-                        $relationFullName ? $key . '.' . $relationFullName . '.' : $key
+                        null !== $relationFullName && '' !== $relationFullName && '0' !== $relationFullName ? $key . '.' . $relationFullName . '.' : $key
                     );
                     $response['data'][$key]['meta'] = $this->generatePagination(
                         $model, $key,

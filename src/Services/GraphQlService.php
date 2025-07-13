@@ -34,7 +34,7 @@ class GraphQlService
 
         $builder = $this->builderQuery->execute($model, $fields, $filters)->paginate(
             perPage: $limit,
-            pageName: $pageName ?: 'page',
+            pageName: null !== $pageName && '' !== $pageName && '0' !== $pageName ? $pageName : 'page',
             page: $page,
         );
 
@@ -54,7 +54,7 @@ class GraphQlService
 
         $builder = $this->builderQuery->execute($model, $fields, $filters)->simplePaginate(
             perPage: $limit,
-            pageName: $pageName ?: 'page',
+            pageName: null !== $pageName && '' !== $pageName && '0' !== $pageName ? $pageName : 'page',
             page: $page,
         );
 
