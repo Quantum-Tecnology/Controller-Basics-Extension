@@ -48,16 +48,19 @@ test('fields starting with can_ go to meta', function () {
 test('asterisk returns all fields and accessors', function () {
     $fields = ['author' => ['*']];
     $result = $this->presenter->execute($this->post, $fields);
-    expect($result['data']['author']['data'])
+    expect($result['data']['author'])
         ->toMatchArray([
-            'id'         => $this->author->id,
-            'name'       => $this->author->name,
-            'created_at' => $this->author->created_at->toDateTimeString(),
-            'updated_at' => $this->author->created_at->toDateTimeString(),
-            'deleted_at' => null,
-        ])
-        ->and($result['data']['author']['meta'])->toMatchArray([
-            'can_delete' => true,
-            'can_update' => false,
+            'data' => [
+                'id'          => $this->author->id,
+                'name'        => $this->author->name,
+                'created_at'  => $this->author->created_at->toDateTimeString(),
+                'updated_at'  => $this->author->created_at->toDateTimeString(),
+                'deleted_at'  => null,
+                'use_factory' => null,
+            ],
+            'meta' => [
+                'can_delete' => true,
+                'can_update' => false,
+            ],
         ]);
 });

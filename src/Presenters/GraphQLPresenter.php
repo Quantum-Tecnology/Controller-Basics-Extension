@@ -74,9 +74,23 @@ class GraphQLPresenter
             if (in_array($model->{$key}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
                 $response['data'][$key] = $this->generate($model->{$key}, $fields[$key], $pagination[$key] ?? []);
             }
+
+            if (in_array($model->{$key}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
+                foreach ($model->{$key} as $value) {
+                    $response['data'][$key]['data'][] = $this->generate($value, $fields[$key], $pagination[$key] ?? []);
+                    $response['data'][$key]['meta']   = $this->generatePagination($model->{$key}->count());
+                }
+            }
         }
 
         return $response;
+    }
+
+    protected function generatePagination(int $total): array
+    {
+        return [
+            'total' => $total,
+        ];
     }
 
     protected function getAllModelAttributes(Model $model): array
