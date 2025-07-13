@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Presenters;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
+use Illuminate\Support\Collection;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 
 class GraphQLPresenter
@@ -78,7 +79,7 @@ class GraphQLPresenter
             if (in_array($model->{$key}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
                 foreach ($model->{$key} as $value) {
                     $response['data'][$key]['data'][] = $this->generate($value, $fields[$key], $pagination[$key] ?? []);
-                    $response['data'][$key]['meta']   = $this->generatePagination($model->{$key}->count());
+                    $response['data'][$key]['meta']   = $this->generatePagination($model->{$key});
                 }
             }
         }
@@ -86,10 +87,10 @@ class GraphQLPresenter
         return $response;
     }
 
-    protected function generatePagination(int $total): array
+    protected function generatePagination(Collection $model): array
     {
         return [
-            'total' => $total,
+            'total' => $model->count(),
         ];
     }
 
