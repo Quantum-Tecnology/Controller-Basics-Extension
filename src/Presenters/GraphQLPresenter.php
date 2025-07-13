@@ -30,7 +30,14 @@ class GraphQLPresenter
             }
         }
 
+        $relations = [];
+
         foreach ($fields as $field) {
+            if (is_array($field)) {
+                $relations[] = $field;
+
+                continue;
+            }
             $valueField = $model->{$field};
 
             $valueField = match (true) {
