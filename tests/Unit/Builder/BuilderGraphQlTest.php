@@ -3,10 +3,9 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderGraphQl;
-use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 beforeEach(function () {
-    $this->builder = new BuilderGraphQl(new PaginationSupport());
+    $this->builder = new BuilderGraphQl();
     $reflection    = new ReflectionClass($this->builder);
     $this->method  = $reflection->getMethod('nestedDotPaths');
     $this->method->setAccessible(true);

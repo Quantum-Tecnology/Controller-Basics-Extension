@@ -10,22 +10,18 @@ use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 class BuilderGraphQl
 {
-    public function __construct(
-        protected PaginationSupport $paginationSupport,
-    ) {
-    }
-
     public function execute(Model $model, array $fields, array $pagination = []): Builder
     {
-        $query = $model->newQuery();
+        $paginationSupport = app(PaginationSupport::class);
 
+        $query    = $model->newQuery();
         $with     = [];
         $includes = $this->nestedDotPaths($fields);
 
         foreach ($includes as $include) {
 
             $paginate = data_get($pagination, $include);
-            $limit    = $this->paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
+            $limit    = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
 
             $with[$include] = fn ($query) => $query->limit((string) $limit);
         }
