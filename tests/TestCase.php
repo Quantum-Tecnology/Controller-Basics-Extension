@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
@@ -20,6 +21,7 @@ abstract class TestCase extends BaseTestCase
 
         $this->setUpDatabase($this->app);
         $this->setUpRoute($this->app);
+        Model::unguard();
         $this->app->register(ControllerBasicsExtensionProvider::class);
     }
 

@@ -7,6 +7,9 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
 use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
@@ -38,11 +41,67 @@ trait AsGraphQLController
 
     public function show(
         Request $request,
-        GraphQlService $graphQlService,
+        BuilderQuery $builderQuery,
         FieldSupport $fieldSupport,
         FilterSupport $filterSupport,
-        PaginationSupport $paginationSupport,
+        GraphQLPresenter $presenter,
     ): JsonResponse {
+        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+
+        $response = $presenter->execute($model, $fieldSupport->parse($queries['fields'] ?? ''), $filters);
+
+        return response()->json($response, Response::HTTP_OK);
+    }
+
+    public function destroy(
+        Request $request,
+        BuilderQuery $builderQuery,
+        FieldSupport $fieldSupport,
+        FilterSupport $filterSupport,
+        GraphQLPresenter $presenter,
+    ): Response {
+        [, , $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+
+        $model->delete();
+
+        return response()->noContent();
+    }
+
+    public function store(
+        GraphQlService $graphQlService,
+        FieldSupport $fieldSupport,
+    ): JsonResponse {
+        $request = app($this->getNamespaceRequest('store'));
+
+        abort_unless($request->authorize(), 403, 'This action is unauthorized.');
+
+        $response = $graphQlService->sole(
+            $this->model()->create($request->validated()),
+            $fieldSupport->parse($request->query()['fields'] ?? ''),
+        );
+
+        return response()->json($response, Response::HTTP_CREATED);
+    }
+
+    public function update(
+        BuilderQuery $builderQuery,
+        FieldSupport $fieldSupport,
+        FilterSupport $filterSupport,
+        GraphQLPresenter $presenter,
+    ): JsonResponse {
+        $request = app($this->getNamespaceRequest('update'));
+        abort_unless($request->authorize(), 403, 'This action is unauthorized.');
+
+        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+        $model->update($request->validated());
+
+        $response = $presenter->execute($model, $fieldSupport->parse($queries['fields'] ?? ''), $filters);
+
+        return response()->json($response, Response::HTTP_OK);
+    }
+
+    public function findBySole(mixed $request, FilterSupport $filterSupport, BuilderQuery $builderQuery): array
+    {
         $p       = $request->route()?->parameters() ?: [];
         $key     = $this->model()->getKeyName();
         $id      = array_pop($p);
@@ -50,14 +109,9 @@ trait AsGraphQLController
 
         $filters = $filterSupport->parse($queries + $this->filterRouteParams($p));
 
-        $response = $graphQlService->sole(
-            $this->model(),
-            $fieldSupport->parse($queries['fields'] ?? ''),
-            $filters,
-            $paginationSupport->parse($queries),
-        );
+        $model = $builderQuery->execute($this->model(), [], $filters)->sole();
 
-        return response()->json($response);
+        return [$queries, $filters, $model];
     }
 
     protected function filterRouteParams(array $data): array
@@ -66,4 +120,44 @@ trait AsGraphQLController
             ->mapWithKeys(fn ($value, $key) => ['filter(' . $key . ')' => $value])
             ->all();
     }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function getNamespaceRequest(?string $action = null): string
+    {
+        $class = static::class;
+        $parts = explode('Controller', $class);
+
+        if (count($parts) > 2) {
+            $last        = array_pop($parts);
+            $penultimate = array_pop($parts);
+            $class       = implode('Controller', $parts) . 'Request' . $penultimate . 'Request' . $last;
+        } else {
+            $class = str_replace('Controller', 'Request', $class);
+        }
+        // Replace the namespace segment
+        $class = str_replace('\\Controller\\', '\\Request\\', $class);
+
+        $value = str_replace(['App\\Http\\Controllers\\'],
+            ['App\\Http\\Requests\\'],
+            static::class);
+
+        if (blank($action)) {
+            return $class;
+        }
+
+        $value = mb_substr($value, 0, -7) . '\\' . ucfirst($action) . 'Request';
+
+        if (class_exists($value)) {
+            return $value;
+        }
+
+        return self::getNamespaceRequest();
+    }/*
+ * @param  mixed  $request
+ * @param  FilterSupport  $filterSupport
+ * @param  BuilderQuery  $builderQuery
+ * @return array
+ */
 }
