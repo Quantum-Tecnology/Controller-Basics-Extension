@@ -16,6 +16,7 @@
         <include>
             <directory>src/Support</directory>
             <directory>src/Presenters</directory>
+            <directory>src/Builder</directory>
         </include>
     </source>
     <php>

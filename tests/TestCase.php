@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Console\AboutCommand;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware;
+use QuantumTecnology\ControllerBasicsExtension\Providers\ControllerBasicsExtensionProvider;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Controller\PostController;
 
 abstract class TestCase extends BaseTestCase
@@ -18,6 +19,7 @@ abstract class TestCase extends BaseTestCase
 
         $this->setUpDatabase($this->app);
         $this->setUpRoute($this->app);
+        $this->app->register(ControllerBasicsExtensionProvider::class);
     }
 
     protected function tearDown(): void
