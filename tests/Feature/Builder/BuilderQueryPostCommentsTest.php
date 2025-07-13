@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 use Illuminate\Database\Eloquent\Model;
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
-use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
