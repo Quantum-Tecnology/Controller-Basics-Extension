@@ -30,6 +30,7 @@ class BuilderQuery
 
             $paginate = data_get($pagination, $include);
             $limit    = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
+            $page     = $paginate['page'] ?? 1;
 
             $withCountChildren = [];
             $includeChildren   = $this->getIncludesWithCount($includes, $include);
@@ -38,7 +39,10 @@ class BuilderQuery
                 $withCountChildren[$child] = fn ($query) => $this->filters($query, $filter);
             }
 
+            $offset = ($page - 1) * $limit;
+
             $with[$include] = fn ($query) => $this->filters($query->withCount($withCountChildren), $filter)
+                ->offset($offset)
                 ->limit((string) $limit);
         }
 
