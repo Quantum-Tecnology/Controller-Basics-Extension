@@ -38,7 +38,7 @@ class GraphQlService
             page: $page,
         );
 
-        return $this->extracted($builder, $fields, $pagination);
+        return $this->formatPaginatedResponse($builder, $fields, $pagination);
     }
 
     public function simplePaginate(
@@ -58,7 +58,7 @@ class GraphQlService
             page: $page,
         );
 
-        return $this->extracted($builder, $fields, $pagination);
+        return $this->formatPaginatedResponse($builder, $fields, $pagination);
     }
 
     public function sole(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
@@ -75,7 +75,7 @@ class GraphQlService
         return collect($this->unique($item, $fields, $pagination));
     }
 
-    protected function extracted(
+    protected function formatPaginatedResponse(
         Paginator $builder,
         array $fields,
         array $pagination
