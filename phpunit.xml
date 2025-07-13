@@ -14,7 +14,7 @@
     </testsuites>
     <source>
         <include>
-            <file>src/Support/FieldSupport.php</file>
+            <directory>src/Support</directory>
         </include>
     </source>
     <php>
