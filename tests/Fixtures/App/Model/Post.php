@@ -26,9 +26,9 @@ final class Post extends BaseModel
         return 'custom_value';
     }
 
-    public function customAttribute2(): Attribute
+    public function customOld(): Attribute
     {
-        return Attribute::get(fn () => 'custom_value_2');
+        return Attribute::get(fn () => 'custom_old');
     }
 
     protected static function newFactory(): PostFactory

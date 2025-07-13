@@ -68,6 +68,16 @@ class GraphQLPresenter
                 $key              = Str::snake($matches[1]);
                 $attributes[$key] = $model->{$key};
             }
+
+            if (0 === $method->getNumberOfParameters()) {
+                $returnType = $method->getReturnType();
+
+                if ($returnType && \Illuminate\Database\Eloquent\Casts\Attribute::class === $returnType->getName()) {
+                    $key              = Str::snake($method->name);
+                    $attribute        = $model->{$key};
+                    $attributes[$key] = $attribute;
+                }
+            }
         }
 
         foreach ($model->getMutatedAttributes() as $key) {

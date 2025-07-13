@@ -122,11 +122,11 @@ test('meta omitted if empty', function () {
 });
 
 test('includes accessors', function () {
-    $fields = ['custom', 'custom_2'];
+    $fields = ['custom', 'custom_old'];
     $result = $this->presenter->execute($this->model, $fields);
     expect($result['data'])
         ->toHaveKey('custom', 'custom_value')
-        ->and($result['data'])->toHaveKey('custom_2', null);
+        ->and($result['data'])->toHaveKey('custom_old', 'custom_old');
 });
 
 test('includes mutated attributes', function () {
