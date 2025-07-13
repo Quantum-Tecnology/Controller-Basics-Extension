@@ -6,13 +6,13 @@ use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->presenter = app(GraphQLPresenter::class);
     $this->author    = Author::factory()->create();
     $this->post      = Post::factory()->for($this->author)->create();
 });
 
-test('returns only requested fields in data', function () {
+test('returns only requested fields in data', function (): void {
     $fields = ['id', 'author_id', 'author' => ['id', 'name']];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->toBe([
@@ -29,7 +29,7 @@ test('returns only requested fields in data', function () {
     ]);
 });
 
-test('fields starting with can_ go to meta', function () {
+test('fields starting with can_ go to meta', function (): void {
     $fields = ['author' => ['id', 'can_delete', 'can_update']];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->toBe([
@@ -45,7 +45,7 @@ test('fields starting with can_ go to meta', function () {
     ]);
 });
 
-test('asterisk returns all fields and accessors', function () {
+test('asterisk returns all fields and accessors', function (): void {
     $fields = ['author' => ['*']];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result['data']['author'])

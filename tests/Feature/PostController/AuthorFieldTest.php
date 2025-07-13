@@ -8,7 +8,7 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
-test('it returns a list of posts', function () {
+test('it returns a list of posts', function (): void {
     Post::factory()->create();
 
     getJson(route('posts.index'))
@@ -20,7 +20,7 @@ test('it returns a list of posts', function () {
         ->assertOk();
 })->todo();
 
-test('it returns a list of posts with selected author fields', function () {
+test('it returns a list of posts with selected author fields', function (): void {
     $author = Author::factory()->create();
     Post::factory()->for($author)->create();
 
@@ -40,7 +40,7 @@ test('it returns a list of posts with selected author fields', function () {
         ->assertOk();
 })->todo();
 
-test('it returns a list of posts with all author fields', function () {
+test('it returns a list of posts with all author fields', function (): void {
     $post   = Post::factory()->create();
     $author = $post->author;
 

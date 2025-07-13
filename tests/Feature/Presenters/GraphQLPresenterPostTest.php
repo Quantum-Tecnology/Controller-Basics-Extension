@@ -6,12 +6,12 @@ use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->presenter = app(GraphQLPresenter::class);
     $this->post      = Post::factory()->create();
 });
 
-test('returns only requested fields in data', function () {
+test('returns only requested fields in data', function (): void {
     $fields = ['id', 'title'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->toBe([
@@ -22,7 +22,7 @@ test('returns only requested fields in data', function () {
     ]);
 });
 
-test('fields starting with can_ go to meta', function () {
+test('fields starting with can_ go to meta', function (): void {
     $fields = ['id', 'can_delete', 'can_update'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->toBe([
@@ -34,7 +34,7 @@ test('fields starting with can_ go to meta', function () {
     ]);
 });
 
-test('date fields are formatted', function () {
+test('date fields are formatted', function (): void {
     $fields = ['created_at'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->toBe([
@@ -42,7 +42,7 @@ test('date fields are formatted', function () {
     ]);
 });
 
-test('asterisk returns all fields and accessors', function () {
+test('asterisk returns all fields and accessors', function (): void {
     $fields = ['*'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result['data'])
@@ -59,13 +59,13 @@ test('asterisk returns all fields and accessors', function () {
         ]);
 });
 
-test('meta omitted if empty', function () {
+test('meta omitted if empty', function (): void {
     $fields = ['id', 'title'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)->not->toHaveKey('meta');
 });
 
-test('includes accessors', function () {
+test('includes accessors', function (): void {
     $fields = ['custom', 'custom_old'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result['data'])
@@ -73,13 +73,13 @@ test('includes accessors', function () {
         ->and($result['data'])->toHaveKey('custom_old', 'custom_old');
 });
 
-test('includes mutated attributes', function () {
+test('includes mutated attributes', function (): void {
     $fields = ['can_update'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result['meta'])->toHaveKey('can_update', false);
 });
 
-test('handles empty fields array', function () {
+test('handles empty fields array', function (): void {
     $fields = [];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result)
@@ -87,7 +87,7 @@ test('handles empty fields array', function () {
         ->not->toHaveKey('meta');
 });
 
-test('handles non existent fields gracefully', function () {
+test('handles non existent fields gracefully', function (): void {
     $fields = ['id', 'not_a_field'];
     $result = $this->presenter->execute($this->post, $fields);
     expect($result['data'])

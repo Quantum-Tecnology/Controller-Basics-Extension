@@ -6,7 +6,7 @@ use function Pest\Laravel\getJson;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 
-test('it returns a list of posts with selected comments fields', function () {
+test('it returns a list of posts with selected comments fields', function (): void {
     $comment = Comment::factory()->create();
 
     getJson(route('posts.index', [
@@ -28,7 +28,7 @@ test('it returns a list of posts with selected comments fields', function () {
         ->assertOk();
 })->todo();
 
-test('it returns a list of posts with all comments fields', function () {
+test('it returns a list of posts with all comments fields', function (): void {
     $comment = Comment::factory()->create();
 
     getJson(route('posts.index', [

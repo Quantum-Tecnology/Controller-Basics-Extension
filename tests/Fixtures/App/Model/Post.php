@@ -28,7 +28,7 @@ final class Post extends BaseModel
 
     public function customOld(): Attribute
     {
-        return Attribute::get(fn () => 'custom_old');
+        return Attribute::get(fn (): string => 'custom_old');
     }
 
     protected static function newFactory(): PostFactory

@@ -24,7 +24,7 @@ class BuilderQuery
             $changePointUnderline = str_replace('.', '_', $include);
             $filter               = $filters[$changePointUnderline] ?? [];
 
-            if (!str_contains($include, '.')) {
+            if (!str_contains((string) $include, '.')) {
                 $withCount[$include] = fn ($query) => $this->filters($query, $filter);
             }
 
@@ -53,7 +53,7 @@ class BuilderQuery
 
         foreach ($fields as $key => $value) {
             if (is_array($value)) {
-                $current = $prefix ? "$prefix.$key" : $key;
+                $current = '' !== $prefix && '0' !== $prefix ? "$prefix.$key" : $key;
                 $paths[] = $current;
                 $paths   = array_merge($paths, $this->nestedDotPaths($value, $current));
             }

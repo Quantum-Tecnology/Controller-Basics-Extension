@@ -9,9 +9,9 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\CommentL
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
-test('it returns post with comments and likes counts', function () {
+test('it returns post with comments and likes counts', function (): void {
     $post = Post::factory()->create();
-    Comment::factory(3)->for($post)->create()->map(function (Comment $comment) {
+    Comment::factory(3)->for($post)->create()->map(function (Comment $comment): void {
         CommentLike::factory(5)->for($comment)->create();
     });
 

@@ -46,7 +46,7 @@ class GraphQLPresenter
                 default                                  => $valueField
             };
 
-            if (str_starts_with($field, 'can_')) {
+            if (str_starts_with((string) $field, 'can_')) {
                 $meta[$field] = $valueField;
             } else {
                 $data[$field] = $valueField;
@@ -62,15 +62,15 @@ class GraphQLPresenter
 
         $response = [];
 
-        if ($data) {
-            $response = compact('data');
+        if ([] !== $data) {
+            $response = ['data' => $data];
         }
 
-        if ($meta) {
+        if ([] !== $meta) {
             $response['meta'] = $meta;
         }
 
-        foreach ($relations as $key => $relation) {
+        foreach (array_keys($relations) as $key) {
             if (in_array($model->{$key}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
                 $response['data'][$key] = $this->generate($model->{$key}, $fields[$key], $pagination[$key] ?? []);
             }

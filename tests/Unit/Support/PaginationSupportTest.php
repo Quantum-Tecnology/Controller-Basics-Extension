@@ -3,11 +3,11 @@
 declare(strict_types = 1);
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->support = new PaginationSupport();
 });
 
-it('parses deeply nested pagination keys', function () {
+it('parses deeply nested pagination keys', function (): void {
     $data = [
         'per_page_a.b.c.d' => '15',
         'page_a.b.c.d'     => '3',
@@ -28,7 +28,7 @@ it('parses deeply nested pagination keys', function () {
     ]);
 });
 
-it('handles multiple nested relations at different levels', function () {
+it('handles multiple nested relations at different levels', function (): void {
     $data = [
         'per_page_users'                => '10',
         'page_users'                    => '1',
@@ -55,7 +55,7 @@ it('handles multiple nested relations at different levels', function () {
     ]);
 });
 
-it('handles missing per_page or page for some relations', function () {
+it('handles missing per_page or page for some relations', function (): void {
     $data = [
         'per_page_items'     => '8',
         'per_page_items.sub' => '4',
@@ -75,7 +75,7 @@ it('handles missing per_page or page for some relations', function () {
     ]);
 });
 
-it('ignores unrelated keys and non-matching patterns', function () {
+it('ignores unrelated keys and non-matching patterns', function (): void {
     $data = [
         'foo'                 => 'bar',
         'per_page_alpha.beta' => '6',
@@ -94,7 +94,7 @@ it('ignores unrelated keys and non-matching patterns', function () {
     ]);
 });
 
-it('casts all values to int', function () {
+it('casts all values to int', function (): void {
     $data = [
         'per_page_x.y' => '12',
         'page_x.y'     => '5',
@@ -105,7 +105,7 @@ it('casts all values to int', function () {
     expect($result['x']['y']['page'])->toBeInt();
 });
 
-it('returns empty array if no pagination keys are present', function () {
+it('returns empty array if no pagination keys are present', function (): void {
     $data = [
         'foo' => 'bar',
         'baz' => 'qux',
