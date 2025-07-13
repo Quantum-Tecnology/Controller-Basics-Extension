@@ -16,7 +16,7 @@ class GraphQLPresenter
         return $this->generate($model, $fields, $pagination);
     }
 
-    protected function generate(Model $model, array $fields, array $pagination = [])
+    protected function generate(Model $model, array $fields, array $pagination = []): array
     {
         $meta            = [];
         $data            = [];
