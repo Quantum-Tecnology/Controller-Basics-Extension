@@ -10,7 +10,6 @@ class FieldSupport
     {
         $input = mb_trim($input);
 
-        // Se for vazio ou apenas um bloco vazio
         if ('' === $input || preg_match('/^\{\s*\}$/', $input)) {
             return [];
         }
