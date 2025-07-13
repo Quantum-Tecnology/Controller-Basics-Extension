@@ -88,7 +88,7 @@ class GraphQLPresenter
                     $response['data'][$key]['data'][] = $this->generate(
                         $value, $fields[$key],
                         $pagination[$key] ?? [],
-                        $relationFullName . '.'
+                        $relationFullName ? $key . '.' . $relationFullName . '.' : $key
                     );
                     $response['data'][$key]['meta'] = $this->generatePagination(
                         $model, $key,
@@ -111,7 +111,8 @@ class GraphQLPresenter
         $total = $model->{$relation}->count();
 
         if (($totalRelation = $model->{"{$relation}_count"}) > 0) {
-            $pageName = Str::camel(str_replace('.', '_', $fullRelationName . '.' . $relation));
+
+            $pageName = Str::snake(str_replace('.', '_', $fullRelationName . '.' . $relation));
 
             $paginator = new LengthAwarePaginator(
                 [],

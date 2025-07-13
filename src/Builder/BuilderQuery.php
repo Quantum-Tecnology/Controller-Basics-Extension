@@ -36,7 +36,7 @@ class BuilderQuery
             $includeChildren   = $this->getIncludesWithCount($includes, $include);
 
             foreach ($includeChildren as $child) {
-                $withCountChildren[$child] = fn ($query) => $this->filters($query, $filter);
+                $withCountChildren[$child] = fn ($query) => $this->filters($query, $filters[$child] ?? []);
             }
 
             $offset = ($page - 1) * $limit;
