@@ -32,7 +32,7 @@ final class ControllerBasicsExtensionProvider extends ServiceProvider
             __DIR__ . '/../config/page.php'    => __DIR__ . '/../page.php',
         ], 'config');
 
-        //        $this->app->make(Kernel::class)
-        //            ->pushMiddleware(LogMiddleware::class);
+        $this->app->make(Kernel::class)
+            ->pushMiddleware(LogMiddleware::class);
     }
 }
