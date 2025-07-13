@@ -161,3 +161,16 @@ it('returns empty array for no matching filters', function () {
 
     expect($result)->toBe([]);
 });
+
+it('a', function () {
+    $data   = ['filter(id)' => '1|2|3'];
+    $result = $this->support->parse($data);
+
+    expect($result)->toBe([
+        '[__model__]' => [
+            'id' => [
+                '=' => [1, 2, 3],
+            ],
+        ],
+    ]);
+});
