@@ -12,8 +12,13 @@ final class LogSupport
     {
         if (config('app.debug')) {
             $stackTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+            $key        = 1;
 
-            self::$messages[$message . $stackTrace[1]['line']] = [
+            if (app()->environment('testing')) {
+                $key = 0;
+            }
+
+            self::$messages[$message . $stackTrace[$key]['line']] = [
                 'message'     => $message,
                 'stack_trace' => $stackTrace,
             ];

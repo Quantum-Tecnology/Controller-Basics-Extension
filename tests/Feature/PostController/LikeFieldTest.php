@@ -9,23 +9,25 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\CommentL
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
-test('it returns post with comments and likes counts', function () {
+test('it returns post with comments and likes counts', function (): void {
     $post = Post::factory()->create();
-    Comment::factory(3)->for($post)->create()->map(function (Comment $comment) {
+    Comment::factory(3)->for($post)->create()->map(function (Comment $comment): void {
         CommentLike::factory(5)->for($comment)->create();
     });
 
     $response = getJson(route('posts.index', [
-        'fields' => 'id,title;comments[id];comments.likes[id]',
+        'fields' => 'id title comments {likes{id}}',
     ]))
         ->assertJsonStructure([
             'data' => [
                 '*' => [
-                    'comments' => [
-                        'data' => [
-                            '*' => [
-                                'likes' => [
-                                    'data',
+                    'data' => [
+                        'comments' => [
+                            'data' => [
+                                '*' => [
+                                    'data' => [
+                                        'likes',
+                                    ],
                                 ],
                             ],
                         ],
@@ -35,7 +37,7 @@ test('it returns post with comments and likes counts', function () {
         ])
         ->json('data')[0];
 
-    expect($response['comments']['meta']['total_items'])
+    expect($response['data']['comments']['meta']['total'])
         ->toBe(3)
-        ->and($response['comments']['data'][0]['likes']['meta']['total_items'])->toBe(5);
+        ->and($response['data']['comments']['data'][0]['data']['likes']['meta']['total'])->toBe(5);
 });
