@@ -76,6 +76,28 @@ it('it creates a new post with only id and title fields', function (): void {
         ->assertCreated();
 });
 
+it('it creates a new post with meta and comments', function (): void {
+    postJson(route('posts.store', [
+        'fields' => 'id title',
+    ]), [
+        'title'     => 'create a new post',
+        'author_id' => Author::factory()->create()->id,
+        'meta'      => ['test'],
+        'comments'  => [
+            [
+                'body' => 'test comment',
+            ],
+        ],
+    ])
+        ->assertJsonStructure([
+            'data' => [
+                'id',
+                'title',
+            ],
+        ])
+        ->assertCreated();
+});
+
 it('it updated a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
 
