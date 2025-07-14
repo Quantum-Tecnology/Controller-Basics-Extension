@@ -48,7 +48,7 @@ trait AsGraphQLController
         FilterSupport $filterSupport,
         GraphQLPresenter $presenter,
     ): JsonResponse {
-        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $fieldSupport, $builderQuery);
 
         $response = $presenter->execute($model, $fieldSupport->parse($queries['fields'] ?? ''), $filters);
 
@@ -59,8 +59,9 @@ trait AsGraphQLController
         Request $request,
         BuilderQuery $builderQuery,
         FilterSupport $filterSupport,
+        FieldSupport $fieldSupport,
     ): Response {
-        [, , $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+        [, , $model] = $this->findBySole($request, $filterSupport, $fieldSupport, $builderQuery);
 
         $model->delete();
 
@@ -71,8 +72,6 @@ trait AsGraphQLController
         Request $request,
         GraphQLPresenter $presenter,
         FieldSupport $fieldSupport,
-        FilterSupport $filterSupport,
-        PaginationSupport $paginationSupport,
     ): JsonResponse {
         $requestValid = app($this->getNamespaceRequest('store'));
 
@@ -112,7 +111,7 @@ trait AsGraphQLController
         $request = app($this->getNamespaceRequest('update'));
         abort_unless($request->authorize(), 403, 'This action is unauthorized.');
 
-        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $fieldSupport, $builderQuery);
         $model->update($request->validated());
 
         $response = $presenter->execute($model, $fieldSupport->parse($queries['fields'] ?? ''), $filters);
@@ -120,16 +119,22 @@ trait AsGraphQLController
         return response()->json($response, Response::HTTP_OK);
     }
 
-    public function findBySole(mixed $request, FilterSupport $filterSupport, BuilderQuery $builderQuery): array
-    {
+    public function findBySole(
+        mixed $request,
+        FilterSupport $filterSupport,
+        FieldSupport $fieldSupport,
+        BuilderQuery $builderQuery
+    ): array {
         $p       = $request->route()?->parameters() ?: [];
         $key     = $this->model()->getKeyName();
         $id      = array_pop($p);
         $queries = ["filter({$key})" => $id] + $request->query();
 
-        $filters = $filterSupport->parse($queries + $this->filterRouteParams($p));
-
-        $model = $builderQuery->execute($this->model(), [], $filters)->sole();
+        $model = $builderQuery->execute(
+            $this->model(),
+            $fieldSupport->parse($request->query()['fields'] ?? ''),
+            $filters = $filterSupport->parse($queries)
+        )->sole();
 
         return [$queries, $filters, $model];
     }
