@@ -121,6 +121,20 @@ it('it updated a new post with only id and title fields', function (): void {
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
+        'meta'      => ['test'],
+        'comments'  => [
+            [
+                'body'  => 'test comment',
+                'likes' => [
+                    [
+                        'like' => 1,
+                    ],
+                    [
+                        'like' => 3,
+                    ],
+                ],
+            ],
+        ],
     ])
         ->assertJsonStructure([
             'data' => [
