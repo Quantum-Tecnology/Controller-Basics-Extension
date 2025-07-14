@@ -177,6 +177,7 @@ trait AsGraphQLController
         return app(BuilderQuery::class);
     }
 
+    /** @codeCoverageIgnore  */
     protected function getDataRequest(?string $action = null, bool $exact = false): array
     {
         $class = static::class;

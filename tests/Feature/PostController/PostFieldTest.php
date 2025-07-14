@@ -14,7 +14,9 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\CommentLike;
+
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Tag;
 
 test('it returns a show of posts', function (): void {
     $p = Post::factory()->create();
@@ -87,7 +89,12 @@ it('it creates a new post with meta and comments', function (): void {
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
         'meta'      => ['test'],
-        'comments'  => [
+        'tags'      => [
+            [
+                'name' => 'test',
+            ],
+        ],
+        'comments' => [
             [
                 'body'  => 'test comment',
                 'likes' => [
@@ -108,6 +115,7 @@ it('it creates a new post with meta and comments', function (): void {
     ])
         ->assertCreated();
 
+    assertDatabaseCount(Tag::class, 1);
     assertDatabaseCount(Comment::class, 1);
     assertDatabaseCount(CommentLike::class, 2);
 });
