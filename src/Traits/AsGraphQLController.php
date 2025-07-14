@@ -81,15 +81,13 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('update');
 
-        $model = $this->findBySole();
-
         foreach ($dataValues as $key => $value) {
-            $keyCamel = Str::camel($key);
-
-            if (is_array($value) && method_exists($model, $keyCamel) && $model->{$keyCamel}() instanceof Relation) {
+            if (is_array($value)) {
                 unset($dataValues[$key]);
             }
         }
+
+        $model = $this->findBySole();
 
         $model = DB::transaction(function () use ($model, $dataValues) {
             $model->update($dataValues);
@@ -232,9 +230,7 @@ trait AsGraphQLController
                 $dataArray = [];
 
                 foreach ($value2 as $key3 => $value3) {
-                    $keyCamel = Str::camel($key3);
-
-                    if (is_array($value3) && method_exists($model, $keyCamel) && $model->{$keyCamel}() instanceof Relation) {
+                    if (is_array($value3)) {
                         $dataArray[$key3] = $value3;
                         unset($value2[$key3]);
                     }
