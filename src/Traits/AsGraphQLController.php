@@ -200,7 +200,7 @@ trait AsGraphQLController
                 }
 
                 if ($model->{$keyCamel}() instanceof Relations\HasMany) {
-                    $newModel = $model->{$key}()->create($value2);
+                    $newModel = $model->{$keyCamel}()->create($value2);
                 }
 
                 if ($model->{$keyCamel}() instanceof Relations\BelongsToMany) {
@@ -218,7 +218,7 @@ trait AsGraphQLController
             }
 
             if (filled($ids)) {
-                $model->{$key}()->attach($ids);
+                $model->{$keyCamel}()->attach($ids);
             }
         }
     }
