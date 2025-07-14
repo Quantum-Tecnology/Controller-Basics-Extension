@@ -226,7 +226,9 @@ trait AsGraphQLController
                 $dataArray = [];
 
                 foreach ($value2 as $key3 => $value3) {
-                    if (is_array($value3)) {
+                    $key3Camel = Str::camel($key3);
+
+                    if (is_array($value) && method_exists($model, $key3Camel)) {
                         $dataArray[$key3] = $value3;
                         unset($value2[$key3]);
                     }
