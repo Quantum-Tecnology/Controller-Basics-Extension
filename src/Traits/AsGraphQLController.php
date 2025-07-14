@@ -6,6 +6,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -46,18 +47,22 @@ trait AsGraphQLController
 
     public function store(): JsonResponse
     {
+        $model      = $this->model();
         $dataValues = $this->getDataRequest('store');
         $dataArray  = [];
 
         foreach ($dataValues as $key => $value) {
-            if (is_array($value)) {
+            $keyCamel = Str::camel($key);
+
+            if (is_array($value) && $model->{$keyCamel} instanceof Relation) {
                 $dataArray[$key] = $value;
                 unset($dataValues[$key]);
             }
         }
 
-        $model = DB::transaction(function () use ($dataValues, $dataArray) {
-            $model = $this->model()->create($dataValues);
+        $model = DB::transaction(function () use ($model, $dataValues, $dataArray) {
+            $model = $model->fill($dataValues);
+            $model->save();
             $this->saveStoreChildren($model, $dataArray);
 
             return $model;
