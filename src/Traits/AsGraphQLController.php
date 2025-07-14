@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
@@ -76,8 +77,25 @@ trait AsGraphQLController
 
         abort_unless($request->authorize(), 403, 'This action is unauthorized.');
 
+        $dataArray  = [];
+        $dataValues = $request->validated();
+
+        foreach ($dataValues as $key => $value) {
+            if (is_array($value)) {
+                $dataArray[$key] = $value;
+                unset($dataValues[$key]);
+            }
+        }
+
+        $model = DB::transaction(function () use ($dataValues, $dataArray) {
+            $model = $this->model()->create($dataValues);
+            $this->saveStoreChildren($model, $dataArray);
+
+            return $model;
+        });
+
         $response = $graphQlService->sole(
-            $this->model()->create($request->validated()),
+            $model,
             $fieldSupport->parse($request->query()['fields'] ?? ''),
         );
 
@@ -122,9 +140,6 @@ trait AsGraphQLController
             ->all();
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     protected function getNamespaceRequest(?string $action = null): string
     {
         $class = static::class;
