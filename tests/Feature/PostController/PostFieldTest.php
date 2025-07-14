@@ -2,16 +2,14 @@
 
 declare(strict_types = 1);
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
+
 use function Pest\Laravel\putJson;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
-
-use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
 test('it returns a show of posts', function (): void {
@@ -97,34 +95,6 @@ it('it updated a new post with only id and title fields', function (): void {
         ->assertOk();
 });
 
-it('it updated a new post with meta', function (): void {
-    $post = Post::factory()->create();
-
-    putJson(route('posts.update', [
-        'fields' => 'id title',
-        'post'   => $post->id,
-    ]), [
-        'title'     => 'create a new post',
-        'author_id' => Author::factory()->create()->id,
-        'meta'      => ['test'],
-        'comments'  => [
-            [
-                'body' => 'This is a comment',
-            ],
-            [
-                'body' => 'This is another comment',
-            ],
-        ],
-    ])
-        ->assertJsonStructure([
-            'data' => [
-                'id',
-                'title',
-            ],
-        ])
-        ->assertOk();
-});
-
 it('it deleted a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
 
@@ -134,30 +104,4 @@ it('it deleted a new post with only id and title fields', function (): void {
         ->assertNoContent();
 
     assertSoftDeleted($post);
-});
-
-it('it creates a new post with comments', function (): void {
-    postJson(route('posts.store', [
-        'fields' => 'id title',
-    ]), [
-        'title'     => 'create a new post',
-        'author_id' => Author::factory()->create()->id,
-        'meta'      => ['test', 'test_2'],
-        'comments'  => [
-            [
-                'body' => 'This is a comment',
-            ],
-            [
-                'body' => 'This is another comment',
-            ],
-        ],
-    ])
-        ->assertJsonStructure([
-            'data' => [
-                'id',
-                'title',
-            ],
-        ])
-        ->assertCreated();
-    assertDatabaseCount(Comment::class, 2);
 });

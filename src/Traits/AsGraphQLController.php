@@ -6,11 +6,13 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
 use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
@@ -52,7 +54,7 @@ trait AsGraphQLController
         foreach ($dataValues as $key => $value) {
             $keyCamel = Str::camel($key);
 
-            if (is_array($value) && method_exists($model, $keyCamel)) {
+            if (is_array($value) && $model->{$keyCamel}() instanceof Relation) {
                 $dataArray[$key] = $value;
                 unset($dataValues[$key]);
             }
@@ -79,15 +81,13 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('update');
 
-        $model = $this->findBySole();
-
         foreach ($dataValues as $key => $value) {
-            $keyCamel = Str::camel($key);
-
-            if (is_array($value) && method_exists($model, $keyCamel)) {
+            if (is_array($value)) {
                 unset($dataValues[$key]);
             }
         }
+
+        $model = $this->findBySole();
 
         $model = DB::transaction(function () use ($model, $dataValues) {
             $model->update($dataValues);
@@ -169,12 +169,16 @@ trait AsGraphQLController
         return app(GraphQlService::class);
     }
 
+    protected function getGraphQLPresenter(): GraphQLPresenter
+    {
+        return app(GraphQLPresenter::class);
+    }
+
     protected function getBuilderQuery(): BuilderQuery
     {
         return app(BuilderQuery::class);
     }
 
-    /** @codeCoverageIgnore  */
     protected function getDataRequest(?string $action = null, bool $exact = false): array
     {
         $class = static::class;
@@ -226,9 +230,7 @@ trait AsGraphQLController
                 $dataArray = [];
 
                 foreach ($value2 as $key3 => $value3) {
-                    $key3Camel = Str::camel($key3);
-
-                    if (is_array($value) && method_exists($model, $key3Camel)) {
+                    if (is_array($value3)) {
                         $dataArray[$key3] = $value3;
                         unset($value2[$key3]);
                     }
