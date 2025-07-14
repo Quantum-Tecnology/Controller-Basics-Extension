@@ -33,10 +33,9 @@ final class PostRequest extends FormRequest
                 'string',
                 'max:1000',
             ],
-            'comments.*.likes.*.like' => [
-                'nullable',
-                'string',
-                'max:30',
+            'comments.*.commentsLike.*.like' => [
+                'required',
+                'numeric',
             ],
         ];
     }
