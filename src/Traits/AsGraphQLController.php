@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -36,7 +37,7 @@ trait AsGraphQLController
     public function show(): JsonResponse
     {
         $response = $this->getGraphQlService()->presenter(
-            $this->findBySole(),
+            $this->findBy()->sole(),
             $this->getFields(),
             $this->getPagination(),
         );
@@ -90,7 +91,7 @@ trait AsGraphQLController
             }
         }
 
-        $model = $this->findBySole();
+        $model = $this->findBy()->sole();
 
         $model = DB::transaction(function () use ($model, $dataValues) {
             $model->update($dataValues);
@@ -111,7 +112,7 @@ trait AsGraphQLController
     {
         $this->getDataRequest('destroy', true);
 
-        $model = $this->findBySole();
+        $model = $this->findBy()->sole();
 
         DB::transaction(function () use ($model) {
             $model->delete();
@@ -122,20 +123,21 @@ trait AsGraphQLController
         return response()->noContent();
     }
 
-    protected function findBySole(): Model
+    protected function findBy(): Builder
     {
-        $p       = request()->route()?->parameters() ?: [];
-        $id      = array_pop($p);
-        $queries = $this->getFilters();
-        $key     = $this->model()->getKeyName();
+        $routeParams = request()->route()?->parameters() ?: [];
+        $idFromParam = array_pop($routeParams);
+        $queries     = $this->getFilters();
+        $keyName     = $this->model()->getKeyName();
+
         array_pop($queries['[__model__]']);
-        $queries['[__model__]'][$key] = ['=' => [$id]];
+        $queries['[__model__]'][$keyName] = ['=' => [$idFromParam]];
 
         return $this->getBuilderQuery()->execute(
             $this->model(),
             $this->getFields(),
-            $queries
-        )->sole();
+            $queries,
+        );
     }
 
     protected function getFilters(): array
@@ -177,7 +179,7 @@ trait AsGraphQLController
         return app(BuilderQuery::class);
     }
 
-    /** @codeCoverageIgnore  */
+    /** @codeCoverageIgnore */
     protected function getDataRequest(?string $action = null, bool $exact = false): array
     {
         $class = static::class;
