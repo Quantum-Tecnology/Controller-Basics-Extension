@@ -6,7 +6,6 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -54,7 +53,7 @@ trait AsGraphQLController
         foreach ($dataValues as $key => $value) {
             $keyCamel = Str::camel($key);
 
-            if (is_array($value) && $model->{$keyCamel}() instanceof Relation) {
+            if (is_array($value) && method_exists($model, $keyCamel)) {
                 $dataArray[$key] = $value;
                 unset($dataValues[$key]);
             }
@@ -81,13 +80,15 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('update');
 
+        $model = $this->findBySole();
+
         foreach ($dataValues as $key => $value) {
-            if (is_array($value)) {
+            $keyCamel = Str::camel($key);
+
+            if (is_array($value) && method_exists($model, $keyCamel)) {
                 unset($dataValues[$key]);
             }
         }
-
-        $model = $this->findBySole();
 
         $model = DB::transaction(function () use ($model, $dataValues) {
             $model->update($dataValues);

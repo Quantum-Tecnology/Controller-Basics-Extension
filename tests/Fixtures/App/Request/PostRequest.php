@@ -14,6 +14,7 @@ final class PostRequest extends FormRequest
 
         return [
             'title'     => ['required'],
+            'meta'      => ['nullable', 'array'],
             'author_id' => [
                 'required',
                 'exists:' . Author::class . ',id',

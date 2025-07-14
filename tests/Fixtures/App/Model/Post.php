@@ -11,6 +11,10 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories
 
 final class Post extends BaseModel
 {
+    protected $casts = [
+        'meta' => 'array',
+    ];
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class);

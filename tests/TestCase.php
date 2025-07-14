@@ -49,6 +49,7 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('author_id')->constrained('authors');
             $table->string('title');
+            $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
