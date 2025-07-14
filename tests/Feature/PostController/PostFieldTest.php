@@ -2,14 +2,18 @@
 
 declare(strict_types = 1);
 
+use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
-
 use function Pest\Laravel\putJson;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
+
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
+
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\CommentLike;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
 test('it returns a show of posts', function (): void {
@@ -85,17 +89,27 @@ it('it creates a new post with meta and comments', function (): void {
         'meta'      => ['test'],
         'comments'  => [
             [
-                'body' => 'test comment',
+                'body'  => 'test comment',
+                'likes' => [
+                    [
+                        'like' => 1,
+                    ],
+                    [
+                        'like' => 3,
+                    ],
+                ],
             ],
         ],
+    ])->assertJsonStructure([
+        'data' => [
+            'id',
+            'title',
+        ],
     ])
-        ->assertJsonStructure([
-            'data' => [
-                'id',
-                'title',
-            ],
-        ])
         ->assertCreated();
+
+    assertDatabaseCount(Comment::class, 1);
+    assertDatabaseCount(CommentLike::class, 2);
 });
 
 it('it updated a new post with only id and title fields', function (): void {
