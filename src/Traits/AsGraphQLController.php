@@ -58,9 +58,7 @@ trait AsGraphQLController
     public function destroy(
         Request $request,
         BuilderQuery $builderQuery,
-        FieldSupport $fieldSupport,
         FilterSupport $filterSupport,
-        GraphQLPresenter $presenter,
     ): Response {
         [, , $model] = $this->findBySole($request, $filterSupport, $builderQuery);
 
@@ -70,15 +68,20 @@ trait AsGraphQLController
     }
 
     public function store(
-        GraphQlService $graphQlService,
-        FieldSupport $fieldSupport,
+        Request $request,
+        GraphQLPresenter $presenter,
+        FieldSupport $filterSupport,
     ): JsonResponse {
-        $request = app($this->getNamespaceRequest('store'));
+        $requestValid = app($this->getNamespaceRequest('store'));
 
-        abort_unless($request->authorize(), 403, 'This action is unauthorized.');
+        abort_unless($requestValid->authorize(), 403, 'This action is unauthorized.');
+
+        $queries  = $request->query();
+        $params   = $request->route()?->parameters() ?: [];
+        $filters  = $filterSupport->parse($queries + $this->filterRouteParams($params));
 
         $dataArray  = [];
-        $dataValues = $request->validated();
+        $dataValues = $requestValid->validated();
 
         foreach ($dataValues as $key => $value) {
             if (is_array($value)) {
@@ -94,9 +97,9 @@ trait AsGraphQLController
             return $model;
         });
 
-        $response = $graphQlService->sole(
+        $response = $presenter->execute(
             $model,
-            $fieldSupport->parse($request->query()['fields'] ?? ''),
+            $filters
         );
 
         return response()->json($response, Response::HTTP_CREATED);
