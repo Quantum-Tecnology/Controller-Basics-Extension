@@ -54,7 +54,11 @@ trait AsGraphQLController
         foreach ($dataValues as $key => $value) {
             $keyCamel = Str::camel($key);
 
-            if (is_array($value) && method_exists($model, $keyCamel) && $model->{$keyCamel}() instanceof Relation) {
+            if (
+                is_array($value)
+                && method_exists($model, $keyCamel)
+                && $model->{$keyCamel}() instanceof Relation
+            ) {
                 $dataArray[$key] = $value;
                 unset($dataValues[$key]);
             }
@@ -227,10 +231,17 @@ trait AsGraphQLController
             $keyCamel = Str::camel($key);
 
             foreach ($value as $value2) {
-                $dataArray = [];
+                $classRelated = $model->{$keyCamel}()->getRelated();
+                $dataArray    = [];
 
                 foreach ($value2 as $key3 => $value3) {
-                    if (is_array($value3)) {
+                    $key3Camel = Str::camel($key3);
+
+                    if (
+                        is_array($value3)
+                        && method_exists($classRelated, $key3Camel)
+                        && $classRelated->{$key3Camel}() instanceof Relation
+                    ) {
                         $dataArray[$key3] = $value3;
                         unset($value2[$key3]);
                     }
@@ -241,11 +252,10 @@ trait AsGraphQLController
                 }
 
                 if ($model->{$keyCamel}() instanceof Relations\BelongsToMany) {
-                    $belongsToMany = $model->{$keyCamel}()->getRelated();
                     ksort($value2);
 
                     if (!isset($ids[$name = json_encode($value2, JSON_THROW_ON_ERROR)])) {
-                        $ids[$name] = $belongsToMany->create($value2);
+                        $ids[$name] = $classRelated->create($value2);
                     }
                 }
 

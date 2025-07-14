@@ -123,7 +123,7 @@ final readonly class GraphQLPresenter
         $pageNameRelation = Str::snake(str_replace('.', '_', $fullRelationName . '.' . $relation));
         $pageName         = preg_replace('/_+/', '_', 'page_' . $pageNameRelation);
 
-        if (($totalRelation = $model->{"{$relation}_count"}) > 0) {
+        if (($totalRelation = $model->{"{$relation}_count"} ?? 0) > 0) {
 
             $paginator = new LengthAwarePaginator(
                 [],
