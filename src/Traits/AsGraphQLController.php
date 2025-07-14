@@ -7,8 +7,9 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
@@ -20,99 +21,121 @@ trait AsGraphQLController
 {
     abstract protected function model(): Model;
 
-    public function index(
-        Request $request,
-        GraphQlService $graphQlService,
-        FieldSupport $fieldSupport,
-        FilterSupport $filterSupport,
-        PaginationSupport $paginationSupport,
-    ): JsonResponse {
-        $queries  = $request->query();
-        $params   = $request->route()?->parameters() ?: [];
-        $filters  = $filterSupport->parse($queries + $this->filterRouteParams($params));
-        $response = $graphQlService->paginate(
+    public function index(): JsonResponse
+    {
+        $response = $this->getGraphQlService()->paginate(
             $this->model(),
-            $fieldSupport->parse($queries['fields'] ?? ''),
-            $filters,
-            $paginationSupport->parse($queries),
+            $this->getFields(),
+            $this->getFilters(),
+            $this->getPagination(),
         );
 
         return response()->json($response);
     }
 
-    public function show(
-        Request $request,
-        BuilderQuery $builderQuery,
-        FieldSupport $fieldSupport,
-        FilterSupport $filterSupport,
-        GraphQLPresenter $presenter,
-    ): JsonResponse {
-        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+    public function show(): JsonResponse
+    {
+        $response = $this->getGraphQlService()->presenter(
+            $this->findBySole(),
+            $this->getFields(),
+            $this->getPagination(),
+        );
 
-        $response = $presenter->execute($model, $fieldSupport->parse($queries['fields'] ?? ''), $filters);
-
-        return response()->json($response, Response::HTTP_OK);
+        return response()->json($response);
     }
 
-    public function destroy(
-        Request $request,
-        BuilderQuery $builderQuery,
-        FieldSupport $fieldSupport,
-        FilterSupport $filterSupport,
-        GraphQLPresenter $presenter,
-    ): Response {
-        [, , $model] = $this->findBySole($request, $filterSupport, $builderQuery);
+    public function store(): JsonResponse
+    {
+        $dataValues = $this->getDataRequest('store');
+        $dataArray  = [];
 
-        $model->delete();
+        foreach ($dataValues as $key => $value) {
+            if (is_array($value)) {
+                $dataArray[$key] = $value;
+                unset($dataValues[$key]);
+            }
+        }
 
-        return response()->noContent();
-    }
+        $model = DB::transaction(function () use ($dataValues, $dataArray) {
+            $model = $this->model()->create($dataValues);
+            $this->saveStoreChildren($model, $dataArray);
 
-    public function store(
-        GraphQlService $graphQlService,
-        FieldSupport $fieldSupport,
-    ): JsonResponse {
-        $request = app($this->getNamespaceRequest('store'));
+            return $model;
+        });
 
-        abort_unless($request->authorize(), 403, 'This action is unauthorized.');
-
-        $response = $graphQlService->sole(
-            $this->model()->create($request->validated()),
-            $fieldSupport->parse($request->query()['fields'] ?? ''),
+        $response = $this->getGraphQlService()->presenter(
+            $model,
+            $this->getFields(),
+            $this->getPagination(),
         );
 
         return response()->json($response, Response::HTTP_CREATED);
     }
 
-    public function update(
-        BuilderQuery $builderQuery,
-        FieldSupport $fieldSupport,
-        FilterSupport $filterSupport,
-        GraphQLPresenter $presenter,
-    ): JsonResponse {
-        $request = app($this->getNamespaceRequest('update'));
-        abort_unless($request->authorize(), 403, 'This action is unauthorized.');
+    public function update(): JsonResponse
+    {
+        $dataValues = $this->getDataRequest('update');
 
-        [$queries, $filters, $model] = $this->findBySole($request, $filterSupport, $builderQuery);
-        $model->update($request->validated());
+        foreach ($dataValues as $key => $value) {
+            if (is_array($value)) {
+                unset($dataValues[$key]);
+            }
+        }
 
-        $response = $presenter->execute($model, $fieldSupport->parse($queries['fields'] ?? ''), $filters);
+        $model = $this->findBySole();
 
-        return response()->json($response, Response::HTTP_OK);
+        $model = DB::transaction(function () use ($model, $dataValues) {
+            $model->update($dataValues);
+
+            return $model;
+        });
+
+        $response = $this->getGraphQlService()->presenter(
+            $model,
+            $this->getFields(),
+            $this->getPagination(),
+        );
+
+        return response()->json($response);
     }
 
-    public function findBySole(mixed $request, FilterSupport $filterSupport, BuilderQuery $builderQuery): array
+    public function destroy(): Response
     {
-        $p       = $request->route()?->parameters() ?: [];
-        $key     = $this->model()->getKeyName();
+        $this->getDataRequest('destroy', true);
+
+        $model = $this->findBySole();
+
+        DB::transaction(function () use ($model) {
+            $model->delete();
+
+            return $model;
+        });
+
+        return response()->noContent();
+    }
+
+    protected function findBySole(): Model
+    {
+        $p       = request()->route()?->parameters() ?: [];
         $id      = array_pop($p);
-        $queries = ["filter({$key})" => $id] + $request->query();
+        $queries = $this->getFilters();
+        $key     = $this->model()->getKeyName();
+        array_pop($queries['[__model__]']);
+        $queries['[__model__]'][$key] = ['=' => [$id]];
 
-        $filters = $filterSupport->parse($queries + $this->filterRouteParams($p));
+        return $this->getBuilderQuery()->execute(
+            $this->model(),
+            $this->getFields(),
+            $queries
+        )->sole();
+    }
 
-        $model = $builderQuery->execute($this->model(), [], $filters)->sole();
+    protected function getFilters(): array
+    {
+        $queries = request()->query();
+        $params  = request()->route()?->parameters();
 
-        return [$queries, $filters, $model];
+        return app(FilterSupport::class)->parse($queries + $this->filterRouteParams($params));
     }
 
     protected function filterRouteParams(array $data): array
@@ -122,10 +145,36 @@ trait AsGraphQLController
             ->all();
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function getNamespaceRequest(?string $action = null): string
+    protected function getFields(): array
+    {
+        $queries = request()->query();
+
+        return app(FieldSupport::class)->parse($queries['fields'] ?? '');
+    }
+
+    protected function getPagination(): array
+    {
+        $queries = request()->query();
+
+        return app(PaginationSupport::class)->parse($queries);
+    }
+
+    protected function getGraphQlService(): GraphQlService
+    {
+        return app(GraphQlService::class);
+    }
+
+    protected function getGraphQLPresenter(): GraphQLPresenter
+    {
+        return app(GraphQLPresenter::class);
+    }
+
+    protected function getBuilderQuery(): BuilderQuery
+    {
+        return app(BuilderQuery::class);
+    }
+
+    protected function getDataRequest(?string $action = null, bool $exact = false): array
     {
         $class = static::class;
         $parts = explode('Controller', $class);
@@ -137,7 +186,6 @@ trait AsGraphQLController
         } else {
             $class = str_replace('Controller', 'Request', $class);
         }
-        // Replace the namespace segment
         $class = str_replace('\\Controller\\', '\\Request\\', $class);
 
         $value = str_replace(['App\\Http\\Controllers\\'],
@@ -145,26 +193,33 @@ trait AsGraphQLController
             static::class);
 
         if (blank($action)) {
-            return $class;
+            $request = app($class);
+            $request->validated();
+
+            return $request->validated();
         }
 
         $value = mb_substr($value, 0, -7) . '\\' . ucfirst($action) . 'Request';
 
         if (class_exists($value)) {
-            return $value;
+            $request = app($value);
+            $request->validated();
+
+            return $request->validated();
         }
 
-        return self::getNamespaceRequest();
+        if (true === $exact) {
+            return [];
+        }
+
+        return self::getDataRequest();
     }
 
-    /**
-     * @codeCoverageIgnore
-     * // TODO: Implement a method to save children models in a GraphQL context.
-     */
     protected function saveStoreChildren(Model $model, array $children): void
     {
         foreach ($children as $key => $value) {
-            $ids = [];
+            $ids      = [];
+            $keyCamel = Str::camel($key);
 
             foreach ($value as $value2) {
                 $dataArray = [];
@@ -176,16 +231,16 @@ trait AsGraphQLController
                     }
                 }
 
-                if ($model->{$key}() instanceof Relations\HasMany) {
-                    $newModel = $model->{$key}()->create($value2);
+                if ($model->{$keyCamel}() instanceof Relations\HasMany) {
+                    $newModel = $model->{$keyCamel}()->create($value2);
                 }
 
-                if ($model->{$key}() instanceof Relations\BelongsToMany) {
-                    $belongsToMany = $model->{$key}()->getRelated();
+                if ($model->{$keyCamel}() instanceof Relations\BelongsToMany) {
+                    $belongsToMany = $model->{$keyCamel}()->getRelated();
                     ksort($value2);
 
-                    if (!isset($ids[json_encode($value2)])) {
-                        $ids[json_encode($value2)] = $belongsToMany->create($value2);
+                    if (!isset($ids[$name = json_encode($value2, JSON_THROW_ON_ERROR)])) {
+                        $ids[$name] = $belongsToMany->create($value2);
                     }
                 }
 
@@ -195,7 +250,7 @@ trait AsGraphQLController
             }
 
             if (filled($ids)) {
-                $model->{$key}()->attach($ids);
+                $model->{$keyCamel}()->attach($ids);
             }
         }
     }

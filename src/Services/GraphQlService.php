@@ -65,14 +65,19 @@ final readonly class GraphQlService
     {
         $item = $this->builderQuery->execute($model, $fields, $filters)->sole();
 
-        return collect($this->unique($item, $fields, $pagination));
+        return collect($this->presenter($item, $fields, $pagination));
     }
 
     public function first(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
     {
         $item = $this->builderQuery->execute($model, $fields, $filters)->first();
 
-        return collect($this->unique($item, $fields, $pagination));
+        return collect($this->presenter($item, $fields, $pagination));
+    }
+
+    public function presenter(Model $model, array $fields, array $pagination = []): array
+    {
+        return $this->presenter->execute($model, $fields, $pagination);
     }
 
     private function formatPaginatedResponse(
@@ -102,10 +107,5 @@ final readonly class GraphQlService
             'data' => $response,
             'meta' => $pagination,
         ]);
-    }
-
-    private function unique(Model $model, array $fields, array $pagination = []): array
-    {
-        return $this->presenter->execute($model, $fields, $pagination);
     }
 }
