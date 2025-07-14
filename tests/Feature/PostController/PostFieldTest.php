@@ -70,9 +70,12 @@ it('it creates a new post with only id and title fields', function (): void {
     postJson(route('posts.store', [
         'fields' => 'id title',
     ]), [
-        'title'     => 'create a new post',
-        'author_id' => Author::factory()->create()->id,
+        'title'  => 'create a new post',
+        'author' => [
+            'name' => fake()->name,
+        ],
     ])
+        ->ddJson()
         ->assertJsonStructure([
             'data' => [
                 'id',

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
 
 final class PostRequest extends FormRequest
@@ -16,9 +17,11 @@ final class PostRequest extends FormRequest
             'title'     => ['required'],
             'meta'      => ['nullable', 'array'],
             'author_id' => [
-                'required',
+                'nullable',
+                Rule::requiredIf(fn () => !$this->input('author')),
                 'exists:' . Author::class . ',id',
             ],
+            'author.name' => 'required',
             'tags.*.name' => [
                 'required',
                 'string',
