@@ -186,7 +186,7 @@ trait AsGraphQLController
     protected function saveStoreChildren(Model $model, array $children): void
     {
         foreach ($children as $key => $value) {
-            $ids = [];
+            $ids      = [];
             $keyCamel = Str::camel($key);
 
             foreach ($value as $value2) {
