@@ -129,7 +129,7 @@ trait AsGraphQLController
         $p       = $request->route()?->parameters() ?: [];
         $key     = $this->model()->getKeyName();
         $id      = array_pop($p);
-        $queries = ["filter({$key})" => $id] + $request->query();
+        $queries = ["filter({$key})" => $id] + $request->query() + $this->filterRouteParams($p);
 
         $model = $builderQuery->execute(
             $this->model(),
