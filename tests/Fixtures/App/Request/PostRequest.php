@@ -34,15 +34,11 @@ final class PostRequest extends FormRequest
                 'string',
                 'max:1000',
             ],
-            'comments.*.commentsData.*.name' => [
-                'nullable',
-                'string',
-                'max:30',
-            ],
-            'comments.*.commentsData.*.commentsData2.*.name' => [
-                'nullable',
-                'string',
-                'max:30',
+            'comments.*.likes.*.like' => [
+                'boolean',
+                'required',
+                'max:1',
+                'max:5',
             ],
         ];
     }
