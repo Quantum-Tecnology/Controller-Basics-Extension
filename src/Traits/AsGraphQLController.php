@@ -70,15 +70,13 @@ trait AsGraphQLController
     public function store(
         Request $request,
         GraphQLPresenter $presenter,
-        FieldSupport $filterSupport,
+        FieldSupport $fieldSupport,
+        FilterSupport $filterSupport,
+        PaginationSupport $paginationSupport,
     ): JsonResponse {
         $requestValid = app($this->getNamespaceRequest('store'));
 
         abort_unless($requestValid->authorize(), 403, 'This action is unauthorized.');
-
-        $queries  = $request->query();
-        $params   = $request->route()?->parameters() ?: [];
-        $filters  = $filterSupport->parse($queries + $this->filterRouteParams($params));
 
         $dataArray  = [];
         $dataValues = $requestValid->validated();
@@ -99,7 +97,7 @@ trait AsGraphQLController
 
         $response = $presenter->execute(
             $model,
-            $filters
+            $fieldSupport->parse($request->query()['fields'] ?? '')
         );
 
         return response()->json($response, Response::HTTP_CREATED);
