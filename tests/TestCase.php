@@ -104,7 +104,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUpRoute(Application $app): void
     {
         $app['router']->apiResource('posts', PostController::class);
-        $app['router']->prefix('post/{post_id}')->group(function () use ($app) {
+        $app['router']->prefix('post/{post_id}')->group(function () use ($app): void {
             $app['router']->apiResource('comments', PostCommentController::class);
         });
     }

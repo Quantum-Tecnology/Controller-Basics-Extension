@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-final class GraphQLPresenter
+final readonly class GraphQLPresenter
 {
     public function __construct(
         private PaginationSupport $paginationSupport,
@@ -95,10 +95,12 @@ final class GraphQLPresenter
                     );
                 }
 
+                $paginateName = str_replace('.', '_', $relationFullName . $key);
+
                 $response['data'][$key]['meta'] = $this->generatePagination(
                     $model,
                     $key,
-                    $pagination[$key] ?? [],
+                    $pagination[$paginateName] ?? [],
                     $relationFullName
                 );
             }

@@ -12,7 +12,7 @@ use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
-final class GraphQlService
+final readonly class GraphQlService
 {
     public function __construct(
         private BuilderQuery $builderQuery,

@@ -97,7 +97,7 @@ test('it returns a list of posts with all comments fields', function (): void {
     ])->assertOk();
 });
 
-test('it filters comments by id and returns only selected fields', function () {
+test('it filters comments by id and returns only selected fields', function (): void {
     $comment01 = Comment::factory()->create();
     Comment::factory()->create();
     getJson(route('comments.index', [
@@ -110,7 +110,7 @@ test('it filters comments by id and returns only selected fields', function () {
     ]);
 });
 
-test('it returns 404 for comment not belonging to post and 200 for valid comment', function () {
+test('it returns 404 for comment not belonging to post and 200 for valid comment', function (): void {
     $comment01 = Comment::factory()->create();
     $comment02 = Comment::factory()->create();
     getJson(route('comments.show', [

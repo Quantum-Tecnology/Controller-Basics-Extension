@@ -183,10 +183,8 @@ test('a', function (): void {
     CommentLike::factory(50)->for($this->comment->first())->create();
 
     $post = $this->service->sole($this->post, $fields, $filters, [
-        'comments' => [
-            'likes' => [
-                'page' => 2,
-            ],
+        'comments_likes' => [
+            'page' => 2,
         ],
     ]);
     expect($post['data']['comments']['data'][0]['data']['likes']['meta'])

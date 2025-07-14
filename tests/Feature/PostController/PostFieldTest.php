@@ -60,7 +60,7 @@ test('it returns only the requested actions for a post', function (): void {
         ->assertOk();
 });
 
-it('it creates a new post with only id and title fields', function () {
+it('it creates a new post with only id and title fields', function (): void {
     postJson(route('posts.store', [
         'fields' => 'id title',
     ]), [
@@ -76,7 +76,7 @@ it('it creates a new post with only id and title fields', function () {
         ->assertCreated();
 });
 
-it('it updated a new post with only id and title fields', function () {
+it('it updated a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
 
     putJson(route('posts.update', [
@@ -95,7 +95,7 @@ it('it updated a new post with only id and title fields', function () {
         ->assertOk();
 });
 
-it('it deleted a new post with only id and title fields', function () {
+it('it deleted a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
 
     deleteJson(route('posts.destroy', [
