@@ -11,7 +11,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
-use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
 use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
@@ -168,11 +167,6 @@ trait AsGraphQLController
     protected function getGraphQlService(): GraphQlService
     {
         return app(GraphQlService::class);
-    }
-
-    protected function getGraphQLPresenter(): GraphQLPresenter
-    {
-        return app(GraphQLPresenter::class);
     }
 
     protected function getBuilderQuery(): BuilderQuery
