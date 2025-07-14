@@ -205,7 +205,7 @@ trait AsGraphQLController
                     $belongsToMany = $model->{$key}()->getRelated();
                     ksort($value2);
 
-                    if (!isset($ids[$name = json_encode($value2)])) {
+                    if (!isset($ids[$name = json_encode($value2, JSON_THROW_ON_ERROR)])) {
                         $ids[$name] = $belongsToMany->create($value2);
                     }
                 }
