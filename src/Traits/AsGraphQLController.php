@@ -54,7 +54,7 @@ trait AsGraphQLController
         foreach ($dataValues as $key => $value) {
             $keyCamel = Str::camel($key);
 
-            if (is_array($value) && $model->{$keyCamel} instanceof Relation) {
+            if (is_array($value) && $model->{$keyCamel}() instanceof Relation) {
                 $dataArray[$key] = $value;
                 unset($dataValues[$key]);
             }
