@@ -262,6 +262,7 @@ trait AsGraphQLController
 
                     if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
                         $newModel = $cloneModel->{$keyCamel}()->where($idModel, $value2[$idModel])->sole();
+                        $newModel->fill($value2);
                     } else {
                         $newModel = $modelInternal->create($value2);
                     }
