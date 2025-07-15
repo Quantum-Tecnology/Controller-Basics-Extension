@@ -7,7 +7,7 @@
         "enabled": true,
         "actions": [
             {
-                "action": "pest"
+                "action": "composer test"
             }
         ]
     },

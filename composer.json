@@ -25,6 +25,11 @@
     "format": [
       "@php vendor/bin/rector",
       "@php vendor/bin/pint"
+    ],
+    "test": [
+      "@php vendor/bin/pest",
+      "@php vendor/bin/rector process --dry-run",
+      "@php vendor/bin/pint --test"
     ]
   },
   "authors": [
