@@ -65,12 +65,6 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('update');
 
-        foreach ($dataValues as $key => $value) {
-            if (is_array($value)) {
-                unset($dataValues[$key]);
-            }
-        }
-
         $model = $this->findBy()->sole();
 
         $model = DB::transaction(function () use ($model, $dataValues) {
@@ -260,7 +254,15 @@ trait AsGraphQLController
                 }
 
                 if ($typeRelation instanceof Relations\HasMany) {
-                    $newModel = $model->{$keyCamel}()->create($value2);
+                    $modelInternal = $model->{$keyCamel}();
+                    $idModel       = $modelInternal->getRelated()->getKeyName();
+
+                    if (array_key_exists($idModel, $value2)) {
+                        $newModel = $typeRelation->where($idModel, $value2[$idModel])->sole();
+                        $newModel->update($value2);
+                    } else {
+                        $newModel = $modelInternal->create($value2);
+                    }
                     $this->saveModel($newModel, $dataArray);
                 }
 

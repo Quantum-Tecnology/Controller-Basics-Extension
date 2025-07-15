@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Request;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 
 final class PostRequest extends FormRequest
 {
@@ -35,6 +36,10 @@ final class PostRequest extends FormRequest
                 'required',
                 'string',
                 'max:1000',
+            ],
+            'comments.*.id' => [
+                'nullable',
+                Rule::exists(Comment::class, 'id'),
             ],
             'comments.*.body' => [
                 'required',

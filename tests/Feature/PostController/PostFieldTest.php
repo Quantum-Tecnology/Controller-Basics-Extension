@@ -129,7 +129,38 @@ it('it creates a new post with meta and comments', function (): void {
 });
 
 it('a', function () {
+    $post = postJson(route('posts.store', [
+        'fields' => 'id title comments {id}',
+    ]), [
+        'title'     => 'create a new post',
+        'author_id' => Author::factory()->create()->id,
+        'comments'  => [
+            [
+                'body' => 'test comment',
+            ],
+        ],
+    ])->assertCreated();
+    $idPost    = $post->json('data.id');
+    $idComment = $post->json('data.comments.data.0.data.id');
 
+    putJson(route('posts.update', [
+        'fields' => 'id title comments {id}',
+        'post'   => $idPost,
+    ]), [
+        'title'     => 'create a new post',
+        'author_id' => Author::factory()->create()->id,
+        'comments'  => [
+            [
+                'id'   => $idComment,
+                'body' => 'test comment',
+            ],
+        ],
+    ]);
+    assertDatabaseCount(Comment::class, 1);
+    assertDatabaseHas(Comment::class, [
+        'id'   => $idComment,
+        'body' => 'test comment',
+    ]);
 });
 
 it('it updated a new post with only id and title fields', function (): void {
