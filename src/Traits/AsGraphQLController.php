@@ -49,25 +49,8 @@ trait AsGraphQLController
     {
         $model      = $this->model();
         $dataValues = $this->getDataRequest('store');
-        //        $dataArray  = [];
-        //
-        //        foreach ($dataValues as $key => $value) {
-        //            $keyCamel = Str::camel($key);
-        //
-        //            if (
-        //                is_array($value)
-        //                && method_exists($model, $keyCamel)
-        //                && $model->{$keyCamel}() instanceof Relation
-        //            ) {
-        //                $dataArray[$key] = $value;
-        //                unset($dataValues[$key]);
-        //            }
-        //        }
 
-        $model = DB::transaction(fn () => //            $model = $model->fill($dataValues);
-            //            $model->save();
-            //            $this->saveStoreChildren($model, $dataArray);
-            $this->saveModel($model, $dataValues));
+        $model = DB::transaction(fn () => $this->createModel($model, $dataValues));
 
         $response = $this->getGraphQlService()->presenter(
             $model,
@@ -218,7 +201,7 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function saveModel(Model $model, array $dataValues): Model
+    protected function createModel(Model $model, array $dataValues): Model
     {
         $dataChildren = [];
         $dataFather   = [];
@@ -248,7 +231,7 @@ trait AsGraphQLController
         }
 
         foreach ($dataFather as $value) {
-            $dataValues[$value['key']] = $this->saveModel(new $value['model'](), $value['value']);
+            $dataValues[$value['key']] = $this->createModel(new $value['model'](), $value['value']);
         }
 
         $model->fill($dataValues);
@@ -278,7 +261,7 @@ trait AsGraphQLController
 
                 if ($typeRelation instanceof Relations\HasMany) {
                     $newModel = $model->{$keyCamel}()->create($value2);
-                    $this->saveModel($newModel, $dataArray);
+                    $this->createModel($newModel, $dataArray);
                 }
 
                 if ($typeRelation instanceof Relations\BelongsToMany) {
