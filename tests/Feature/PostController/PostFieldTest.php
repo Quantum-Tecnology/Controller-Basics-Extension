@@ -128,7 +128,7 @@ it('it creates a new post with meta and comments', function (): void {
     assertDatabaseCount(CommentLike::class, 2);
 });
 
-it('a', function () {
+it('a', function (): void {
     $post = postJson(route('posts.store', [
         'fields' => 'id title comments {id}',
     ]), [
