@@ -25,6 +25,11 @@ final class LogSupport
         }
     }
 
+    public static function reset(): void
+    {
+        self::$messages = [];
+    }
+
     public static function getMessages(): array
     {
         return array_values(self::$messages);

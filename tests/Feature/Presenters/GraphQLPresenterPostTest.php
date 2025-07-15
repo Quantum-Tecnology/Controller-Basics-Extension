@@ -9,6 +9,7 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 beforeEach(function (): void {
     $this->presenter = app(GraphQLPresenter::class);
     $this->post      = Post::factory()->create();
+    LogSupport::reset();
 });
 
 test('returns only requested fields in data', function (): void {

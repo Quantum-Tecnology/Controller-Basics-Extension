@@ -8,6 +8,7 @@ use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 
 beforeEach(function () {
     config(['app.key' => 'base64:' . base64_encode(random_bytes(32))]);
+    LogSupport::reset();
     Route::middleware(['web', QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware::class])
         ->get('/test-middleware', function () {
             LogSupport::add('Test log message');
