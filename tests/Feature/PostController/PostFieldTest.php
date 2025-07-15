@@ -158,7 +158,7 @@ it('it updated a new post with only id and title fields', function (): void {
             ],
         ])
         ->assertOk();
-})->todo();
+});
 
 it('it deleted a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
