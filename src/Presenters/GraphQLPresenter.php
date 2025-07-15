@@ -11,6 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
+use QuantumTecnology\ModelBasicsExtension\HasManySyncable;
 
 final readonly class GraphQLPresenter
 {
@@ -85,7 +86,11 @@ final readonly class GraphQLPresenter
                 $response['data'][$key] = $this->generate($model->{$keyCamel}, $fields[$key]);
             }
 
-            if (in_array($model->{$keyCamel}()::class, [Relations\HasMany::class, Relations\BelongsToMany::class])) {
+            if (in_array($model->{$keyCamel}()::class, [
+                Relations\HasMany::class,
+                HasManySyncable::class,
+                Relations\BelongsToMany::class,
+            ])) {
                 foreach ($model->{$keyCamel} as $value) {
                     $response['data'][$key]['data'][] = $this->generate(
                         $value,
