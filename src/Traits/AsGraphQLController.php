@@ -50,7 +50,7 @@ trait AsGraphQLController
         $model      = $this->model();
         $dataValues = $this->getDataRequest('store');
 
-        $model = DB::transaction(fn () => $this->createModel($model, $dataValues));
+        $model = DB::transaction(fn () => $this->saveModel($model, $dataValues));
 
         $response = $this->getGraphQlService()->presenter(
             $model,
@@ -74,7 +74,7 @@ trait AsGraphQLController
         $model = $this->findBy()->sole();
 
         $model = DB::transaction(function () use ($model, $dataValues) {
-            $model->update($dataValues);
+            $this->saveModel($model, $dataValues);
 
             return $model;
         });
@@ -201,7 +201,7 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function createModel(Model $model, array $dataValues): Model
+    protected function saveModel(Model $model, array $dataValues): Model
     {
         $dataChildren = [];
         $dataFather   = [];
@@ -231,7 +231,7 @@ trait AsGraphQLController
         }
 
         foreach ($dataFather as $value) {
-            $dataValues[$value['key']] = $this->createModel(new $value['model'](), $value['value']);
+            $dataValues[$value['key']] = $this->saveModel(new $value['model'](), $value['value']);
         }
 
         $model->fill($dataValues);
@@ -261,7 +261,7 @@ trait AsGraphQLController
 
                 if ($typeRelation instanceof Relations\HasMany) {
                     $newModel = $model->{$keyCamel}()->create($value2);
-                    $this->createModel($newModel, $dataArray);
+                    $this->saveModel($newModel, $dataArray);
                 }
 
                 if ($typeRelation instanceof Relations\BelongsToMany) {

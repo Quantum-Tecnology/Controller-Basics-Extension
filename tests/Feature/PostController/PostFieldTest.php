@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -127,6 +128,10 @@ it('it creates a new post with meta and comments', function (): void {
     assertDatabaseCount(CommentLike::class, 2);
 });
 
+it('a', function () {
+
+});
+
 it('it updated a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
 
@@ -158,6 +163,11 @@ it('it updated a new post with only id and title fields', function (): void {
             ],
         ])
         ->assertOk();
+
+    assertDatabaseCount(Post::class, 1);
+    assertDatabaseHas(Post::class, [
+        'title' => 'create a new post',
+    ]);
 });
 
 it('it deleted a new post with only id and title fields', function (): void {
