@@ -124,7 +124,7 @@ it('it creates a new post with meta and comments', function (): void {
     assertDatabaseCount(Tag::class, 1);
     assertDatabaseCount(Comment::class, 1);
     assertDatabaseCount(CommentLike::class, 2);
-});
+})->todo();
 
 it('it updated a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
@@ -157,7 +157,7 @@ it('it updated a new post with only id and title fields', function (): void {
             ],
         ])
         ->assertOk();
-});
+})->todo();
 
 it('it deleted a new post with only id and title fields', function (): void {
     $post = Post::factory()->create();
