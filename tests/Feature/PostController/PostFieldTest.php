@@ -79,13 +79,12 @@ it('it creates a new post with only id and title fields', function (): void {
                 'body' => 'test comment',
             ],
         ],
-    ])->ddJson()
-        ->assertJsonStructure([
-            'data' => [
-                'id',
-                'title',
-            ],
-        ])
+    ])->assertJsonStructure([
+        'data' => [
+            'id',
+            'title',
+        ],
+    ])
         ->assertCreated();
 });
 
