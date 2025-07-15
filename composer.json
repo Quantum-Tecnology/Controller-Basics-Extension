@@ -53,7 +53,8 @@
   "config": {
     "allow-plugins": {
       "php-http/discovery": true,
-      "pestphp/pest-plugin": true
+      "pestphp/pest-plugin": true,
+      "captainhook/captainhook-phar": true
     }
   },
   "require-dev": {
@@ -64,6 +65,7 @@
     "pestphp/pest": "^3.8",
     "pestphp/pest-plugin-faker": "^3.0",
     "pestphp/pest-plugin-laravel": "^3.2",
-    "pestphp/pest-plugin-watch": "^3.0"
+    "pestphp/pest-plugin-watch": "^3.0",
+    "captainhook/captainhook-phar": "^5.25"
   }
 }
