@@ -18,7 +18,7 @@ final class PostRequest extends FormRequest
             'meta'      => ['nullable', 'array'],
             'author_id' => [
                 'nullable',
-                Rule::requiredIf(fn () => !$this->input('author')),
+                Rule::requiredIf(fn (): bool => !$this->input('author')),
                 'exists:' . Author::class . ',id',
             ],
             'author.name' => [

@@ -64,12 +64,10 @@ trait AsGraphQLController
         //            }
         //        }
 
-        $model = DB::transaction(function () use ($model, $dataValues) {
-            //            $model = $model->fill($dataValues);
+        $model = DB::transaction(fn () => //            $model = $model->fill($dataValues);
             //            $model->save();
             //            $this->saveStoreChildren($model, $dataArray);
-            return $this->saveModel($model, $dataValues);
-        });
+            $this->saveModel($model, $dataValues));
 
         $response = $this->getGraphQlService()->presenter(
             $model,
@@ -213,14 +211,14 @@ trait AsGraphQLController
             return $request->validated();
         }
 
-        if (true === $exact) {
+        if ($exact) {
             return [];
         }
 
         return self::getDataRequest();
     }
 
-    protected function saveModel(Model $model, array $dataValues)
+    protected function saveModel(Model $model, array $dataValues): Model
     {
         $dataChildren = [];
         $dataFather   = [];
@@ -233,7 +231,7 @@ trait AsGraphQLController
                 && method_exists($model, $keyCamel)
                 && $model->{$keyCamel}() instanceof Relation
             ) {
-                if (in_array(get_class($model->{$keyCamel}()), [
+                if (in_array($model->{$keyCamel}()::class, [
                     Relations\HasOne::class,
                     Relations\BelongsTo::class,
                 ], true)) {
