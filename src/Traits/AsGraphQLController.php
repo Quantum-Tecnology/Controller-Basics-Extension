@@ -233,9 +233,11 @@ trait AsGraphQLController
         $model->save();
 
         foreach ($dataChildren as $key => $value) {
+            $cloneModel = $model;
+
             $keyCamel       = Str::camel($key);
-            $typeRelation   = $model->{$keyCamel}();
-            $classRelated   = $model->{$keyCamel}()->getRelated();
+            $typeRelation   = $cloneModel->{$keyCamel}();
+            $classRelated   = $cloneModel->{$keyCamel}()->getRelated();
             $idDataChildren = [];
 
             foreach ($value as $value2) {
@@ -255,12 +257,11 @@ trait AsGraphQLController
                 }
 
                 if ($typeRelation instanceof Relations\HasMany) {
-                    $modelInternal = $model->{$keyCamel}();
+                    $modelInternal = $cloneModel->{$keyCamel}();
                     $idModel       = $modelInternal->getRelated()->getKeyName();
 
-                    if (array_key_exists($idModel, $value2)) {
-                        $newModel = $typeRelation->where($idModel, $value2[$idModel])->sole();
-                        $newModel->update($value2);
+                    if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
+                        $newModel = $cloneModel->{$keyCamel}()->where($idModel, $value2[$idModel])->sole();
                     } else {
                         $newModel = $modelInternal->create($value2);
                     }
