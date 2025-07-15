@@ -4,16 +4,16 @@
         "actions": []
     },
     "pre-push": {
-        "enabled": false,
-        "actions": []
-    },
-    "pre-commit": {
         "enabled": true,
         "actions": [
             {
                 "action": "pest"
             }
         ]
+    },
+    "pre-commit": {
+        "enabled": false,
+        "actions": []
     },
     "prepare-commit-msg": {
         "enabled": false,
