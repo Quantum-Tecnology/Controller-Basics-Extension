@@ -66,6 +66,8 @@ final readonly class GraphQLPresenter
                     'field' => $field,
                     'model' => $model->getTable(),
                 ]));
+
+                unset($data[$field]);
             }
         }
 
