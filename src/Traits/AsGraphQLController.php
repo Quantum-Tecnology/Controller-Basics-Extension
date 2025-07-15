@@ -267,7 +267,9 @@ trait AsGraphQLController
                 if ($typeRelation instanceof Relations\BelongsToMany) {
                     ksort($value2);
 
-                    if (!isset($idDataChildren[$name = json_encode($value2, JSON_THROW_ON_ERROR)])) {
+                    $name = json_encode($value2, JSON_THROW_ON_ERROR);
+
+                    if (!isset($idDataChildren[$name])) {
                         $idDataChildren[$name] = $classRelated->create($value2);
                     }
                 }
