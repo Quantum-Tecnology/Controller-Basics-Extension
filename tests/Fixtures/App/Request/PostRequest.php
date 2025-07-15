@@ -21,7 +21,11 @@ final class PostRequest extends FormRequest
                 Rule::requiredIf(fn () => !$this->input('author')),
                 'exists:' . Author::class . ',id',
             ],
-            'author.name' => 'required',
+            'author.name' => [
+                'nullable',
+                Rule::requiredIf(fn () => $this->input('author')),
+                'max:70',
+            ],
             'tags.*.name' => [
                 'required',
                 'string',
