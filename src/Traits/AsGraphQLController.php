@@ -49,27 +49,26 @@ trait AsGraphQLController
     {
         $model      = $this->model();
         $dataValues = $this->getDataRequest('store');
-        $dataArray  = [];
+        //        $dataArray  = [];
+        //
+        //        foreach ($dataValues as $key => $value) {
+        //            $keyCamel = Str::camel($key);
+        //
+        //            if (
+        //                is_array($value)
+        //                && method_exists($model, $keyCamel)
+        //                && $model->{$keyCamel}() instanceof Relation
+        //            ) {
+        //                $dataArray[$key] = $value;
+        //                unset($dataValues[$key]);
+        //            }
+        //        }
 
-        foreach ($dataValues as $key => $value) {
-            $keyCamel = Str::camel($key);
-
-            if (
-                is_array($value)
-                && method_exists($model, $keyCamel)
-                && $model->{$keyCamel}() instanceof Relation
-            ) {
-                $dataArray[$key] = $value;
-                unset($dataValues[$key]);
-            }
-        }
-
-        $model = DB::transaction(function () use ($model, $dataValues, $dataArray) {
-            $model = $model->fill($dataValues);
-            $model->save();
-            $this->saveStoreChildren($model, $dataArray);
-
-            return $model;
+        $model = DB::transaction(function () use ($model, $dataValues) {
+            //            $model = $model->fill($dataValues);
+            //            $model->save();
+            //            $this->saveStoreChildren($model, $dataArray);
+            return $this->saveModel($model, $dataValues);
         });
 
         $response = $this->getGraphQlService()->presenter(
@@ -221,49 +220,88 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function saveStoreChildren(Model $model, array $children): void
+    protected function saveModel(Model $model, array $dataValues)
     {
-        foreach ($children as $key => $value) {
-            $ids      = [];
+        $dataChildren = [];
+        $dataFather   = [];
+
+        foreach ($dataValues as $key => $value) {
             $keyCamel = Str::camel($key);
 
-            foreach ($value as $value2) {
-                $classRelated = $model->{$keyCamel}()->getRelated();
-                $dataArray    = [];
-
-                foreach ($value2 as $key3 => $value3) {
-                    $key3Camel = Str::camel($key3);
-
-                    if (
-                        is_array($value3)
-                        && method_exists($classRelated, $key3Camel)
-                        && $classRelated->{$key3Camel}() instanceof Relation
-                    ) {
-                        $dataArray[$key3] = $value3;
-                        unset($value2[$key3]);
-                    }
+            if (
+                is_array($value)
+                && method_exists($model, $keyCamel)
+                && $model->{$keyCamel}() instanceof Relation
+            ) {
+                if (in_array(get_class($model->{$keyCamel}()), [
+                    Relations\HasOne::class,
+                    Relations\BelongsTo::class,
+                ], true)) {
+                    $dataFather[$key] = [
+                        'model' => $model->{$keyCamel}()->getRelated(),
+                        'value' => $value,
+                        'key'   => $model->{$keyCamel}()->getForeignKeyName(),
+                    ];
+                } else {
+                    $dataChildren[$key] = $value;
                 }
-
-                if ($model->{$keyCamel}() instanceof Relations\HasMany) {
-                    $newModel = $model->{$keyCamel}()->create($value2);
-                }
-
-                if ($model->{$keyCamel}() instanceof Relations\BelongsToMany) {
-                    ksort($value2);
-
-                    if (!isset($ids[$name = json_encode($value2, JSON_THROW_ON_ERROR)])) {
-                        $ids[$name] = $classRelated->create($value2);
-                    }
-                }
-
-                if (isset($newModel) && filled($dataArray)) {
-                    $this->saveStoreChildren($newModel, $dataArray);
-                }
-            }
-
-            if (filled($ids)) {
-                $model->{$keyCamel}()->attach($ids);
+                unset($dataValues[$key]);
             }
         }
+
+        foreach ($dataFather as $value) {
+            $dataValues[$value['key']] = $this->saveModel(new $value['model'](), $value['value']);
+        }
+
+        $model->fill($dataValues);
+        $model->save();
+
+        return $model;
     }
+
+    //    protected function saveStoreChildren(Model $model, array $children): void
+    //    {
+    //        foreach ($children as $key => $value) {
+    //            $ids      = [];
+    //            $keyCamel = Str::camel($key);
+    //
+    //            foreach ($value as $value2) {
+    //                $classRelated = $model->{$keyCamel}()->getRelated();
+    //                $dataArray    = [];
+    //
+    //                foreach ($value2 as $key3 => $value3) {
+    //                    $key3Camel = Str::camel($key3);
+    //
+    //                    if (
+    //                        is_array($value3)
+    //                        && method_exists($classRelated, $key3Camel)
+    //                        && $classRelated->{$key3Camel}() instanceof Relation
+    //                    ) {
+    //                        $dataArray[$key3] = $value3;
+    //                        unset($value2[$key3]);
+    //                    }
+    //                }
+    //
+    //                if ($model->{$keyCamel}() instanceof Relations\HasMany) {
+    //                    $newModel = $model->{$keyCamel}()->create($value2);
+    //                }
+    //
+    //                if ($model->{$keyCamel}() instanceof Relations\BelongsToMany) {
+    //                    ksort($value2);
+    //
+    //                    if (!isset($ids[$name = json_encode($value2, JSON_THROW_ON_ERROR)])) {
+    //                        $ids[$name] = $classRelated->create($value2);
+    //                    }
+    //                }
+    //
+    //                if (isset($newModel) && filled($dataArray)) {
+    //                    $this->saveStoreChildren($newModel, $dataArray);
+    //                }
+    //            }
+    //
+    //            if (filled($ids)) {
+    //                $model->{$keyCamel}()->attach($ids);
+    //            }
+    //        }
+    //    }
 }

@@ -74,8 +74,12 @@ it('it creates a new post with only id and title fields', function (): void {
         'author' => [
             'name' => fake()->name,
         ],
-    ])
-        ->ddJson()
+        'comments' => [
+            [
+                'body' => 'test comment',
+            ],
+        ],
+    ])->ddJson()
         ->assertJsonStructure([
             'data' => [
                 'id',
