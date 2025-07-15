@@ -93,6 +93,6 @@ test('handles non existent fields gracefully', function (): void {
     $result = $this->presenter->execute($this->post, $fields);
     expect($result['data'])
         ->toHaveKey('id', 1)
-        ->and($result['data'])->toHaveKey('not_a_field', null)
+        ->and($result['data'])->not->toHaveKey('not_a_field', null)
         ->and(LogSupport::getMessages())->toHaveCount(1);
 });

@@ -55,13 +55,16 @@ final readonly class GraphQLPresenter
                 default                                  => $valueField
             };
 
+            $existAttribute = false;
+
             if (str_starts_with((string) $field, 'can_')) {
                 $actions[$field] = $valueField;
+                $existAttribute  = true;
             } else {
                 $data[$field] = $valueField;
             }
 
-            if (!in_array($field, $attributesModel, true)) {
+            if (!in_array($field, $attributesModel, true) && !$existAttribute) {
                 LogSupport::add(__("The field ':field' does not exist in the model ':model'. Please check your fields.", [
                     'field' => $field,
                     'model' => $model->getTable(),
