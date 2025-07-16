@@ -154,6 +154,7 @@ it('a', function (): void {
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
+        'status'    => PostStatusEnum::DRAFT->name,
         'comments'  => [
             [
                 'body' => 'test comment',

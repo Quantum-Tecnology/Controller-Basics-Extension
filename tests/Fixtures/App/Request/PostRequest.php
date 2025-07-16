@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\PostStatusEnum;
 
 final class PostRequest extends FormRequest
 {
@@ -17,6 +18,7 @@ final class PostRequest extends FormRequest
         return [
             'title'     => ['required'],
             'meta'      => ['nullable', 'array'],
+            'status'    => ['required', Rule::enum(PostStatusEnum::class)],
             'author_id' => [
                 'nullable',
                 Rule::requiredIf(fn (): bool => !$this->input('author')),
