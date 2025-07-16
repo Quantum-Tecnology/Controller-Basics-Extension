@@ -23,10 +23,7 @@ class ModelPersistenceService
                 && method_exists($model, $keyCamel)
                 && $model->{$keyCamel}() instanceof Relations\Relation
             ) {
-                if (in_array($model->{$keyCamel}()::class, [
-                    Relations\HasOne::class,
-                    Relations\BelongsTo::class,
-                ], true)) {
+                if ($model->{$keyCamel}() instanceof Relations\BelongsTo) {
                     $dataFather[$key] = [
                         'model' => $model->{$keyCamel}()->getRelated(),
                         'key'   => $model->{$keyCamel}()->getForeignKeyName(),
