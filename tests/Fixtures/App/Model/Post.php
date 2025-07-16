@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\PostStatusEnum;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories\PostFactory;
 
 final class Post extends BaseModel
 {
     protected $casts = [
-        'meta' => 'array',
+        'meta'   => 'array',
+        'status' => PostStatusEnum::class,
     ];
 
     public function author(): BelongsTo

@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 use QuantumTecnology\ModelBasicsExtension\HasManySyncable;
+use UnitEnum;
 
 final readonly class GraphQLPresenter
 {
@@ -52,7 +53,16 @@ final readonly class GraphQLPresenter
 
             $valueField = match (true) {
                 $valueField instanceof DateTimeInterface => $valueField->toDateTimeString(),
-                default                                  => $valueField
+                $valueField instanceof UnitEnum          => [
+                    'key'   => $valueField->name,
+                    'value' => property_exists($valueField, 'value')
+                        ? $valueField->value
+                        : null,
+                    'label' => method_exists($valueField, 'label')
+                        ? $valueField->label()
+                        : null,
+                ],
+                default => $valueField
             };
 
             $existAttribute = false;

@@ -16,6 +16,8 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\CommentLike;
 
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\PostStatusEnum;
+
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Tag;
 
@@ -35,6 +37,24 @@ test('it returns only the requested fields for a post', function (): void {
             'data' => [
                 'id'    => $p->id,
                 'title' => $p->title,
+            ],
+        ])
+        ->assertOk();
+});
+
+test('AAAAA', function (): void {
+    $p = Post::factory()->create(['status' => PostStatusEnum::PUBLISHED]);
+
+    getJson(route('posts.show', ['post' => $p->id, 'fields' => 'id title status']))
+        ->assertJson([
+            'data' => [
+                'id'     => $p->id,
+                'title'  => $p->title,
+                'status' => [
+                    'key'   => PostStatusEnum::PUBLISHED->name,
+                    'value' => null,
+                    'label' => null,
+                ],
             ],
         ])
         ->assertOk();

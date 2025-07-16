@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Fac
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Author;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\PostStatusEnum;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
 final class PostFactory extends Factory
@@ -18,6 +19,7 @@ final class PostFactory extends Factory
         return [
             'author_id'  => Author::factory(),
             'title'      => $this->faker->sentence(3),
+            'status'     => $this->faker->randomElement(PostStatusEnum::cases()),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

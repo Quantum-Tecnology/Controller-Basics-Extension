@@ -50,6 +50,7 @@ abstract class TestCase extends BaseTestCase
             $table->foreignId('author_id')->constrained('authors');
             $table->string('title');
             $table->json('meta')->nullable();
+            $table->unsignedTinyInteger('status');
             $table->timestamps();
             $table->softDeletes();
         });
