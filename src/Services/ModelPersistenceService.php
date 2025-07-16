@@ -67,30 +67,15 @@ class ModelPersistenceService
                     }
                 }
 
-                if ($typeRelation instanceof Relations\HasMany) {
-                    $modelInternal = $cloneModel->{$keyCamel}();
-                    $idModel       = $modelInternal->getRelated()->getKeyName();
-
-                    if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
-                        $newModel = $cloneModel->{$keyCamel}()
-                            ->where($idModel, $value2[$idModel])
-                            ->sole();
-                        $newModel->fill($value2);
-                    } else {
-                        $newModel = $modelInternal->create($value2);
-                    }
-                    $this->execute($newModel, $dataArray);
-                }
-
-                if ($typeRelation instanceof Relations\BelongsToMany) {
-                    ksort($value2);
-
-                    $name = json_encode($value2, JSON_THROW_ON_ERROR);
-
-                    if (!isset($idDataChildren[$name])) {
-                        $idDataChildren[$name] = $classRelated->create($value2);
-                    }
-                }
+                [$idDataChildren] = $this->persistRelatedModels(
+                    $cloneModel,
+                    $classRelated,
+                    $typeRelation,
+                    $keyCamel,
+                    $value2,
+                    $dataArray,
+                    $idDataChildren,
+                );
             }
 
             if (filled($idDataChildren)) {
@@ -99,5 +84,43 @@ class ModelPersistenceService
         }
 
         return $model;
+    }
+
+    protected function persistRelatedModels(
+        Model $cloneModel,
+        Model $classRelated,
+        Relations\Relation $typeRelation,
+        string $keyCamel,
+        array $value2,
+        array $dataArray,
+        array $idDataChildren,
+    ): array {
+        if ($typeRelation instanceof Relations\HasMany) {
+            $modelInternal = $cloneModel->{$keyCamel}();
+            $idModel       = $modelInternal->getRelated()->getKeyName();
+
+            if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
+                $newModel = $cloneModel
+                    ->{$keyCamel}()
+                    ->where($idModel, $value2[$idModel])
+                    ->sole();
+                $newModel->fill($value2);
+            } else {
+                $newModel = $modelInternal->create($value2);
+            }
+            $this->execute($newModel, $dataArray);
+        }
+
+        if ($typeRelation instanceof Relations\BelongsToMany) {
+            ksort($value2);
+
+            $name = json_encode($value2, JSON_THROW_ON_ERROR);
+
+            if (!isset($idDataChildren[$name])) {
+                $idDataChildren[$name] = $classRelated->create($value2);
+            }
+        }
+
+        return [$idDataChildren];
     }
 }
