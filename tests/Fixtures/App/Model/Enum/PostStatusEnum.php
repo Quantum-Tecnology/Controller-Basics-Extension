@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum;
 
-enum PostStatusEnum
+enum PostStatusEnum: int
 {
-    case DRAFT;
-    case PUBLISHED;
-    case ARCHIVED;
+    case DRAFT     = 1;
+    case PUBLISHED = 2;
+    case ARCHIVED  = 3;
 }

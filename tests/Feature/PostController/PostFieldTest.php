@@ -42,8 +42,8 @@ test('it returns only the requested fields for a post', function (): void {
         ->assertOk();
 });
 
-test('AAAAA', function (): void {
-    $p = Post::factory()->create(['status' => PostStatusEnum::PUBLISHED]);
+test('it returns the requested fields including status as enum for a post', function (): void {
+    $p = Post::factory()->create(['status' => PostStatusEnum::PUBLISHED->value]);
 
     getJson(route('posts.show', ['post' => $p->id, 'fields' => 'id title status']))
         ->assertJson([
@@ -52,7 +52,7 @@ test('AAAAA', function (): void {
                 'title'  => $p->title,
                 'status' => [
                     'key'   => PostStatusEnum::PUBLISHED->name,
-                    'value' => null,
+                    'value' => 2,
                     'label' => null,
                 ],
             ],
@@ -92,6 +92,7 @@ it('it creates a new post with only id and title fields', function (): void {
         'fields' => 'id title',
     ]), [
         'title'  => 'create a new post',
+        'status' => PostStatusEnum::DRAFT->value,
         'author' => [
             'name' => fake()->name,
         ],
@@ -115,6 +116,7 @@ it('it creates a new post with meta and comments', function (): void {
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
+        'status'    => PostStatusEnum::PUBLISHED->value,
         'meta'      => ['test'],
         'tags'      => [
             [
@@ -148,13 +150,13 @@ it('it creates a new post with meta and comments', function (): void {
     assertDatabaseCount(CommentLike::class, 2);
 });
 
-it('a', function (): void {
+it('it updates a post and its comments with only id and title fields', function (): void {
     $post = postJson(route('posts.store', [
         'fields' => 'id title comments {id}',
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
-        'status'    => PostStatusEnum::DRAFT->name,
+        'status'    => PostStatusEnum::DRAFT->value,
         'comments'  => [
             [
                 'body' => 'test comment',
@@ -193,6 +195,7 @@ it('it updated a new post with only id and title fields', function (): void {
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
+        'status'    => PostStatusEnum::DRAFT->value,
         'meta'      => ['test'],
         'comments'  => [
             [
