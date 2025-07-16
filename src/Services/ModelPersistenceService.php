@@ -10,129 +10,156 @@ use Illuminate\Support\Str;
 
 class ModelPersistenceService
 {
-    public function execute(Model $model, array $dataValues): Model
+    public function execute(Model $model, array $inputData): Model
     {
-        $dataChildren = [];
-        $dataFather   = [];
+        [$parentRelations, $childRelations, $ownAttributes] = $this->separateModelData($model, $inputData);
 
-        foreach ($dataValues as $key => $value) {
-            $keyCamel = Str::camel($key);
+        $this->persistParentRelations($ownAttributes, $parentRelations);
 
-            if (
-                is_array($value)
-                && method_exists($model, $keyCamel)
-                && $model->{$keyCamel}() instanceof Relations\Relation
-            ) {
-                if ($model->{$keyCamel}() instanceof Relations\BelongsTo) {
-                    $dataFather[$key] = [
-                        'model' => $model->{$keyCamel}()->getRelated(),
-                        'key'   => $model->{$keyCamel}()->getForeignKeyName(),
-                        'value' => $value,
-                    ];
-                } else {
-                    $dataChildren[$key] = $value;
-                }
-                unset($dataValues[$key]);
-            }
-        }
-
-        foreach ($dataFather as $value) {
-            $dataValues[$value['key']] = $this->execute(new $value['model'](), $value['value']);
-        }
-
-        $model->fill($dataValues);
+        $model->fill($ownAttributes);
         $model->save();
 
-        foreach ($dataChildren as $key => $value) {
-            $cloneModel = $model;
-
-            $keyCamel       = Str::camel($key);
-            $typeRelation   = $cloneModel->{$keyCamel}();
-            $classRelated   = $cloneModel->{$keyCamel}()->getRelated();
-            $idDataChildren = [];
-
-            foreach ($value as $value2) {
-                $dataArray = [];
-
-                foreach ($value2 as $key3 => $value3) {
-                    $key3Camel = Str::camel($key3);
-
-                    if (
-                        is_array($value3)
-                        && method_exists($classRelated, $key3Camel)
-                        && $classRelated->{$key3Camel}() instanceof Relations\Relation
-                    ) {
-                        $dataArray[$key3] = $value3;
-                        unset($value2[$key3]);
-                    }
-                }
-
-                [$idDataChildren] = $this->persistRelatedModels(
-                    $cloneModel,
-                    $classRelated,
-                    $typeRelation,
-                    $keyCamel,
-                    $value2,
-                    $dataArray,
-                    $idDataChildren,
-                );
-            }
-
-            if (filled($idDataChildren)) {
-                $typeRelation->attach($idDataChildren);
-            }
-        }
+        $this->persistChildRelations($model, $childRelations);
 
         return $model;
     }
 
-    public function persistHasManyRelation(string $keyCamel, Model $cloneModel, array $value2, array $dataArray): void
-    {
-        $modelInternal = $cloneModel->{$keyCamel}();
-        $idModel       = $modelInternal->getRelated()->getKeyName();
-
-        if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
-            $newModel = $cloneModel
-                ->{$keyCamel}()
-                ->where($idModel, $value2[$idModel])
-                ->sole();
-            $newModel->fill($value2);
-        } else {
-            $newModel = $modelInternal->create($value2);
-        }
-        $this->execute($newModel, $dataArray);
-    }
-
     protected function persistRelatedModels(
-        Model $cloneModel,
-        Model $classRelated,
-        Relations\Relation $typeRelation,
-        string $keyCamel,
-        array $value2,
-        array $dataArray,
-        array $idDataChildren,
+        Model $parentModel,
+        Model $relatedModel,
+        Relations\Relation $relation,
+        string $relationMethod,
+        array $data,
+        array $nestedData,
+        array $attachedIds,
     ): array {
-        if ($typeRelation instanceof Relations\HasMany) {
-            $this->persistHasManyRelation($keyCamel, $cloneModel, $value2, $dataArray);
+        if ($relation instanceof Relations\HasMany) {
+            $this->persistHasMany($parentModel, $relationMethod, $data, $nestedData);
         }
 
-        if ($typeRelation instanceof Relations\BelongsToMany) {
-            [$idDataChildren] = $this->persistBelongsToManyRelation($value2, $idDataChildren, $classRelated);
+        if ($relation instanceof Relations\BelongsToMany) {
+            [$attachedIds] = $this->persistBelongsToMany($relatedModel, $data, $attachedIds);
         }
 
-        return [$idDataChildren];
+        return [$attachedIds];
     }
 
-    protected function persistBelongsToManyRelation(array $value2, array $idDataChildren, Model $classRelated): array
+    protected function persistHasMany(Model $parentModel, string $relationMethod, array $data, array $nestedData): void
     {
-        ksort($value2);
+        $relation     = $parentModel->{$relationMethod}();
+        $relatedModel = $relation->getRelated();
+        $primaryKey   = $relatedModel->getKeyName();
 
-        $name = json_encode($value2, JSON_THROW_ON_ERROR);
-
-        if (!isset($idDataChildren[$name])) {
-            $idDataChildren[$name] = $classRelated->create($value2);
+        if (!empty($data[$primaryKey] ?? null)) {
+            $model = $relation->where($primaryKey, $data[$primaryKey])->sole();
+            $model->fill($data);
+        } else {
+            $model = $relation->create($data);
         }
 
-        return [$value2, $idDataChildren];
+        $this->execute($model, $nestedData);
+    }
+
+    protected function persistBelongsToMany(Model $relatedModel, array $data, array $attachedIds): array
+    {
+        ksort($data);
+        $dataKey = json_encode($data, JSON_THROW_ON_ERROR);
+
+        if (!isset($attachedIds[$dataKey])) {
+            $attachedIds[$dataKey] = $relatedModel->create($data)->getKey();
+        }
+
+        return [$attachedIds];
+    }
+
+    private function separateModelData(Model $model, array $inputData): array
+    {
+        $parentRelations = [];
+        $childRelations  = [];
+        $ownAttributes   = $inputData;
+
+        foreach ($inputData as $key => $value) {
+            $relationMethod = Str::camel($key);
+
+            if (!is_array($value) || !method_exists($model, $relationMethod)) {
+                continue;
+            }
+
+            $relation = $model->{$relationMethod}();
+
+            if ($relation instanceof Relations\Relation) {
+                if ($relation instanceof Relations\BelongsTo) {
+                    $parentRelations[$key] = [
+                        'model'       => $relation->getRelated(),
+                        'foreign_key' => $relation->getForeignKeyName(),
+                        'data'        => $value,
+                    ];
+                } else {
+                    $childRelations[$key] = $value;
+                }
+
+                unset($ownAttributes[$key]);
+            }
+        }
+
+        return [$parentRelations, $childRelations, $ownAttributes];
+    }
+
+    private function persistParentRelations(array &$ownAttributes, array $parentRelations): void
+    {
+        foreach ($parentRelations as $relation) {
+            $relatedModel                            = new ($relation['model'])();
+            $persistedParent                         = $this->execute($relatedModel, $relation['data']);
+            $ownAttributes[$relation['foreign_key']] = $persistedParent->getKey();
+        }
+    }
+
+    private function persistChildRelations(Model $model, array $childRelations): void
+    {
+        foreach ($childRelations as $relationKey => $childrenData) {
+            $relationMethod = Str::camel($relationKey);
+            $relation       = $model->{$relationMethod}();
+            $relatedModel   = $relation->getRelated();
+
+            $attachedIds = [];
+
+            foreach ($childrenData as $childData) {
+                [$nestedRelations, $cleanChildData] = $this->extractNestedRelations($relatedModel, $childData);
+
+                [$attachedIds] = $this->persistRelatedModels(
+                    $model,
+                    $relatedModel,
+                    $relation,
+                    $relationMethod,
+                    $cleanChildData,
+                    $nestedRelations,
+                    $attachedIds,
+                );
+            }
+
+            if (!empty($attachedIds) && $relation instanceof Relations\BelongsToMany) {
+                $relation->attach($attachedIds);
+            }
+        }
+    }
+
+    private function extractNestedRelations(Model $relatedModel, array $childData): array
+    {
+        $nestedRelations = [];
+
+        foreach ($childData as $key => $value) {
+            $relationMethod = Str::camel($key);
+
+            if (is_array($value) && method_exists($relatedModel, $relationMethod)) {
+                $relation = $relatedModel->{$relationMethod}();
+
+                if ($relation instanceof Relations\Relation) {
+                    $nestedRelations[$key] = $value;
+                    unset($childData[$key]);
+                }
+            }
+        }
+
+        return [$nestedRelations, $childData];
     }
 }
