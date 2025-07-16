@@ -29,8 +29,8 @@ class ModelPersistenceService
                 ], true)) {
                     $dataFather[$key] = [
                         'model' => $model->{$keyCamel}()->getRelated(),
-                        'value' => $value,
                         'key'   => $model->{$keyCamel}()->getForeignKeyName(),
+                        'value' => $value,
                     ];
                 } else {
                     $dataChildren[$key] = $value;
