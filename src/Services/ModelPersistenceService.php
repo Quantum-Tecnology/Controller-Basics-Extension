@@ -24,7 +24,7 @@ class ModelPersistenceService
                 && $model->{$keyCamel}() instanceof Relations\Relation
             ) {
                 if (in_array($model->{$keyCamel}()::class, [
-                    HasOne::class,
+                    Relations\HasOne::class,
                     Relations\BelongsTo::class,
                 ], true)) {
                     $dataFather[$key] = [
