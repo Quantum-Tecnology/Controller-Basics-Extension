@@ -6,14 +6,12 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
+use QuantumTecnology\ControllerBasicsExtension\Services\ModelPersistenceService;
 use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
@@ -193,107 +191,6 @@ trait AsGraphQLController
 
     protected function execute(Model $model, array $data)
     {
-        return DB::transaction(fn () => $this->saveModel($model, $data));
-    }
-
-    private function saveModel(Model $model, array $dataValues): Model
-    {
-        $dataChildren = [];
-        $dataFather   = [];
-
-        foreach ($dataValues as $key => $value) {
-            $keyCamel = Str::camel($key);
-
-            if (
-                is_array($value)
-                && method_exists($model, $keyCamel)
-                && $model->{$keyCamel}() instanceof Relation
-            ) {
-                if (in_array($model->{$keyCamel}()::class, [
-                    Relations\HasOne::class,
-                    Relations\BelongsTo::class,
-                ], true)) {
-                    $dataFather[$key] = [
-                        'model' => $model->{$keyCamel}()->getRelated(),
-                        'value' => $value,
-                        'key'   => $model->{$keyCamel}()->getForeignKeyName(),
-                    ];
-                } else {
-                    $dataChildren[$key] = $value;
-                }
-                unset($dataValues[$key]);
-            }
-        }
-
-        foreach ($dataFather as $value) {
-            $dataValues[$value['key']] = $this->saveModel(new $value['model'](), $value['value']);
-        }
-
-        $model->fill($dataValues);
-        $model->save();
-
-        foreach ($dataChildren as $key => $value) {
-            $cloneModel = $model;
-
-            $keyCamel       = Str::camel($key);
-            $typeRelation   = $cloneModel->{$keyCamel}();
-            $classRelated   = $cloneModel->{$keyCamel}()->getRelated();
-            $idDataChildren = [];
-
-            foreach ($value as $value2) {
-                $dataArray = [];
-
-                foreach ($value2 as $key3 => $value3) {
-                    $key3Camel = Str::camel($key3);
-
-                    if (
-                        is_array($value3)
-                        && method_exists($classRelated, $key3Camel)
-                        && $classRelated->{$key3Camel}() instanceof Relation
-                    ) {
-                        $dataArray[$key3] = $value3;
-                        unset($value2[$key3]);
-                    }
-                }
-
-                if ($typeRelation instanceof Relations\HasMany) {
-                    $modelInternal = $cloneModel->{$keyCamel}();
-                    $idModel       = $modelInternal->getRelated()->getKeyName();
-
-                    //                    dump([
-                    //                        $idModel,
-                    //                        $value2,
-                    //                        array_key_exists($idModel, $value2),
-                    //                        filled($value2[$idModel] ?? null),
-                    //                    ]);
-
-                    if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
-                        $newModel = $cloneModel->{$keyCamel}()
-                            ->where($idModel, $value2[$idModel])
-                            ->sole();
-                        $newModel->fill($value2);
-                    } else {
-                        $newModel = $modelInternal->create($value2);
-                    }
-                    $this->saveModel($newModel, $dataArray);
-                }
-
-                if ($typeRelation instanceof Relations\BelongsToMany) {
-                    ksort($value2);
-
-                    $name = json_encode($value2, JSON_THROW_ON_ERROR);
-
-                    if (!isset($idDataChildren[$name])) {
-                        $idDataChildren[$name] = $classRelated->create($value2);
-                    }
-                }
-            }
-
-            if (filled($idDataChildren)) {
-                $typeRelation->attach($idDataChildren);
-            }
-        }
-
-        return $model;
+        return DB::transaction(fn () => app(ModelPersistenceService::class)->execute($model, $data));
     }
 }
