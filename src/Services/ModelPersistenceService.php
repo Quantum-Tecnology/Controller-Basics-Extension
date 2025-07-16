@@ -112,13 +112,11 @@ class ModelPersistenceService
         array $dataArray,
         array $idDataChildren,
     ): array {
-        if ($typeRelation instanceof Relations\HasMany) {
-            $this->persistHasManyRelation($keyCamel, $cloneModel, $value2, $dataArray);
-        }
-
-        if ($typeRelation instanceof Relations\BelongsToMany) {
-            [$idDataChildren] = $this->persistBelongsToManyRelation($value2, $idDataChildren, $classRelated);
-        }
+        match (get_class($typeRelation)) {
+            Relations\HasMany::class       => $this->persistHasManyRelation($keyCamel, $cloneModel, $value2, $dataArray),
+            Relations\BelongsToMany::class => [$idDataChildren] = $this->persistBelongsToManyRelation($value2, $idDataChildren, $classRelated),
+            default                        => null,
+        };
 
         return [$idDataChildren];
     }
