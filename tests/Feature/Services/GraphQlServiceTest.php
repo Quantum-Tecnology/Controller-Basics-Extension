@@ -170,7 +170,7 @@ test('it paginates likes for the first comment of a post', function (): void {
         ]);
 });
 
-test('a', function (): void {
+test('it paginates likes for the second page of the first comment of a post', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
         'comments' => [
