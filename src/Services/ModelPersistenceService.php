@@ -86,6 +86,23 @@ class ModelPersistenceService
         return $model;
     }
 
+    public function persistHasManyRelation(string $keyCamel, Model $cloneModel, array $value2, array $dataArray): void
+    {
+        $modelInternal = $cloneModel->{$keyCamel}();
+        $idModel       = $modelInternal->getRelated()->getKeyName();
+
+        if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
+            $newModel = $cloneModel
+                ->{$keyCamel}()
+                ->where($idModel, $value2[$idModel])
+                ->sole();
+            $newModel->fill($value2);
+        } else {
+            $newModel = $modelInternal->create($value2);
+        }
+        $this->execute($newModel, $dataArray);
+    }
+
     protected function persistRelatedModels(
         Model $cloneModel,
         Model $classRelated,
@@ -96,31 +113,26 @@ class ModelPersistenceService
         array $idDataChildren,
     ): array {
         if ($typeRelation instanceof Relations\HasMany) {
-            $modelInternal = $cloneModel->{$keyCamel}();
-            $idModel       = $modelInternal->getRelated()->getKeyName();
-
-            if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
-                $newModel = $cloneModel
-                    ->{$keyCamel}()
-                    ->where($idModel, $value2[$idModel])
-                    ->sole();
-                $newModel->fill($value2);
-            } else {
-                $newModel = $modelInternal->create($value2);
-            }
-            $this->execute($newModel, $dataArray);
+            $this->persistHasManyRelation($keyCamel, $cloneModel, $value2, $dataArray);
         }
 
         if ($typeRelation instanceof Relations\BelongsToMany) {
-            ksort($value2);
-
-            $name = json_encode($value2, JSON_THROW_ON_ERROR);
-
-            if (!isset($idDataChildren[$name])) {
-                $idDataChildren[$name] = $classRelated->create($value2);
-            }
+            [$idDataChildren] = $this->persistBelongsToManyRelation($value2, $idDataChildren, $classRelated);
         }
 
         return [$idDataChildren];
+    }
+
+    protected function persistBelongsToManyRelation(array $value2, array $idDataChildren, Model $classRelated): array
+    {
+        ksort($value2);
+
+        $name = json_encode($value2, JSON_THROW_ON_ERROR);
+
+        if (!isset($idDataChildren[$name])) {
+            $idDataChildren[$name] = $classRelated->create($value2);
+        }
+
+        return [$value2, $idDataChildren];
     }
 }
