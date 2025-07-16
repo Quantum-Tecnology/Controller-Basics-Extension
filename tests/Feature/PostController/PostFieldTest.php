@@ -16,6 +16,8 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\CommentLike;
 
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\CommentStatusEnum;
+
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\PostStatusEnum;
 
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
@@ -152,7 +154,7 @@ it('it creates a new post with meta and comments', function (): void {
 
 it('it updates a post and its comments with only id and title fields', function (): void {
     $post = postJson(route('posts.store', [
-        'fields' => 'id title comments {id}',
+        'fields' => 'id title comments {id status}',
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
@@ -160,6 +162,7 @@ it('it updates a post and its comments with only id and title fields', function 
         'comments'  => [
             [
                 'body' => 'test comment',
+                'status',
             ],
         ],
     ])->assertCreated();
@@ -169,20 +172,27 @@ it('it updates a post and its comments with only id and title fields', function 
     putJson(route('posts.update', [
         'fields' => 'id title comments {id}',
         'post'   => $idPost,
+        'status' => PostStatusEnum::DRAFT->value,
     ]), [
         'title'     => 'create a new post',
         'author_id' => Author::factory()->create()->id,
         'comments'  => [
             [
-                'id'   => $idComment,
-                'body' => 'test comment',
+                'id'     => $idComment,
+                'body'   => 'update comment',
+                'status' => [
+                    'key'   => CommentStatusEnum::DRAFT->name,
+                    'value' => 1,
+                    'label' => CommentStatusEnum::DRAFT->label(),
+                ],
             ],
         ],
-    ]);
+    ])->assertOk();
+
     assertDatabaseCount(Comment::class, 1);
     assertDatabaseHas(Comment::class, [
         'id'   => $idComment,
-        'body' => 'test comment',
+        'body' => 'update comment',
     ]);
 });
 

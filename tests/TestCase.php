@@ -59,6 +59,7 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('post_id')->constrained('posts');
             $table->string('body');
+            $table->unsignedTinyInteger('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

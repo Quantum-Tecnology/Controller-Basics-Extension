@@ -58,9 +58,7 @@ final readonly class GraphQLPresenter
                     'value' => property_exists($valueField, 'value')
                         ? $valueField->value
                         : null,
-                    'label' => method_exists($valueField, 'label')
-                        ? $valueField->label()
-                        : null,
+                    'label' => method_exists($valueField, 'label') ? $valueField->label() : null,
                 ],
                 default => $valueField
             };

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Presenters\GraphQLPresenter;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Comment;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Enum\CommentStatusEnum;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Model\Post;
 
 beforeEach(function (): void {
@@ -79,10 +80,11 @@ test('asterisk returns all fields and accessors', function (): void {
                 'id'          => $this->comment->id,
                 'post_id'     => $this->comment->post_id,
                 'body'        => $this->comment->body,
-                'created_at'  => $this->comment->created_at,
-                'updated_at'  => $this->comment->updated_at,
+                'created_at'  => $this->comment->created_at->toDateTimeString(),
+                'updated_at'  => $this->comment->updated_at->toDateTimeString(),
                 'deleted_at'  => $this->comment->deleted_at,
                 'use_factory' => null,
+                'status'      => CommentStatusEnum::DRAFT->value,
             ],
             'actions' => [
                 'can_delete' => true,

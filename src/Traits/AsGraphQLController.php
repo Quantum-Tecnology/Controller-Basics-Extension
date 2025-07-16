@@ -260,8 +260,17 @@ trait AsGraphQLController
                     $modelInternal = $cloneModel->{$keyCamel}();
                     $idModel       = $modelInternal->getRelated()->getKeyName();
 
+                    //                    dump([
+                    //                        $idModel,
+                    //                        $value2,
+                    //                        array_key_exists($idModel, $value2),
+                    //                        filled($value2[$idModel] ?? null),
+                    //                    ]);
+
                     if (array_key_exists($idModel, $value2) && filled($value2[$idModel])) {
-                        $newModel = $cloneModel->{$keyCamel}()->where($idModel, $value2[$idModel])->sole();
+                        $newModel = $cloneModel->{$keyCamel}()
+                            ->where($idModel, $value2[$idModel])
+                            ->sole();
                         $newModel->fill($value2);
                     } else {
                         $newModel = $modelInternal->create($value2);
