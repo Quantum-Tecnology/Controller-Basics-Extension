@@ -17,11 +17,7 @@ beforeEach(function (): void {
 test('it paginates comments on the first page', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->service->paginate(new Post(), $fields, $filters);
@@ -47,11 +43,7 @@ test('it paginates comments on the first page', function (): void {
 test('it paginates comments on the second page', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->service->paginate(new Post(), $fields, $filters, [
@@ -73,11 +65,7 @@ test('it paginates comments on the second page', function (): void {
 test('it simples paginates comments on the first page', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->service->simplePaginate(new Post(), $fields, $filters);
@@ -101,11 +89,7 @@ test('it simples paginates comments on the first page', function (): void {
 test('it simple paginates comments on the second page', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->service->simplePaginate(new Post(), $fields, $filters, [
@@ -127,11 +111,7 @@ test('it simple paginates comments on the second page', function (): void {
 test('it returns sole post with paginated comments', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->service->sole($this->post, $fields, $filters);
@@ -201,11 +181,7 @@ test('it paginates likes for the second page of the first comment of a post', fu
 test('it returns first post with paginated comments', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->service->first($this->post, $fields, $filters);
