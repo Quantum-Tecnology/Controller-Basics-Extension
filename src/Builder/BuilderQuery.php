@@ -7,13 +7,20 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 final class BuilderQuery
 {
+    public function __construct(
+        private FilterSupport $filterSupport,
+        private PaginationSupport $paginationSupport,
+    ) {
+    }
+
     public function execute(Model $model, array $fields, array $filters = [], array $pagination = []): Builder
     {
-        $paginationSupport = app(PaginationSupport::class);
+        $filters = $this->filterSupport->parse($filters);
 
         $query     = $this->filters($model->newQuery(), $filters['[__model__]'] ?? []);
         $with      = [];
@@ -31,7 +38,7 @@ final class BuilderQuery
             //            dump(str_replace('.', '_', $include));
             $paginate = data_get($pagination, str_replace('.', '_', $include));
 
-            $limit = $paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
+            $limit = $this->paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
             $page  = $paginate['page'] ?? 1;
 
             $withCountChildren = [];

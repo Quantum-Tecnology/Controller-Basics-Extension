@@ -11,7 +11,7 @@ class FilterSupport
         $filters = [];
 
         foreach ($data as $key => $value) {
-            if (preg_match('/^filter_?(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', $key, $matches)) {
+            if (preg_match('/^(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', $key, $matches)) {
                 [$relationPath, $field, $operator] = [
                     '' !== $matches[1] ? $matches[1] : '[__model__]',
                     $matches[2],
@@ -38,6 +38,39 @@ class FilterSupport
 
         return $this->cleanFilters($filters);
     }
+
+    //    public function parse(array $data): array
+    //    {
+    //        $filters = [];
+    //
+    //        foreach ($data as $key => $value) {
+    //            if (preg_match('/^filter_?(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', $key, $matches)) {
+    //                [$relationPath, $field, $operator] = [
+    //                    '' !== $matches[1] ? $matches[1] : '[__model__]',
+    //                    $matches[2],
+    //                    $matches[3] ?? '=',
+    //                ];
+    //
+    //                if (is_string($value)) {
+    //                    $parsedValues = preg_split('/[,\|]/', $value);
+    //                } elseif (is_array($value)) {
+    //                    $parsedValues = $value;
+    //                } else {
+    //                    $parsedValues = [$value];
+    //                }
+    //
+    //                $parsedValues = array_map(static function ($v): int | string {
+    //                    $v = mb_trim((string) $v);
+    //
+    //                    return is_numeric($v) ? (int) $v : $v;
+    //                }, $parsedValues);
+    //
+    //                $filters[$relationPath][$field][$operator] = $parsedValues;
+    //            }
+    //        }
+    //
+    //        return $this->cleanFilters($filters);
+    //    }
 
     protected function cleanFilters(array $filters): array
     {

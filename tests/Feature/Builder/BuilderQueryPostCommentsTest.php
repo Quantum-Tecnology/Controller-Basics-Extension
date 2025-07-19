@@ -38,11 +38,7 @@ test('it paginates comments with page parameter', function (): void {
 test('it filters comments by id less than or equal to 3', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '<=' => [20],
-            ],
-        ],
+        'comments(id,<=)' => 20,
     ];
 
     $post = $this->builder->execute($this->post, $fields, $filters)->where('id', $this->post->id)->sole();
@@ -53,11 +49,7 @@ test('it filters comments by id less than or equal to 3', function (): void {
 test('it filters comments by id less than or equal 3', function (): void {
     $fields  = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $filters = [
-        'comments' => [
-            'id' => [
-                '=' => [3],
-            ],
-        ],
+        'comments(id)' => 3,
     ];
 
     $post = $this->builder->execute($this->post, $fields, $filters)->where('id', $this->post->id)->sole();
