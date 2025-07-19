@@ -13,7 +13,6 @@ use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
 use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
 use QuantumTecnology\ControllerBasicsExtension\Services\ModelPersistenceService;
 use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
-use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 trait AsGraphQLController
@@ -95,16 +94,14 @@ trait AsGraphQLController
     {
         $routeParams = request()->route()?->parameters() ?: [];
         $idFromParam = array_pop($routeParams);
-        $queries     = $this->getFilters();
         $keyName     = $this->model()->getKeyName();
-
-        array_pop($queries['[__model__]']);
-        $queries['[__model__]'][$keyName] = ['=' => [$idFromParam]];
 
         return $this->getBuilderQuery()->execute(
             $this->model(),
             $this->getFields(),
-            $queries,
+            [
+                "({$keyName})" => $idFromParam,
+            ] + $this->filterRouteParams($routeParams),
         );
     }
 
@@ -113,13 +110,13 @@ trait AsGraphQLController
         $queries = request()->query();
         $params  = request()->route()?->parameters();
 
-        return app(FilterSupport::class)->parse($queries + $this->filterRouteParams($params));
+        return $queries + $this->filterRouteParams($params);
     }
 
     protected function filterRouteParams(array $data): array
     {
         return collect($data)
-            ->mapWithKeys(fn ($value, $key) => ['filter(' . $key . ')' => $value])
+            ->mapWithKeys(fn ($value, $key) => ['(' . $key . ')' => $value])
             ->all();
     }
 
