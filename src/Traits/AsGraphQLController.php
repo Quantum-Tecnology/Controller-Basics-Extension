@@ -110,7 +110,15 @@ trait AsGraphQLController
         $queries = request()->query();
         $params  = request()->route()?->parameters();
 
-        return $queries + $this->filterRouteParams($params);
+        $response = [];
+
+        foreach (($queries + $this->filterRouteParams($params)) as $key => $value) {
+            if (preg_match('/^filter_?(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', $key)) {
+                $response[$key] = $value;
+            }
+        }
+
+        return $response;
     }
 
     protected function filterRouteParams(array $data): array
