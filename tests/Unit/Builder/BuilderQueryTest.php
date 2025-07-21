@@ -3,9 +3,11 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
+use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 beforeEach(function (): void {
-    $this->builder = new BuilderQuery();
+    $this->builder = new BuilderQuery(new FilterSupport(), new PaginationSupport());
     $reflection    = new ReflectionClass($this->builder);
     $this->method  = $reflection->getMethod('nestedDotPaths');
     $this->method->setAccessible(true);

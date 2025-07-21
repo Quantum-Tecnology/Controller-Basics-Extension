@@ -13,8 +13,8 @@ use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 final class BuilderQuery
 {
     public function __construct(
-        private FilterSupport $filterSupport,
-        private PaginationSupport $paginationSupport,
+        private readonly FilterSupport $filterSupport,
+        private readonly PaginationSupport $paginationSupport,
     ) {
     }
 
