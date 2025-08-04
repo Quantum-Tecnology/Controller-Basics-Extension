@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types = 1);
+
+namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Author;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Enum\PostStatusEnum;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
+
+final class PostFactory extends Factory
+{
+    protected $model = Post::class;
+
+    public function definition(): array
+    {
+        return [
+            'author_id'  => Author::factory(),
+            'title'      => $this->faker->sentence(3),
+            'status'     => $this->faker->randomElement(PostStatusEnum::cases()),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ];
+    }
+}

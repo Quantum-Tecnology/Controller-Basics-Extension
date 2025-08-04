@@ -4,11 +4,9 @@
   "homepage": "http://www.gustavosantarosa.esy.es/",
   "description": "Controller Basics Extension",
   "require": {
-    "php": "^8.3",
+    "php": "^8.2",
     "quantumtecnology/service-basics-extension": "^2.0 | ^2.1",
-    "illuminate/contracts": "^10.0 || ^11.0 || ^12.0",
-    "illuminate/support": "^10.0 || ^11.0 || ^12.0",
-    "vinkla/hashids": "^11.0 || ^12.0 || ^13.0"
+    "vinkla/hashids": "^13.0 | ^12.0"
   },
   "autoload": {
     "files": [
@@ -18,10 +16,31 @@
       "QuantumTecnology\\ControllerBasicsExtension\\": "src/"
     }
   },
+  "autoload-dev": {
+      "psr-4": {
+          "QuantumTecnology\\ControllerBasicsExtension\\Tests\\": "tests/"
+      }
+  },
+  "scripts": {
+    "format": [
+      "@php vendor/bin/rector",
+      "@php vendor/bin/pint"
+    ],
+    "test": [
+      "@php vendor/bin/rector process --dry-run",
+      "@php vendor/bin/pint --test",
+      "@php vendor/bin/pest"
+    ]
+  },
   "authors": [
     {
       "name": "Luis Gustavo Santarosa",
       "email": "gustavo-computacao@hotmail.com",
+      "role": "Developer"
+    },
+    {
+      "name": "Bruno Henrique da Costa",
+      "email": "bhcosta90@gmail.com",
       "role": "Developer"
     }
   ],
@@ -38,10 +57,22 @@
   },
   "config": {
     "allow-plugins": {
-      "php-http/discovery": true
+      "php-http/discovery": true,
+      "pestphp/pest-plugin": true,
+      "captainhook/captainhook-phar": true,
+      "captainhook/hook-installer": true
     }
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.70"
+    "friendsofphp/php-cs-fixer": "^3.70",
+    "laravel/pint": "^1.13",
+    "rector/rector": "^2.1",
+    "orchestra/testbench": "^10.4",
+    "pestphp/pest": "^3.8",
+    "pestphp/pest-plugin-faker": "^3.0",
+    "pestphp/pest-plugin-laravel": "^3.2",
+    "pestphp/pest-plugin-watch": "^3.0",
+    "captainhook/captainhook-phar": "^5.25",
+    "captainhook/hook-installer": "^1.0"
   }
 }

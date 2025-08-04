@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use QuantumTecnology\ControllerBasicsExtension\resources\DefaultResource;
+use QuantumTecnology\ControllerBasicsExtension\Resources\DefaultResource;
 use QuantumTecnology\ControllerBasicsExtension\Services\DefaultService;
 use QuantumTecnology\HandlerBasicsExtension\Traits\ApiResponseTrait;
 use QuantumTecnology\ServiceBasicsExtension\BaseService;

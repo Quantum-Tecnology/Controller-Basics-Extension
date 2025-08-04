@@ -40,7 +40,7 @@ class CryptographyMiddleware
         return $response;
     }
 
-    private function isEnabledForCryptography($request): bool
+    private function isEnabledForCryptography(Request $request): bool
     {
         return config('hashids.enable_cryptography', false) && ($request->beenEncrypted ?? true);
     }
