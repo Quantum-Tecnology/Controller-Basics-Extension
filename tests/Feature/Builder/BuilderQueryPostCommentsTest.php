@@ -7,7 +7,7 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
 beforeEach(function (): void {
-    $this->post    = Post::factory()->create();
+    $this->post    = Post::factory()->create(['is_draft' => true]);
     $this->comment = Comment::factory(25)->for($this->post)->create();
 
     $this->builder = app(BuilderQuery::class);
@@ -68,4 +68,22 @@ test('it filters posts by title using byFilter', function (): void {
     Post::factory()->create(['title' => 'testing_' . date('YmdHis')]);
     $posts = $this->builder->execute($this->post, $fields, $filters)->get();
     expect($posts)->toHaveCount(1);
+});
+
+test('it filters posts by is_draft status', function (): void {
+    $fields  = ['id'];
+    $filters = [
+        '(is_draft)' => 'true',
+    ];
+
+    $posts = $this->builder->execute($this->post, $fields, $filters)->get();
+    expect($posts)->toHaveCount(1);
+
+    $filters = [
+        '(is_draft)' => 'false',
+    ];
+
+    $posts = $this->builder->execute($this->post, $fields, $filters)->get();
+    expect($posts)->toHaveCount(0);
+
 });

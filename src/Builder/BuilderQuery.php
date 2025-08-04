@@ -107,8 +107,12 @@ final readonly class BuilderQuery
                     continue;
                 }
 
+                if(filled($data) && ($data[0] === 'true' || $data[0] === 'false')) {
+                    $data[0] = filter_var($data[0], FILTER_VALIDATE_BOOLEAN);
+                }
+
                 match ($operator) {
-                    '='    => $query->whereIn("{$table}.{$column}", $data),
+                    '='    => when(is_bool($data[0]), $query->where("{$table}.{$column}", $data), $query->whereIn("{$table}.{$column}", $data)),
                     'like' => $query->where(function ($query) use ($table, $column, $data): void {
                         foreach ($data as $item) {
                             $query->orWhereLike("{$table}.{$column}", "%{$item}%");

@@ -70,6 +70,7 @@ abstract class TestCase extends BaseTestCase
             $table->string('title');
             $table->json('meta')->nullable();
             $table->unsignedTinyInteger('status');
+            $table->unsignedTinyInteger('is_draft')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
