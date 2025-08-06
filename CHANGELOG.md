@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## 2.7.11
+
+# PT-BR
+
+- Adicionado um parametro que desabilita a criptografia quando o ambiente é diferente de producao.
+
+# EN
+
+- Added a parameter that disables encryption when the environment is not production.
+
 ## V2.7.10 (05/07/2025)
 
 # PT-BR

@@ -52,22 +52,22 @@ trait BootControllerTrait
         );
     }
 
-    protected function setService(): BaseService
+    public function setService(): BaseService
     {
         return app($this->defaultService);
     }
 
-    protected function getService(): BaseService
+    public function getService(): BaseService | string
     {
         return $this->defaultService;
     }
 
-    protected function setResource(): string
+    public function setResource(): string
     {
         return $this->defaultResource;
     }
 
-    protected function getResource(): string
+    public function getResource(): string
     {
         return $this->defaultResource;
     }
