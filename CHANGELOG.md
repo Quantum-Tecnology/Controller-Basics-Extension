@@ -1,14 +1,14 @@
 # CHANGE LOG
 
-## X.X.X
+## 2.7.11
 
 # PT-BR
 
-- Alterando metodos protedigos para publico. @bhcosta90
+- Adicionado um parametro que desabilita a criptografia quando o ambiente é diferente de producao.
 
 # EN
 
-- Change protected methods to public. @bhcosta90
+- Added a parameter that disables encryption when the environment is not production.
 
 ## V2.7.10 (05/07/2025)
 
