@@ -8,7 +8,8 @@ use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use QuantumTecnology\ControllerBasicsExtension\Resources\DefaultResource;
+use QuantumTecnology\ControllerBasicsExtension\Contracts\ServiceInterface;
+use QuantumTecnology\ControllerBasicsExtension\resources\DefaultResource;
 use QuantumTecnology\ControllerBasicsExtension\Services\DefaultService;
 use QuantumTecnology\HandlerBasicsExtension\Traits\ApiResponseTrait;
 use QuantumTecnology\ServiceBasicsExtension\BaseService;
@@ -20,7 +21,7 @@ trait BootControllerTrait
     use DispatchesJobs;
     use ValidatesRequests;
 
-    private string | BaseService $defaultService = DefaultService::class;
+    private string | ServiceInterface $defaultService = DefaultService::class;
     private string $defaultResource              = DefaultResource::class;
 
     public function booted(): void
@@ -52,12 +53,12 @@ trait BootControllerTrait
         );
     }
 
-    public function setService(): BaseService
+    public function setService(): ServiceInterface
     {
         return app($this->defaultService);
     }
 
-    public function getService(): BaseService | string
+    public function getService(): ServiceInterface | string
     {
         return $this->defaultService;
     }
