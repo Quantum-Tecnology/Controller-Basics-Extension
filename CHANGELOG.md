@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## 2.7.12
+
+# PT-BR
+
+- Apresentar ServiceInterface e atualizar dicas de tipo de serviço em BootControllerTrait e ShowControllerTrait. @bhcosta90
+
+# EN
+
+- Introduce ServiceInterface and update service type hints in BootControllerTrait and ShowControllerTrait. @bhcosta90
+
 ## 2.7.11
 
 # PT-BR
