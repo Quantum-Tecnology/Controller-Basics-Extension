@@ -51,15 +51,15 @@ final readonly class BuilderQuery
 
             $offset = ($page - 1) * $limit;
 
-            $relation = method_exists($model, $include) ? $model->$include() : null;
+            $relation    = method_exists($model, $include) ? $model->$include() : null;
             $isBelongsTo = $relation instanceof BelongsTo;
 
-            $with[$includeCamel] = fn ($query) =>
-                $isBelongsTo
+            $with[$includeCamel] = fn ($query) => $isBelongsTo
                     ? $this->filters($query->withCount($withCountChildren), $filter)
                     : $this->filters($query->withCount($withCountChildren), $filter)
-                    ->offset($offset)
-                    ->limit((string) $limit);        }
+                        ->offset($offset)
+                        ->limit((string) $limit);
+        }
 
         $query->withCount($withCount)->with($with);
 
@@ -107,8 +107,14 @@ final readonly class BuilderQuery
                     continue;
                 }
 
-                if(filled($data) && ($data[0] === 'true' || $data[0] === 'false')) {
+                if (filled($data) && ('true' === $data[0] || 'false' === $data[0])) {
                     $data[0] = filter_var($data[0], FILTER_VALIDATE_BOOLEAN);
+                }
+
+                if (str_starts_with($column, 'by')) {
+                    $query->{$column}(collect($data));
+
+                    continue;
                 }
 
                 match ($operator) {
