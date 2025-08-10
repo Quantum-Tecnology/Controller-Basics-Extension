@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## 2.7.13
+
+# PT-BR
+
+- Migrado o service interface para o pacote service, pois se mantivesse aqui, a dependencia seria no duplo sentido, com ele la, somente o controller depende do service, e nao o contrario. @GustavoSantarosa
+
+# EN
+
+- Migrated the service interface to the service package, as keeping it here would create a two-way dependency; with it there, only the controller depends on the service, not the other way around. @GustavoSantarosa
+
 ## 2.7.12
 
 # PT-BR
@@ -58,7 +68,7 @@
 
 # EN
 
-- Enhance BindAttributesTrait to conditionally bind attributes based on fillable fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/14 
+- Enhance BindAttributesTrait to conditionally bind attributes based on fillable fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/14
 
 ## V2.7.6 (03/06/2025)
 
@@ -79,7 +89,6 @@
 # EN
 
 - condition in WhenLoadedTrait to correctly check relationship containment. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/11
-
 
 ## V2.7.4 (26/05/2025)
 
