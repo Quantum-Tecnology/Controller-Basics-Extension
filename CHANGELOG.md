@@ -1,6 +1,6 @@
 # CHANGE LOG
 
-## 2.7.13
+## 2.7.13 (10/08/2025)
 
 # PT-BR
 
@@ -10,7 +10,7 @@
 
 - Migrated the service interface to the service package, as keeping it here would create a two-way dependency; with it there, only the controller depends on the service, not the other way around. @GustavoSantarosa
 
-## 2.7.12
+## 2.7.12 (08/08/2025)
 
 # PT-BR
 
@@ -20,7 +20,7 @@
 
 - Introduce ServiceInterface and update service type hints in BootControllerTrait and ShowControllerTrait. @bhcosta90
 
-## 2.7.11
+## 2.7.11 (06/08/2025)
 
 # PT-BR
 
