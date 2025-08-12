@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 
 trait UpdateControllerTrait
 {
-    public function update(string | int $id): JsonResponse
+    public function update(int $id): JsonResponse
     {
         $this->checkIncludes();
 
