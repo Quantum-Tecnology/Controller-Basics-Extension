@@ -5,10 +5,12 @@
 # PT-BR
 
 - Atualizar dicas de tipo de serviço e ShowControllerTrait. @bhcosta90
+- Acrescentado uma nova alternativa de rotas utilizando rest + graphql. @brunocosta90
 
 # EN
 
 - Update service type hints and ShowControllerTrait. @bhcosta90
+- Added a new route alternative using rest + graphql. @brunocosta90
 
 ## 2.7.13 (10/08/2025)
 
