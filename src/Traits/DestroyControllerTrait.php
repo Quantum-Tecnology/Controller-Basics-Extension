@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 
 trait DestroyControllerTrait
 {
-    public function destroy(string | int $id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         if (!$this->getService()->destroy($id)) {
             return response()->json([

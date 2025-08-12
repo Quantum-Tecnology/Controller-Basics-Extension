@@ -1,16 +1,26 @@
 # CHANGE LOG
 
-## 2.7.12
+## 2.7.13 (10/08/2025)
 
 # PT-BR
 
-- Apresentar ServiceInterface e atualizar dicas de tipo de serviço em BootControllerTrait e ShowControllerTrait. @bhcosta90
+- Migrado o service interface para o pacote service, pois se mantivesse aqui, a dependencia seria no duplo sentido, com ele la, somente o controller depende do service, e nao o contrario. @GustavoSantarosa
 
 # EN
 
-- Introduce ServiceInterface and update service type hints in BootControllerTrait and ShowControllerTrait. @bhcosta90
+- Migrated the service interface to the service package, as keeping it here would create a two-way dependency; with it there, only the controller depends on the service, not the other way around. @GustavoSantarosa
 
-## 2.7.11
+## 2.7.12 (08/08/2025)
+
+# PT-BR
+
+- Apresentar ServiceInterface e atualizar dicas de tipo de serviço em BootControllerTrait ~~e ShowControllerTrait.~~ <span style="color: #d73a49;">(Migrado para a versao 3)</span> @bhcosta90
+
+# EN
+
+- Introduce ServiceInterface and update service type hints in BootControllerTrait ~~and ShowControllerTrait.~~ <span style="color: #d73a49;">(Migrated to version 3)</span> @bhcosta90
+
+## 2.7.11 (06/08/2025)
 
 # PT-BR
 
@@ -58,7 +68,7 @@
 
 # EN
 
-- Enhance BindAttributesTrait to conditionally bind attributes based on fillable fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/14 
+- Enhance BindAttributesTrait to conditionally bind attributes based on fillable fields. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/14
 
 ## V2.7.6 (03/06/2025)
 
@@ -79,7 +89,6 @@
 # EN
 
 - condition in WhenLoadedTrait to correctly check relationship containment. @bhcosta90 in https://github.com/Quantum-Tecnology/Controller-Basics-Extension/pull/11
-
 
 ## V2.7.4 (26/05/2025)
 
