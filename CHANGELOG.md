@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## 3.0.0 (12/08/2025)
+
+# PT-BR
+
+- Atualizar dicas de tipo de serviço e ShowControllerTrait. @bhcosta90
+
+# EN
+
+- Update service type hints and ShowControllerTrait. @bhcosta90
+
 ## 2.7.13 (10/08/2025)
 
 # PT-BR
