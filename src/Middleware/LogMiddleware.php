@@ -39,7 +39,7 @@ final class LogMiddleware
 
                 $response->setData($data);
             })(),
-            default => Log::debug(json_encode(LogSupport::getMessages())),
+            default => when(LogSupport::getMessages(), fn() => Log::debug(json_encode(LogSupport::getMessages()))),
         };
 
         return $response;
