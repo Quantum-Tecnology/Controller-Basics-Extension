@@ -14,11 +14,11 @@
 
 # PT-BR
 
-- Apresentar ServiceInterface e atualizar dicas de tipo de serviço em BootControllerTrait e ShowControllerTrait. @bhcosta90
+- Apresentar ServiceInterface e atualizar dicas de tipo de serviço em BootControllerTrait ~~e ShowControllerTrait.~~ <span style="color: #d73a49;">(Migrado para a versao 3)</span> @bhcosta90
 
 # EN
 
-- Introduce ServiceInterface and update service type hints in BootControllerTrait and ShowControllerTrait. @bhcosta90
+- Introduce ServiceInterface and update service type hints in BootControllerTrait ~~and ShowControllerTrait.~~ <span style="color: #d73a49;">(Migrated to version 3)</span> @bhcosta90
 
 ## 2.7.11 (06/08/2025)
 

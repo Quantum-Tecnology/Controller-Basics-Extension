@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 
 trait ShowControllerTrait
 {
-    public function show(string | int $id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         $this->checkIncludes();
 
