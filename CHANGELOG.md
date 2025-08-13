@@ -1,5 +1,17 @@
 # CHANGE LOG
 
+## V3.0.0 (13/08/2025)
+
+# PT-BR
+
+- Adicionada documentação README.graphql.md descrevendo o padrão "GraphQL-like" via REST (fields, filters, paginação por relação), baseada nos testes em tests/Feature e tests/Unit. Inclui exemplos práticos e instruções de uso.
+- Sem mudanças de API; atualização de documentação.
+
+# EN
+
+- Added README.graphql.md documenting the "GraphQL-like" pattern over REST (fields, filters, per-relation pagination), based on tests in tests/Feature and tests/Unit. Includes practical examples and usage guidance.
+- No API changes; docs update.
+
 ## 2.7.12
 
 # PT-BR
