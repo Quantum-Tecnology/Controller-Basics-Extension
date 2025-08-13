@@ -41,6 +41,9 @@ Nele existem algumas ferramentas uteis.
 - [PerPage-Trait](https://packagist.org/packages/quantumtecnology/perpage-trait) - Padronizar a quantidade do paginate na api inteira e definir uma quantidade máxima;
 - [Handler-Basics-Extension](https://packagist.org/packages/quantumtecnology/handler-basics-extension) - Contem tratamento das principais exceções do laravel, e contem varios responses para lhe auxiliar;
 
+## 📚 Documentação GraphQL-like
+
+- [GraphQL-like via REST (README.graphql.md)](README.graphql.md) — Guia baseado nos testes, mostrando fields, filters e paginação por relação.
 
 ## ⛏️ Ferramentas
 
