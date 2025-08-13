@@ -8,7 +8,6 @@ beforeEach(function (): void {
     // Reset static property for isolation
     $ref  = new ReflectionClass(LogSupport::class);
     $prop = $ref->getProperty('messages');
-    $prop->setAccessible(true);
     $prop->setValue([]);
 });
 

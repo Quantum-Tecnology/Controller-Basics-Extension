@@ -175,7 +175,6 @@ it('removes empty operators and fields after cleaning', function (): void {
     $support    = new FilterSupport();
     $reflection = new ReflectionClass($support);
     $method     = $reflection->getMethod('cleanFilters');
-    $method->setAccessible(true);
 
     $result = $method->invoke($support, $filters);
 

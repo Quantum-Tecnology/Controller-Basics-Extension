@@ -43,7 +43,7 @@ class CryptographyMiddleware
     private function isEnabledForCryptography(Request $request): bool
     {
         if (!app()->isProduction() && $request->has('crypt')) {
-            return $request->crypt === 'true';
+            return 'true' === $request->crypt;
         }
 
         return config('hashids.enable_cryptography', false)

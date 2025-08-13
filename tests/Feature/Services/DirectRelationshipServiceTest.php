@@ -71,7 +71,6 @@ it('directly tests the uncovered lines in the RelationshipService class', functi
 
     // Get the protected splitAttributesAndRelations method
     $splitMethod = $reflectionClass->getMethod('splitAttributesAndRelations');
-    $splitMethod->setAccessible(true);
 
     // Test the execute method directly with a non-existent relation name (line 26)
     $data1 = [
@@ -191,7 +190,6 @@ it('tests the uncovered lines by directly accessing the execute method', functio
 
     // Get the execute method
     $executeMethod = $reflectionClass->getMethod('execute');
-    $executeMethod->setAccessible(true);
 
     // Test line 26: Skip if method doesn't exist
     // Call the execute method with a non-existent relation name

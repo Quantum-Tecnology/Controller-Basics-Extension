@@ -26,7 +26,6 @@ it('correctly splits attributes and relations', function (): void {
     ];
 
     $method = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $method->setAccessible(true);
 
     [$attributes, $relations] = $method->invoke($this->service, $model, $data);
 
@@ -54,7 +53,6 @@ it('handles empty arrays in splitAttributesAndRelations', function (): void {
     ];
 
     $method = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $method->setAccessible(true);
 
     [$attributes, $relations] = $method->invoke($this->service, $model, $data);
 
@@ -74,7 +72,6 @@ it('handles non-relation methods in splitAttributesAndRelations', function (): v
     ];
 
     $method = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $method->setAccessible(true);
 
     [$attributes, $relations] = $method->invoke($this->service, $model, $data);
 
@@ -93,7 +90,6 @@ it('handles non-array values for relation methods in splitAttributesAndRelations
     ];
 
     $method = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $method->setAccessible(true);
 
     [$attributes, $relations] = $method->invoke($this->service, $model, $data);
 
@@ -624,8 +620,7 @@ it('handles non-existent relation methods', function (): void {
     ];
 
     // Extract the splitAttributesAndRelations method to test it directly
-    $method = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $method->setAccessible(true);
+    $method                   = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
     [$attributes, $relations] = $method->invoke($this->service, $post, $data);
 
     // Verify that nonExistentRelation is treated as an attribute, not a relation
@@ -701,8 +696,7 @@ it('handles non-relation methods', function (): void {
     ];
 
     // Extract the splitAttributesAndRelations method to test it directly
-    $method = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $method->setAccessible(true);
+    $method                   = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
     [$attributes, $relations] = $method->invoke($this->service, $post, $data);
 
     // Verify that getCustomAttribute is treated as an attribute, not a relation

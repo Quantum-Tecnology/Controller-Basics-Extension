@@ -136,7 +136,6 @@ it('covers the remaining uncovered lines using a different approach', function (
 
     // Get the execute method
     $executeMethod = $reflectionClass->getMethod('execute');
-    $executeMethod->setAccessible(true);
 
     // Create a mock of the RelationshipService that doesn't save to the database
     $mockService = $this->createPartialMock(RelationshipService::class, ['handleHasOne', 'handleHasMany', 'handleBelongsTo', 'handleBelongsToMany', 'handleMorphOne', 'handleMorphMany', 'handleMorphToMany']);

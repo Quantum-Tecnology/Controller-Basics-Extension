@@ -10,7 +10,6 @@ beforeEach(function (): void {
     $this->builder = new BuilderQuery(new FilterSupport(), new PaginationSupport());
     $reflection    = new ReflectionClass($this->builder);
     $this->method  = $reflection->getMethod('nestedDotPaths');
-    $this->method->setAccessible(true);
 });
 
 it('returns only nested keys in dot notation', function (): void {

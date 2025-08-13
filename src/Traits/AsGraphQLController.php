@@ -122,7 +122,7 @@ trait AsGraphQLController
         );
 
         $response = array_combine(
-            array_map(fn ($key): string => mb_substr((string) $key, 6), array_keys($response)),
+            array_map(fn (int | string $key): string => mb_substr((string) $key, 6), array_keys($response)),
             array_values($response)
         );
 

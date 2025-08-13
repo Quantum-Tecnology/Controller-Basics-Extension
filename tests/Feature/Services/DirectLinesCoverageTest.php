@@ -38,8 +38,7 @@ it('directly targets line 26 in the RelationshipService class', function (): voi
     ];
 
     // Split the data into attributes and relations
-    $reflectionMethod = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $reflectionMethod->setAccessible(true);
+    $reflectionMethod         = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
     [$attributes, $relations] = $reflectionMethod->invoke($service, $model, $data);
 
     // Verify that nonExistentRelation is in the attributes array, not the relations array
@@ -56,7 +55,6 @@ it('directly targets line 26 in the RelationshipService class', function (): voi
 
     // Get the execute method
     $executeMethod = $reflectionClass->getMethod('execute');
-    $executeMethod->setAccessible(true);
 
     // Create a mock of the RelationshipService that doesn't save to the database
     $mockService = $this->createPartialMock(RelationshipService::class, ['splitAttributesAndRelations']);
@@ -109,8 +107,7 @@ it('directly targets line 32 in the RelationshipService class', function (): voi
     ];
 
     // Split the data into attributes and relations
-    $reflectionMethod = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
-    $reflectionMethod->setAccessible(true);
+    $reflectionMethod         = new ReflectionMethod(RelationshipService::class, 'splitAttributesAndRelations');
     [$attributes, $relations] = $reflectionMethod->invoke($service, $model, $data);
 
     // Manually modify the relations array to include notARelation
@@ -123,7 +120,6 @@ it('directly targets line 32 in the RelationshipService class', function (): voi
 
     // Get the execute method
     $executeMethod = $reflectionClass->getMethod('execute');
-    $executeMethod->setAccessible(true);
 
     // Create a mock of the RelationshipService that doesn't save to the database
     $mockService = $this->createPartialMock(RelationshipService::class, ['splitAttributesAndRelations']);
