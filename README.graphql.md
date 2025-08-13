@@ -16,6 +16,38 @@ Internamente, o pacote utiliza:
 
 Assim, é possível, por exemplo, buscar um Post com seu Author, Comments e Likes de Comments, filtrando Comments, paginando por relação e retornando contagens — tudo via REST.
 
+## Exemplo mínimo de uso
+
+Objetivo: retornar um Post com seu Author carregado (sem filtros nem paginação).
+
+- Requisição simples (GET):
+  - `GET /posts/123?fields[author][]=id`
+  - curl: `curl -X GET "https://sua-api.test/posts/123?fields[author][]=id"`
+
+- Controller/Service (Laravel, conceitual):
+  -
+    ```php
+    use Illuminate\Http\Request;
+    use App\Models\Post;
+    use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+
+    class PostController
+    {
+        public function show(Post $post, Request $request, BuilderQuery $builder)
+        {
+            $fields     = (array) $request->input('fields', []);   // quais relações incluir
+            $filters    = (array) $request->input('filters', []);  // filtros opcionais
+            $pagination = [];                                      // opcional para um exemplo mínimo
+
+            $query = $builder->execute(Post::query()->getModel(), $fields, $filters, $pagination);
+
+            return $query->whereKey($post->id)->firstOrFail();
+        }
+    }
+    ```
+
+Resultado: o JSON do Post 123 com a relação `author` incluída e o campo `author` presente no payload. Para relações diretas listadas em `fields`, o pacote também calcula `*_count` quando aplicável.
+
 ## fields: selecionando relações (e contagens)
 
 O parâmetro `fields` é uma estrutura em árvore que descreve quais relações devem ser incluídas. Somente chaves com valor array são consideradas relações. Exemplos (em PHP, como vem dos testes):
@@ -124,6 +156,62 @@ Resultado esperado (conceitual):
   - `$query = app(BuilderQuery::class)->execute(Post::query()->getModel(), $fields, $filters, $pagination);`
   - `return $query->where('id', $id)->sole();`
 - Ao usar os traits/serviços base (veja README principal), você pode combinar com este padrão para expor endpoints flexíveis e consistentes.
+
+### Exemplo usando a trait AsGraphQLController
+
+A trait AsGraphQLController expõe automaticamente as ações de CRUD (index, show, store, update, destroy) já integradas ao padrão GraphQL-like deste documento. Basta definir o model() e, opcionalmente, allowedFields().
+
+- Controller mínimo:
+  
+  ```php
+  use Illuminate\Database\Eloquent\Model;
+  use App\Models\Post;
+  use QuantumTecnology\ControllerBasicsExtension\Traits\AsGraphQLController;
+  
+  final class PostController
+  {
+      use AsGraphQLController;
+  
+      // Define o Model base
+      protected function model(): Model
+      {
+          return new Post();
+      }
+  
+      // Opcional: restringe os fields que podem ser solicitados
+      protected function allowedFields(): array
+      {
+          return [
+              'id',
+              'title',
+              'comments' => [
+                  'id',
+                  'likes' => ['id'],
+              ],
+          ];
+      }
+  }
+  ```
+
+- Rotas (exemplos Laravel):
+  - `GET /posts` → index()
+  - `GET /posts/{post}` → show()
+  - `POST /posts` → store()
+  - `PUT/PATCH /posts/{post}` → update()
+  - `DELETE /posts/{post}` → destroy()
+
+- Como enviar parâmetros com a trait:
+  - fields: igual às demais seções, via query string (ex.: `fields[comments][likes][]=id`) ou JSON.
+  - filters: prefixe as chaves com `filter_` seguindo a sintaxe deste guia. Exemplos:
+    - `?filter_(is_draft)=false` (filtro no modelo raiz)
+    - `?filter_comments(id,%3C%3D)=20` (filtro na relação comments, `id <= 20`)
+    - Parâmetros de rota também viram filtros automaticamente. Ex.: em `GET /posts/123`, o trait aplica `(id)=123` internamente.
+  - Paginação por relação: use `per_page_<path>` e `page_<path>`, como em `?per_page_comments=5&page_comments=2`.
+
+- Respostas:
+  - index(): retorna JSON paginado pelo GraphQlService, incluindo relações, withCount e paginação por relação.
+  - show(): retorna o recurso único formatado pelo GraphQlService.
+  - store/update/destroy: validam dados via Requests convencionados pelo caminho do Controller (ver README principal) e persistem relações via RelationshipService.
 
 ## Dicas e cuidados
 
