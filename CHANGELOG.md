@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## 2.7.14 (18/08/2025)
+
+# PT-BR
+
+- Setado os allowedfilters no service, para validação. @GustavoSantarosa
+
+# EN
+
+- Set allowed filters on the service for validation. @GustavoSantarosa
+
 ## 2.7.13 (10/08/2025)
 
 # PT-BR
