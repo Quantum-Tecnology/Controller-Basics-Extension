@@ -1,16 +1,26 @@
 # CHANGE LOG
 
+## X.X.X
+
+# PT-BR
+
+- Atualize o manuseio de respostas no LogMiddleware para usar o método getContent. @bhcosta90
+
+# EN
+
+- Update response handling in LogMiddleware to use getContent method. @bhcosta90
+
 ## V3.0.0 (13/08/2025)
 
 # PT-BR
 
-- Adicionada documentação README.graphql.md descrevendo o padrão "GraphQL-like" via REST (fields, filters, paginação por relação), baseada nos testes em tests/Feature e tests/Unit. Inclui exemplos práticos e instruções de uso.
-- Sem mudanças de API; atualização de documentação.
+- Adicionada documentação README.graphql.md descrevendo o padrão "GraphQL-like" via REST (fields, filters, paginação por relação), baseada nos testes em tests/Feature e tests/Unit. Inclui exemplos práticos e instruções de uso. @bhcosta90
+- Sem mudanças de API; atualização de documentação. @bhcosta90
 
 # EN
 
-- Added README.graphql.md documenting the "GraphQL-like" pattern over REST (fields, filters, per-relation pagination), based on tests in tests/Feature and tests/Unit. Includes practical examples and usage guidance.
-- No API changes; docs update.
+- Added README.graphql.md documenting the "GraphQL-like" pattern over REST (fields, filters, per-relation pagination), based on tests in tests/Feature and tests/Unit. Includes practical examples and usage guidance. @bhcosta90
+- No API changes; docs update. @bhcosta90
 
 ## 2.7.14 (18/08/2025)
 
