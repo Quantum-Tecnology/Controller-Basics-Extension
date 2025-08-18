@@ -23,7 +23,7 @@ final class LogMiddleware
 
         match (true) {
             $response instanceof JsonResponse => (function () use (&$response, $enableQueryLog): void {
-                $data = $response->getData(true);
+                $data = $response->getContent();
 
                 if (($messages = LogSupport::getMessages()) !== []) {
                     $data['quantum_log'] = $messages;
@@ -37,7 +37,7 @@ final class LogMiddleware
                     }, DB::getQueryLog());
                 }
 
-                $response->setData($data);
+                $response->setContent($data);
             })(),
             default => when(LogSupport::getMessages(), fn () => Log::debug(json_encode(LogSupport::getMessages()))),
         };
