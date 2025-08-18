@@ -52,7 +52,7 @@ trait BootControllerTrait
         );
 
         if(method_exists($this->getService(), 'setAllowedFilters')) {
-            $this->getService()->setAllowedFilters($this->allowedFilters);
+            $this->getService()->setAllowedFilters($this->allowedFilters ?? []);
         }
     }
 
