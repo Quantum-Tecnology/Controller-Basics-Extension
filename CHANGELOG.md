@@ -12,6 +12,16 @@
 - Added README.graphql.md documenting the "GraphQL-like" pattern over REST (fields, filters, per-relation pagination), based on tests in tests/Feature and tests/Unit. Includes practical examples and usage guidance.
 - No API changes; docs update.
 
+## 2.7.14 (18/08/2025)
+
+# PT-BR
+
+- Setado os allowedfilters no service, para validação. @GustavoSantarosa
+
+# EN
+
+- Set allowed filters on the service for validation. @GustavoSantarosa
+
 ## 2.7.13 (10/08/2025)
 
 # PT-BR

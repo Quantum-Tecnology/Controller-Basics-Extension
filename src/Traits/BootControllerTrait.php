@@ -50,6 +50,10 @@ trait BootControllerTrait
             empty($this->getService()),
             new Exception('Service must be defined in the ' . request()->route()->getAction('controller') . '.')
         );
+
+        if(method_exists($this->getService(), 'setAllowedFilters')) {
+            $this->getService()->setAllowedFilters($this->allowedFilters ?? []);
+        }
     }
 
     public function setService(): ServiceInterface
