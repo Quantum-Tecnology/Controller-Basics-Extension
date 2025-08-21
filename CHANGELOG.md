@@ -1,16 +1,21 @@
 # CHANGE LOG
 
+## V3.0.1 (21/08/2025)
+
+# PT-BR
+
+- Defina o valor padrão para o parâmetro Fields no método execute. @bhcosta90
+
 ## V3.0.0 (13/08/2025)
 
 # PT-BR
 
-- Adicionada documentação README.graphql.md descrevendo o padrão "GraphQL-like" via REST (fields, filters, paginação por relação), baseada nos testes em tests/Feature e tests/Unit. Inclui exemplos práticos e instruções de uso.
-- Sem mudanças de API; atualização de documentação.
+- Set default value for fields parameter in execute method. @bhcosta90
 
 # EN
 
-- Added README.graphql.md documenting the "GraphQL-like" pattern over REST (fields, filters, per-relation pagination), based on tests in tests/Feature and tests/Unit. Includes practical examples and usage guidance.
-- No API changes; docs update.
+- Added README.graphql.md documenting the "GraphQL-like" pattern over REST (fields, filters, per-relation pagination), based on tests in tests/Feature and tests/Unit. Includes practical examples and usage guidance. @bhcosta90
+- No API changes; docs update. @bhcosta90
 
 ## 2.7.14 (18/08/2025)
 
