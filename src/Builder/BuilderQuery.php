@@ -55,10 +55,10 @@ final readonly class BuilderQuery
             $isBelongsTo = $relation instanceof BelongsTo;
 
             $with[$includeCamel] = fn ($query) => $isBelongsTo
-                    ? $this->filters($query->withCount($withCountChildren), $filter)
-                    : $this->filters($query->withCount($withCountChildren), $filter)
-                        ->offset($offset)
-                        ->limit((string) $limit);
+                ? $this->filters($query->withCount($withCountChildren), $filter)
+                : $this->filters($query->withCount($withCountChildren), $filter)
+                    ->offset($offset)
+                    ->limit((string) $limit);
         }
 
         $query->withCount($withCount)->with($with);
@@ -99,7 +99,12 @@ final readonly class BuilderQuery
                         $query->where(function ($query) use ($dataItems, $operator): void {
                             foreach ($dataItems as $item) {
                                 $tItem = mb_trim($item);
-                                $query->when(filled($item), fn ($query) => $query->orWhereAny(explode(';', (string) $operator), 'like', "{$tItem}%"));
+
+                                if (filled($item)) {
+                                    foreach (explode(';', (string) $operator) as $column) {
+                                        $query->orWhereLike($column, "{$tItem}%");
+                                    }
+                                }
                             }
                         });
                     }
