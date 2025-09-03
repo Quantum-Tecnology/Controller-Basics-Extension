@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V3.0.0 (03/09/2025)
+
+# PT-BR
+
+- Adicionar QueryBuilderType Enum e aprimore a lógica de filtragem no BuilderQuery. @bhcosta90
+
+# EN
+
+- Add QueryBuilderType enum and enhance filtering logic in BuilderQuery. @bhcosta90
+
 ## V3.0.0 (13/08/2025)
 
 # PT-BR

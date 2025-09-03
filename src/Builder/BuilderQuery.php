@@ -4,8 +4,10 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use QuantumTecnology\ControllerBasicsExtension\Enum\QueryBuilderType;
 use QuantumTecnology\ControllerBasicsExtension\Support\FilterSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
@@ -118,6 +120,15 @@ final readonly class BuilderQuery
 
                 if (str_starts_with($column, 'by')) {
                     $query->{$column}(collect($data));
+
+                    continue;
+                }
+
+                if (isset($data[0]) && $data[0] instanceof BackedEnum) {
+                    match (true) {
+                        QueryBuilderType::Null === $data[0]    => $query->whereNull("{$table}.{$column}"),
+                        QueryBuilderType::NotNull === $data[0] => $query->whereNotNull("{$table}.{$column}"),
+                    };
 
                     continue;
                 }
