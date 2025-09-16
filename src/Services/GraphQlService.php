@@ -25,7 +25,6 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
-        array $order = [],
         array $pagination = [],
         string $pageName = 'page',
     ): Collection {
@@ -44,7 +43,6 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
-        array $order = [],
         array $pagination = [],
         ?int $page = null,
         ?int $perPage = null,
