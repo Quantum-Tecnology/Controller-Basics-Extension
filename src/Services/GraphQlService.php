@@ -31,7 +31,9 @@ final readonly class GraphQlService
     ): Collection {
         $limit = $this->paginationSupport->calculatePerPage($pagination['per_page'] ?? null, $model::class);
 
-        $builder = $this->builderQuery->execute($model, $fields, $filters, $pagination)->paginate(
+        $query = $this->builderQuery->execute($model, $fields, $filters, $pagination);
+
+        $builder = $query->paginate(
             perPage: $limit,
             pageName: $pageName,
             page: $pagination['page'] ?? null,
