@@ -33,6 +33,10 @@ final readonly class GraphQlService
 
         $query = $this->builderQuery->execute($model, $fields, $filters, $pagination);
 
+        if ($order['order_column'] ?? null) {
+            $query->orderBy($order['order_column'], $order['order_direction'] ?? 'asc');
+        }
+
         $builder = $query->paginate(
             perPage: $limit,
             pageName: $pageName,
