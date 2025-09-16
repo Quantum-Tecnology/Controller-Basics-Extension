@@ -285,7 +285,7 @@ it('it deleted a new post with only id and title fields', function (): void {
     assertSoftDeleted($post);
 });
 
-it('aaaa', function (): void {
+it('it orders posts by title ascending and descending', function (): void {
     Post::factory()->create(['title' => 'abc']);
     Post::factory()->create(['title' => 'aaa']);
 
@@ -322,4 +322,25 @@ it('aaaa', function (): void {
                 ],
             ],
         ]);
+});
+
+it('aaaa', function () {
+    $post = Post::factory()->hasComments(5)->create(['title' => 'abc']);
+    Post::factory()->hasComments(3)->create(['title' => 'abc']);
+
+    $post->comments()->first()->likes()
+        ->createMany([
+            ['like' => 5],
+            ['like' => 2],
+            ['like' => 3],
+        ]);
+
+    getJson(route('posts.index', [
+        'fields'                         => 'comments { id likes {id} }',
+        'order_column.comments'          => 'id',
+        'order_direction.comments'       => 'desc',
+        'order_column.comments.likes'    => 'id',
+        'order_direction.comments.likes' => 'desc',
+    ]))
+        ->dump();
 });
