@@ -46,7 +46,7 @@ test('it paginates comments on the second page', function (): void {
         'comments(id,<=)' => 20,
     ];
 
-    $post = $this->service->paginate(new Post(), $fields, $filters, [
+    $post = $this->service->paginate(new Post(), $fields, $filters, [], [
         'comments' => [
             'page' => 2,
         ],
@@ -92,7 +92,7 @@ test('it simple paginates comments on the second page', function (): void {
         'comments(id,<=)' => 20,
     ];
 
-    $post = $this->service->simplePaginate(new Post(), $fields, $filters, [
+    $post = $this->service->simplePaginate(new Post(), $fields, $filters, [], [
         'comments' => [
             'page' => 2,
         ],
