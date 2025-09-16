@@ -25,15 +25,12 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
-        array $order = [],
         array $pagination = [],
         string $pageName = 'page',
     ): Collection {
         $limit = $this->paginationSupport->calculatePerPage($pagination['per_page'] ?? null, $model::class);
 
-        $query = $this->builderQuery->execute($model, $fields, $filters, $pagination);
-
-        $builder = $query->paginate(
+        $builder = $this->builderQuery->execute($model, $fields, $filters, $pagination)->paginate(
             perPage: $limit,
             pageName: $pageName,
             page: $pagination['page'] ?? null,
