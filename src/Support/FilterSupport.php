@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Support;
 
+use BackedEnum;
+
 class FilterSupport
 {
     public function parse(array $data): array
@@ -26,7 +28,10 @@ class FilterSupport
                     $parsedValues = [$value];
                 }
 
-                $parsedValues = array_map(static function ($v): int | string {
+                $parsedValues = array_map(static function ($v): int | string | BackedEnum {
+                    if ($v instanceof BackedEnum) {
+                        return $v;
+                    }
                     $v = mb_trim((string) $v);
 
                     return is_numeric($v) ? (int) $v : $v;

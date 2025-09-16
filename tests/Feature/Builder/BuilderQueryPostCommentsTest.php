@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+use QuantumTecnology\ControllerBasicsExtension\Enum\QueryBuilderType;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
@@ -85,5 +86,23 @@ test('it filters posts by is_draft status', function (): void {
 
     $posts = $this->builder->execute($this->post, $fields, $filters)->get();
     expect($posts)->toHaveCount(0);
+
+});
+
+test('it filters posts by is_draft null and not null', function (): void {
+    $fields  = ['id'];
+    $filters = [
+        '(is_draft)' => QueryBuilderType::Null,
+    ];
+
+    $posts = $this->builder->execute($this->post, $fields, $filters)->get();
+    expect($posts)->toHaveCount(0);
+
+    $filters = [
+        '(is_draft)' => QueryBuilderType::NotNull,
+    ];
+
+    $posts = $this->builder->execute($this->post, $fields, $filters)->get();
+    expect($posts)->toHaveCount(1);
 
 });
