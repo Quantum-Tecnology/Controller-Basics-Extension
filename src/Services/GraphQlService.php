@@ -25,6 +25,7 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
+        array $order = [],
         array $pagination = [],
         string $pageName = 'page',
     ): Collection {
@@ -43,6 +44,7 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
+        array $order = [],
         array $pagination = [],
         ?int $page = null,
         ?int $perPage = null,
@@ -81,7 +83,7 @@ final readonly class GraphQlService
     private function formatPaginatedResponse(
         Paginator $builder,
         array $fields,
-        array $pagination
+        array $pagination,
     ): Collection {
         $response = [];
 

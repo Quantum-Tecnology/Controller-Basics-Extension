@@ -26,6 +26,7 @@ trait AsGraphQLController
             $this->model(),
             $this->getFields(),
             $this->getFilters(),
+            [],
             $this->getPagination(),
         );
 
