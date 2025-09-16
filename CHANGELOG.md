@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V3.2.0 (16/09/2025)
+
+# PT-BR
+
+- Adicionando ordenação de dados via parametros. @bhcosta90
+
+# EN
+
+- Adding data ordering via parameters. @bhcosta90
+
 ## V3.1.0 (03/09/2025)
 
 # PT-BR
