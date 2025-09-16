@@ -85,7 +85,7 @@ final readonly class GraphQlService
 
     public function presenter(Model $model, array $fields, array $order = [], array $pagination = []): array
     {
-        return $this->presenter->execute($model, $fields, $pagination);
+        return $this->presenter->execute($model, $fields, $order, $pagination);
     }
 
     private function formatPaginatedResponse(
@@ -97,7 +97,7 @@ final readonly class GraphQlService
         $response = [];
 
         foreach ($builder as $item) {
-            $response[] = $this->presenter->execute($item, $fields, $pagination);
+            $response[] = $this->presenter->execute($item, $fields, $order, $pagination);
         }
 
         $pagination = [

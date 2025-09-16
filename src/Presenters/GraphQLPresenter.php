@@ -21,7 +21,7 @@ final readonly class GraphQLPresenter
     ) {
     }
 
-    public function execute(Model $model, array $fields, array $pagination = []): array
+    public function execute(Model $model, ?array $fields, ?array $order = [], ?array $pagination = []): array
     {
         return $this->generate($model, $fields, $pagination);
     }
