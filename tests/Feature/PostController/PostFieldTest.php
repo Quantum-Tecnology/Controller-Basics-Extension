@@ -284,3 +284,42 @@ it('it deleted a new post with only id and title fields', function (): void {
 
     assertSoftDeleted($post);
 });
+
+it('aaaa', function (): void {
+    Post::factory()->create(['title' => 'abc']);
+    Post::factory()->create(['title' => 'aaa']);
+
+    getJson(route('posts.index', ['fields' => 'title', 'order_column' => 'title', 'order_direction' => 'desc']))
+        ->assertOk()
+        ->assertJson([
+            'data' => [
+                [
+                    'data' => [
+                        'title' => 'abc',
+                    ],
+                ],
+                [
+                    'data' => [
+                        'title' => 'aaa',
+                    ],
+                ],
+            ],
+        ]);
+
+    getJson(route('posts.index', ['fields' => 'title', 'order_column' => 'title', 'order_direction' => 'asc']))
+        ->assertOk()
+        ->assertJson([
+            'data' => [
+                [
+                    'data' => [
+                        'title' => 'aaa',
+                    ],
+                ],
+                [
+                    'data' => [
+                        'title' => 'abc',
+                    ],
+                ],
+            ],
+        ]);
+});
