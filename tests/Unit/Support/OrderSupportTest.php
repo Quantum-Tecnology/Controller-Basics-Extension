@@ -77,15 +77,21 @@ it('parses order data for items and their children', function (): void {
                 'direction' => 'desc',
             ],
             'children' => [
-                'order' => [
-                    'column'    => 'id',
-                    'direction' => 'desc',
-                    'children'  => [
+                'comment' => [
+                    'order' => [
                         'column'    => 'id',
-                        'direction' => 'asc',
-                        'children'  => [
+                        'direction' => 'desc',
+                    ],
+                    'children' => [
+                        'likes' => [
                             'column'    => 'id',
                             'direction' => 'asc',
+                        ],
+                        'children' => [
+                            'comment' => [
+                                'column'    => 'id',
+                                'direction' => 'asc',
+                            ],
                         ],
                     ],
                 ],
