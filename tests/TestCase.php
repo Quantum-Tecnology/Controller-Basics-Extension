@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Console\AboutCommand;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use QuantumTecnology\ControllerBasicsExtension\Middleware\LogMiddleware;
 use QuantumTecnology\ControllerBasicsExtension\Providers\ControllerBasicsExtensionProvider;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Controller\PostCommentController;
@@ -135,7 +136,9 @@ abstract class TestCase extends BaseTestCase
     protected function setUpRoute(Application $app): void
     {
         $app['router']->apiResource('posts', PostController::class);
-        $app['router']->get('posts-only-fields', [PostOnlyFieldsController::class, 'index'])->name('posts-only-fields.index');
+        $app['router']->get('posts-only-fields', [PostOnlyFieldsController::class, 'index'])
+            ->middleware([LogMiddleware::class])
+            ->name('posts-only-fields.index');
         $app['router']->prefix('post/{post_id}')->group(function () use ($app): void {
             $app['router']->apiResource('comments', PostCommentController::class);
         });

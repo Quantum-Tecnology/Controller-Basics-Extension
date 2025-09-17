@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+use QuantumTecnology\ControllerBasicsExtension\Enum\QueryBuilderType;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
@@ -23,7 +24,7 @@ test('it paginates comments with per_page parameter', function (): void {
     $fields   = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $paginate = ['comments' => ['per_page' => 5]];
 
-    $post = $this->builder->execute($this->post, $fields, [], $paginate)->where('id', $this->post->id)->sole();
+    $post = $this->builder->execute($this->post, $fields, [], [], $paginate)->where('id', $this->post->id)->sole();
     expect($post->comments)->toHaveCount(5);
 });
 
@@ -31,7 +32,7 @@ test('it paginates comments with page parameter', function (): void {
     $fields   = ['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]];
     $paginate = ['comments' => ['page' => 2]];
 
-    $post = $this->builder->execute($this->post, $fields, [], $paginate)->where('id', $this->post->id)->sole();
+    $post = $this->builder->execute($this->post, $fields, [], [], $paginate)->where('id', $this->post->id)->sole();
     expect($post->comments->get(0)->id)->toBe(11);
 });
 
@@ -85,5 +86,23 @@ test('it filters posts by is_draft status', function (): void {
 
     $posts = $this->builder->execute($this->post, $fields, $filters)->get();
     expect($posts)->toHaveCount(0);
+
+});
+
+test('it filters posts by is_draft null and not null', function (): void {
+    $fields  = ['id'];
+    $filters = [
+        '(is_draft)' => QueryBuilderType::Null,
+    ];
+
+    $posts = $this->builder->execute($this->post, $fields, $filters)->get();
+    expect($posts)->toHaveCount(0);
+
+    $filters = [
+        '(is_draft)' => QueryBuilderType::NotNull,
+    ];
+
+    $posts = $this->builder->execute($this->post, $fields, $filters)->get();
+    expect($posts)->toHaveCount(1);
 
 });

@@ -1,14 +1,24 @@
 # CHANGE LOG
 
-## X.X.X
+## V3.2.0 (16/09/2025)
 
 # PT-BR
 
-- Atualize o manuseio de respostas no LogMiddleware para usar o método getContent. @bhcosta90
+- Adicionando ordenação de dados via parametros. @bhcosta90
 
 # EN
 
-- Update response handling in LogMiddleware to use getContent method. @bhcosta90
+- Adding data ordering via parameters. @bhcosta90
+
+## V3.1.0 (03/09/2025)
+
+# PT-BR
+
+- Adicionar QueryBuilderType Enum e aprimore a lógica de filtragem no BuilderQuery. @bhcosta90
+
+# EN
+
+- Add QueryBuilderType enum and enhance filtering logic in BuilderQuery. @bhcosta90
 
 ## V3.0.0 (13/08/2025)
 

@@ -46,7 +46,7 @@ test('it paginates comments on the second page', function (): void {
         'comments(id,<=)' => 20,
     ];
 
-    $post = $this->service->paginate(new Post(), $fields, $filters, [
+    $post = $this->service->paginate(new Post(), $fields, $filters, [], [
         'comments' => [
             'page' => 2,
         ],
@@ -92,7 +92,7 @@ test('it simple paginates comments on the second page', function (): void {
         'comments(id,<=)' => 20,
     ];
 
-    $post = $this->service->simplePaginate(new Post(), $fields, $filters, [
+    $post = $this->service->simplePaginate(new Post(), $fields, $filters, [], [
         'comments' => [
             'page' => 2,
         ],
@@ -162,7 +162,7 @@ test('it paginates likes for the second page of the first comment of a post', fu
 
     CommentLike::factory(50)->for($this->comment->first())->create();
 
-    $post = $this->service->sole($this->post, $fields, $filters, [
+    $post = $this->service->sole($this->post, $fields, $filters, [], [
         'comments_likes' => [
             'page' => 2,
         ],

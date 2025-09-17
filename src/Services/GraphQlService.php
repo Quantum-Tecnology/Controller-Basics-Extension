@@ -25,12 +25,21 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
+        array $order = [],
         array $pagination = [],
         string $pageName = 'page',
     ): Collection {
         $limit = $this->paginationSupport->calculatePerPage($pagination['per_page'] ?? null, $model::class);
 
-        $builder = $this->builderQuery->execute($model, $fields, $filters, $pagination)->paginate(
+        $query = $this->builderQuery->execute($model, $fields, $filters, $order, $pagination);
+
+        $order = data_get($order, 'order');
+
+        if ($order['column'] ?? null) {
+            $query->orderBy($order['column'], $order['direction'] ?? 'asc');
+        }
+
+        $builder = $query->paginate(
             perPage: $limit,
             pageName: $pageName,
             page: $pagination['page'] ?? null,
@@ -43,6 +52,7 @@ final readonly class GraphQlService
         Model $model,
         array $fields,
         array $filters = [],
+        array $order = [],
         array $pagination = [],
         ?int $page = null,
         ?int $perPage = null,
@@ -50,7 +60,7 @@ final readonly class GraphQlService
     ): Collection {
         $limit = $this->paginationSupport->calculatePerPage($perPage, $model::class);
 
-        $builder = $this->builderQuery->execute($model, $fields, $filters, $pagination)->simplePaginate(
+        $builder = $this->builderQuery->execute($model, $fields, $filters, $order, $pagination)->simplePaginate(
             perPage: $limit,
             pageName: null !== $pageName && '' !== $pageName && '0' !== $pageName ? $pageName : 'page',
             page: $page,
@@ -59,16 +69,26 @@ final readonly class GraphQlService
         return $this->formatPaginatedResponse($builder, $fields, $pagination);
     }
 
-    public function sole(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
-    {
-        $item = $this->builderQuery->execute($model, $fields, $filters)->sole();
+    public function sole(
+        Model $model,
+        array $fields,
+        ?array $filters = [],
+        ?array $orders = [],
+        ?array $pagination = []
+    ): Collection {
+        $item = $this->builderQuery->execute($model, $fields, $filters, $orders)->sole();
 
         return collect($this->presenter($item, $fields, $pagination));
     }
 
-    public function first(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
-    {
-        $item = $this->builderQuery->execute($model, $fields, $filters)->first();
+    public function first(
+        Model $model,
+        array $fields,
+        ?array $filters = [],
+        ?array $orders = [],
+        ?array $pagination = []
+    ): Collection {
+        $item = $this->builderQuery->execute($model, $fields, $filters, $orders)->first();
 
         return collect($this->presenter($item, $fields, $pagination));
     }
@@ -80,8 +100,8 @@ final readonly class GraphQlService
 
     private function formatPaginatedResponse(
         Paginator $builder,
-        array $fields,
-        array $pagination
+        ?array $fields,
+        ?array $pagination,
     ): Collection {
         $response = [];
 

@@ -101,8 +101,8 @@ it('casts all values to int', function (): void {
     ];
     $result = $this->support->parse($data);
 
-    expect($result['x']['y']['per_page'])->toBeInt();
-    expect($result['x']['y']['page'])->toBeInt();
+    expect($result['x']['y']['per_page'])->toBeInt()
+        ->and($result['x']['y']['page'])->toBeInt();
 });
 
 it('returns empty array if no pagination keys are present', function (): void {

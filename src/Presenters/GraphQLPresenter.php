@@ -21,12 +21,12 @@ final readonly class GraphQLPresenter
     ) {
     }
 
-    public function execute(Model $model, array $fields, array $pagination = []): array
+    public function execute(Model $model, ?array $fields, ?array $pagination = []): array
     {
         return $this->generate($model, $fields, $pagination);
     }
 
-    private function generate(Model $model, array $fields, array $pagination = [], ?string $relationFullName = null): array
+    private function generate(Model $model, ?array $fields, ?array $pagination = [], ?string $relationFullName = null): array
     {
         $actions         = [];
         $data            = [];

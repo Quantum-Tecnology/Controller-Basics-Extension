@@ -14,6 +14,7 @@ use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
 use QuantumTecnology\ControllerBasicsExtension\Services\RelationshipService;
 use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
+use QuantumTecnology\ControllerBasicsExtension\Support\OrderSupport;
 use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 trait AsGraphQLController
@@ -26,6 +27,7 @@ trait AsGraphQLController
             $this->model(),
             $this->getFields(),
             $this->getFilters(),
+            $this->getOrder(),
             $this->getPagination(),
         );
 
@@ -107,6 +109,7 @@ trait AsGraphQLController
             [
                 "({$keyName})" => $idFromParam,
             ] + $this->filterRouteParams($routeParams),
+            $this->getOrder(),
         );
     }
 
@@ -160,6 +163,13 @@ trait AsGraphQLController
         $queries = request()->query();
 
         return app(PaginationSupport::class)->parse($queries);
+    }
+
+    protected function getOrder(): array
+    {
+        $queries = request()->query();
+
+        return app(OrderSupport::class)->parse($queries);
     }
 
     protected function getGraphQlService(): GraphQlService
