@@ -54,8 +54,7 @@ test('it creates a post with likes and comments', function () {
 });
 
 test('it returns comments count and limits loaded comments to 10', function () {
-    $post    = Post::factory()->hasLikes(5)->create();
-    $comment = Comment::factory()->for($post)->count(30)->create();
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(30)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],
         ['like' => 2],
@@ -63,11 +62,11 @@ test('it returns comments count and limits loaded comments to 10', function () {
         ['like' => 5],
     ]);
 
-    /** @var Post $response */
-    $response = $this->builder->fields(['id', 'comments'])->execute(new Post())->sole();
+    /** @var Post $post */
+    $post = $this->builder->fields(['id', 'comments'])->execute(new Post())->sole();
 
-    expect($response->comments_count)->toBe(30)
-        ->and($response->comments->count())->toBe(10);
+    expect($post->comments_count)->toBe(30)
+        ->and($post->comments->count())->toBe(10);
 });
 
 describe('Testing together some certain methods', function () {
