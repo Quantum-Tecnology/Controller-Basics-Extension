@@ -19,7 +19,7 @@ final readonly class BuilderQuery
     ) {
     }
 
-    public function execute($model, array $fields = [], array $filters = [], array $pagination = [])
+    public function execute($model, array $fields = [], array $filters = [], ?array $order = [], array $pagination = [])
     {
         $filters = $this->filterSupport->parse($filters);
 
