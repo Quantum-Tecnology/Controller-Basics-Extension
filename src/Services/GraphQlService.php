@@ -121,8 +121,10 @@ final readonly class GraphQlService
         }
 
         if ($builder instanceof LengthAwarePaginator) {
-            $response['meta']['total']     = $builder->total();
-            $response['meta']['last_page'] = $builder->lastPage();
+            $response['meta'] = array_merge($response['meta'] ?? [], [
+                'total'     => $builder->total(),
+                'last_page' => $builder->lastPage(),
+            ]);
         }
 
         return collect($response);
