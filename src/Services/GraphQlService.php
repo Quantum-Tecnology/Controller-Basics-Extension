@@ -76,7 +76,7 @@ final readonly class GraphQlService
         ?array $orders = [],
         ?array $pagination = []
     ): Collection {
-        $item = $this->builderQuery->execute($model, $fields, $orders, $filters)->sole();
+        $item = $this->builderQuery->execute($model, $fields, $filters, $orders)->sole();
 
         return collect($this->presenter($item, $fields, $pagination));
     }
@@ -88,7 +88,7 @@ final readonly class GraphQlService
         ?array $orders = [],
         ?array $pagination = []
     ): Collection {
-        $item = $this->builderQuery->execute($model, $fields, $orders, $filters)->first();
+        $item = $this->builderQuery->execute($model, $fields, $filters, $orders)->first();
 
         return collect($this->presenter($item, $fields, $pagination));
     }

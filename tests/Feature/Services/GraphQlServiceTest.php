@@ -162,7 +162,7 @@ test('it paginates likes for the second page of the first comment of a post', fu
 
     CommentLike::factory(50)->for($this->comment->first())->create();
 
-    $post = $this->service->sole($this->post, $fields, $filters, [
+    $post = $this->service->sole($this->post, $fields, $filters, [], [
         'comments_likes' => [
             'page' => 2,
         ],
