@@ -12,8 +12,8 @@ describe('Testing together some certain methods', function () {
         $this->instance = $this->refClass->newInstanceWithoutConstructor();
     });
 
-    it('generateIncludes returns correct includes and closures for nested relations', function () {
-        $method = $this->refClass->getMethod('extractOptions', 'page_offset', 'page_limit');
+    it('extractOptions returns correct nested options array', function () {
+        $method = $this->refClass->getMethod('extractOptions');
         $method->setAccessible(true);
 
         $result = $method->invoke($this->instance, [
@@ -26,7 +26,7 @@ describe('Testing together some certain methods', function () {
             'page_limit_comments'        => 25,
             'page_offset_comments_likes' => 2,
             'page_limit_comments_likes'  => 10,
-        ]);
+        ], 'page_offset', 'page_limit');
 
         expect($result)->toBe([
             'comments' => [
@@ -36,6 +36,34 @@ describe('Testing together some certain methods', function () {
             'comments_likes' => [
                 'page_limit'  => 10,
                 'page_offset' => 2,
+            ],
+        ]);
+    });
+
+    it('extractOptions returns correct nested order options array', function () {
+        $method = $this->refClass->getMethod('extractOptions');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->instance, [
+            'author',
+            'comments',
+            'comments.likes',
+            'comments.likes.comment',
+            'comments.likes.comment.likes',
+            'order_column_comments'          => 'id',
+            'order_direction_comments'       => 'asc',
+            'order_column_comments_likes'    => 'name',
+            'order_direction_comments_likes' => 'desc',
+        ], 'order_column', 'order_direction');
+
+        expect($result)->toBe([
+            'comments' => [
+                'order_column'    => 'id',
+                'order_direction' => 'asc',
+            ],
+            'comments_likes' => [
+                'order_column'    => 'name',
+                'order_direction' => 'desc',
             ],
         ]);
     });

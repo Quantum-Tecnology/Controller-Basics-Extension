@@ -154,4 +154,9 @@ class QueryBuilder
 
         return $relation;
     }
+
+    private function extractOptions(array $options, ...$items): array
+    {
+        return [];
+    }
 }
