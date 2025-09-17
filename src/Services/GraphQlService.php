@@ -89,12 +89,16 @@ final readonly class GraphQlService
             $response[] = $this->presenter->execute($item, $fields, $pagination);
         }
 
-        $pagination = [
-            'per_page'       => $builder->perPage(),
-            'current_page'   => $builder->currentPage(),
-            'has_more_pages' => $builder->hasMorePages(),
-            'page_name'      => $builder->getOptions()['pageName'],
-        ];
+        $pagination = [];
+
+        if ($builder instanceof Paginator) {
+            $pagination = [
+                'per_page'       => $builder->perPage(),
+                'current_page'   => $builder->currentPage(),
+                'has_more_pages' => $builder->hasMorePages(),
+                'page_name'      => $builder->getOptions()['pageName'],
+            ];
+        }
 
         if ($builder instanceof LengthAwarePaginator) {
             $pagination['total']     = $builder->total();
