@@ -108,10 +108,12 @@ test('aaaaa', function () {
     /** @var Post $post */
     $post = $this->builder->fields(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->orders($order)->execute(new Post())->sole();
 
-    expect($post->comments->get(4))->id->toBe(1)
-        ->and($post->comments->get(4))->id->toBe(1)
-        ->and($post->comments->get(1))->id->toBe(4)
-        ->and($post->comments->get(1))->id->toBe(4);
+    $comments = $post->comments;
+
+    expect($comments->get(4))->id->toBe(1)
+        ->and($comments->get(4))->id->toBe(1)
+        ->and($comments->get(1))->id->toBe(4)
+        ->and($comments->get(1))->id->toBe(4);
 });
 
 describe('Testing together some certain methods', function () {
