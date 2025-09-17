@@ -324,11 +324,11 @@ it('it orders posts by title ascending and descending', function (): void {
         ]);
 });
 
-it('aaaa', function () {
+it('it orders nested comments and likes correctly', function () {
     $post = Post::factory()->hasComments(5)->create(['title' => 'abc']);
     Post::factory()->hasComments(3)->create(['title' => 'abc']);
 
-    $post->comments()->first()->likes()
+    $post->comments()->latest()->first()->likes()
         ->createMany([
             ['like' => 5],
             ['like' => 2],
@@ -336,11 +336,47 @@ it('aaaa', function () {
         ]);
 
     getJson(route('posts.index', [
-        'fields'                         => 'comments { id likes {id} }',
-        'order_column.comments'          => 'id',
-        'order_direction.comments'       => 'desc',
-        'order_column.comments.likes'    => 'id',
-        'order_direction.comments.likes' => 'desc',
+        'fields'                      => 'comments { id likes {id} }',
+        'order_column.comments'       => 'id',
+        'order_direction.comments'    => 'desc',
+        'order_column.comments.likes' => 'id',
+        // 'order_direction.comments.likes' => 'asc',
     ]))
-        ->dump();
+        ->dump()
+        ->assertJson([
+            'data' => [
+                [
+                    'data' => [
+                        'comments' => [
+                            'data' => [
+                                [
+                                    'data' => ['id' => 5],
+                                ],
+                                [
+                                    'data' => ['id' => 4],
+                                ],
+                                [
+                                    'data' => ['id' => 3],
+                                ],
+                                [
+                                    'data' => ['id' => 2],
+                                ],
+                                [
+                                    'data' => [
+                                        'id'    => 1,
+                                        'likes' => [
+                                            'data' => [
+                                                ['data' => ['id' => 1]],
+                                                ['data' => ['id' => 2]],
+                                                ['data' => ['id' => 3]],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 });
