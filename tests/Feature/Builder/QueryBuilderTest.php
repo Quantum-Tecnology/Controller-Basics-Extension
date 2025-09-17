@@ -92,7 +92,7 @@ test('it paginates nested relations and returns correct counts', function () {
         ->and($post->comments->count())->toBe(22);
 });
 
-test('aaaaa', function () {
+test('it orders comments and nested likes in descending order', function () {
     $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(5)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],
