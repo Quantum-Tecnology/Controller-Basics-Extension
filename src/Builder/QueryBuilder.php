@@ -7,107 +7,22 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Enum\OrderDirection;
 
-final class QueryBuilder
+class QueryBuilder
 {
-    private array $fields      = [];
-    private array $filters     = [];
-    private array $paginations = [];
-    private array $orders      = [];
-    private array $withCount   = [];
+    protected array $withCount = [];
 
-    public function fields(array $fields): self
-    {
-        $this->fields = $fields;
-
-        return $this;
-    }
-
-    public function filters(Request\Filter $filter): self
-    {
-        foreach ($filter->getData() as $field) {
-            $this->filters[] = [
-                'field'     => $field->column,
-                'operation' => $field->operation,
-            ];
-        }
-
-        return $this;
-    }
-
-    public function paginations(Request\Pagination $pagination): self
-    {
-        foreach ($pagination->getData() as $field) {
-            $this->paginations[] = [
-                'field'    => $field->field,
-                'offset'   => $field->offset,
-                'per_page' => $field->per_page,
-            ];
-        }
-
-        return $this;
-    }
-
-    public function orders(Request\Order $order): self
-    {
-        foreach ($order->getData() as $field) {
-            $this->orders[] = [
-                'field'     => $field->field,
-                'column'    => $field->column,
-                'direction' => $field->direction,
-            ];
-        }
-
-        return $this;
-    }
-
-    public function execute(Model $model): Builder
+    public function execute(Model $model, array $fields, array $options = []): Builder
     {
         $query = $model->query();
 
-        $fields = array_filter($this->fields, fn ($item) => !is_array($item));
-
-        foreach ($fields as $key => $value) {
-            if (method_exists($model, $value)) {
-                unset($fields[$key]);
-            }
-        }
-
-        if (filled($fields)) {
-            $query->select($fields);
-        }
-
-        $includes = $this->generateIncludes($model, $this->fields);
+        $includes = $this->generateIncludes($model, $fields);
 
         if (filled($includes)) {
             $query->with($includes);
         }
 
-        if (!empty($this->withCount)) {
-            $rootCounts = array_values(array_filter(array_keys($this->withCount), fn ($p) => !str_contains($p, '.')));
-
-            if (!empty($rootCounts)) {
-                $query->withCount($rootCounts);
-            }
-        }
-
         return $query;
-    }
-
-    private function nestedDotPaths(array $fields, string $prefix = ''): array
-    {
-        $paths = [];
-
-        foreach ($fields as $key => $value) {
-            if (is_array($value)) {
-                $current = '' !== $prefix && '0' !== $prefix ? "$prefix.$key" : $key;
-                $paths[] = $current;
-                $paths   = array_merge($paths, $this->nestedDotPaths($value, $current));
-            }
-        }
-
-        return $paths;
     }
 
     private function generateIncludes(Model $model, $fields): array
@@ -137,24 +52,6 @@ final class QueryBuilder
             }
         }
 
-        $paginations = [];
-
-        foreach ($this->paginations as $pagination) {
-            $paginations[str($pagination['field'])->replace('.', '_')->toString()] = [
-                'offset'   => $pagination['offset'],
-                'per_page' => $pagination['per_page'],
-            ];
-        }
-
-        $orders = [];
-
-        foreach ($this->orders as $order) {
-            $orders[str($order['field'])->replace('.', '_')->toString()] = [
-                'column'    => $order['column'],
-                'direction' => OrderDirection::Asc === $order['direction'] ? 'asc' : 'desc',
-            ];
-        }
-
         $this->withCount = array_fill_keys($countable, true);
 
         foreach ($paths as $path) {
@@ -163,17 +60,17 @@ final class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) use ($path, $countable, $paginations, $orders) {
+                $result[$path] = function ($query) use ($path, $countable) {
                     $pathUnderline = str($path)->replace('.', '_')->toString();
 
-                    $paginateInclude = data_get($paginations, $pathUnderline, [
+                    $paginateInclude = data_get([], $pathUnderline, [
                         'per_page' => config('page.per_page'),
                         'offset'   => 0,
                     ]);
 
                     $query->limit($paginateInclude['per_page'])->offset($paginateInclude['offset']);
 
-                    $orderInclude = data_get($orders, $pathUnderline, []);
+                    $orderInclude = data_get([], $pathUnderline, []);
 
                     if ($orderInclude['column'] ?? null) {
                         $query->orderBy($orderInclude['column'], $orderInclude['direction']);
@@ -197,6 +94,21 @@ final class QueryBuilder
         }
 
         return $result;
+    }
+
+    private function nestedDotPaths(array $fields, string $prefix = ''): array
+    {
+        $paths = [];
+
+        foreach ($fields as $key => $value) {
+            if (is_array($value)) {
+                $current = '' !== $prefix && '0' !== $prefix ? "$prefix.$key" : $key;
+                $paths[] = $current;
+                $paths   = array_merge($paths, $this->nestedDotPaths($value, $current));
+            }
+        }
+
+        return $paths;
     }
 
     private function resolveLastRelation(Model $model, string $path)
