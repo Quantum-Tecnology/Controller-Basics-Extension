@@ -42,6 +42,7 @@ test('it creates a post with likes and comments', function () {
     $comment->first()->likes()->createMany([
         ['like' => 1],
         ['like' => 2],
+        ['like' => 1],
         ['like' => 5],
     ]);
 
@@ -49,7 +50,7 @@ test('it creates a post with likes and comments', function () {
     $response = $this->builder->fields(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->execute(new Post())->sole();
 
     expect($response->comments_count)->toBe(30)
-        ->and($response->comments->first()->likes_count)->toBe(3);
+        ->and($response->comments->first()->likes_count)->toBe(4);
 });
 
 describe('Testing together some certain methods', function () {
