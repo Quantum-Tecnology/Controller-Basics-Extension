@@ -7,7 +7,6 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class QueryBuilder
 {
@@ -70,43 +69,15 @@ final class QueryBuilder
             $query->select($fields);
         }
 
-        $withRelation = [];
-        $withCount    = [];
+        $includes = $this->generateIncludes($model, $this->fields);
 
-        $includes = $this->generateIncludes($model, $this->nestedDotPaths($this->fields));
-        dd($includes);
+        if (filled($includes)) {
+            $query->with($includes);
+        }
 
-        //        foreach ($includes as $include) {
-        //            if (!str_contains((string) $include, '.')) {
-        //                $withCount[$include] = fn ($query) => $this->executeFilters($query, $include);
-        //            }
-        //
-        //            $relation          = method_exists($model, $include) ? $model->$include() : null;
-        //            $isBelongsTo       = $relation instanceof BelongsTo;
-        //            $includeCamel      = str($include)->camel()->toString();
-        //            $includeChildren   = $this->getIncludesWithCount($includes, $include);
-        //            $withCountChildren = [];
-        //
-        //            foreach ($includeChildren as $child) {
-        //                $childCamel                     = str($child)->camel()->toString();
-        //                $withCountChildren[$childCamel] = fn ($query) => $this->executeFilters($query, "{$include}_{$child}");
-        //            }
-        //
-        //            $withRelation[$includeCamel] = fn ($query) => $isBelongsTo
-        //                ? $this->executeFilters($query->withCount($withCountChildren), null)
-        //                : $this->executeFilters($query->withCount($withCountChildren), null)
-        //                    ->offset(0)
-        //                    // ->when(filled($dataOrder['column'] ?? null), fn ($query) => $query->orderBy($dataOrder['column'], $dataOrder['direction'] ?? 'asc'))
-        //                    ->limit(10);
+        //        if (filled($withCount)) {
+        //            $query->withCount($withCount);
         //        }
-
-        if (filled($withRelation)) {
-            $query->with($withRelation);
-        }
-
-        if (filled($withCount)) {
-            $query->withCount($withCount);
-        }
 
         return $query;
     }
@@ -126,37 +97,62 @@ final class QueryBuilder
         return $paths;
     }
 
-    private function getIncludesWithCount(array $includes, string $include): array
+    private function generateIncludes(Model $model, $fields): array
     {
-        return collect($includes)
-            ->filter(fn ($item) => str($item)->startsWith($include . '.'))
-            ->map(fn ($item) => str($item)->after($include . '.'))
-            ->values()
-            ->all();
+        $hasNested = false;
+
+        foreach ((array) $fields as $value) {
+            if (is_array($value)) {
+                $hasNested = true;
+
+                break;
+            }
+        }
+
+        if ($hasNested) {
+            $paths = $this->nestedDotPaths((array) $fields);
+        } else {
+            $paths = array_values(array_filter((array) $fields, fn ($v) => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
+        }
+
+        $result = [];
+
+        foreach ($paths as $path) {
+            $relation = $this->resolveLastRelation($model, $path);
+
+            if ($relation instanceof BelongsTo) {
+                $result[] = $path;
+            } else {
+                $result[$path] = function ($query) {
+                    return $query;
+                };
+            }
+        }
+
+        return $result;
     }
 
-    private function executeFilters($query, ?string $include)
+    private function resolveLastRelation(Model $model, string $path)
     {
-        return $query;
-    }
+        $currentModel = $model;
+        $relation     = null;
 
-    private function generateIncludes(Model $model, $includes): array
-    {
-        return [];
-        //        $response = [];
-        //
-        //        foreach ($includes as $include) {
-        //            $method = method_exists($model, $include) ? $model->$include() : null;
-        //
-        //            if ($method instanceof BelongsTo || $method instanceof HasOne) {
-        //                $response[] = $include;
-        //            }
-        //
-        //            if (str($include)->contains('.')) {
-        //
-        //            }
-        //        }
-        //
-        //        return $response;
+        foreach (explode('.', $path) as $segment) {
+            if (!method_exists($currentModel, $segment)) {
+                $relation = null;
+
+                break;
+            }
+
+            $relation = $currentModel->{$segment}();
+
+            if (method_exists($relation, 'getRelated')) {
+                $currentModel = $relation->getRelated();
+            } else {
+                break;
+            }
+        }
+
+        return $relation;
     }
 }

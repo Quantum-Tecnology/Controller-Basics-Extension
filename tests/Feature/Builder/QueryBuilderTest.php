@@ -53,10 +53,18 @@ describe('a', function () {
     });
 
     it('generateIncludes returns correct includes and closures for nested relations', function () {
-        $result = $this->method->invoke($this->instance, new Post(), ['author' => [], 'comments' => ['likes' => ['comment' => []]]]);
+        $result = $this->method->invoke($this->instance, new Post(), [
+            'author',
+            'comments',
+            'comments.likes',
+            'comments.likes.comment',
+            'comments.likes.comment.likes',
+        ]);
+
         expect($result[0])->toBe('author')
             ->and($result[1])->toBe('comments.likes.comment')
             ->and($result['comments'])->toBeInstanceOf(Closure::class)
-            ->and($result['comments.likes'])->toBeInstanceOf(Closure::class);
+            ->and($result['comments.likes'])->toBeInstanceOf(Closure::class)
+            ->and($result['comments.likes.comment.likes'])->toBeInstanceOf(Closure::class);
     });
 });
