@@ -15,7 +15,7 @@ class Pagination
         return $this->data;
     }
 
-    public function add(string $field, int $limit, int $perPage): void
+    public function add(string $field, int $offset, int $perPage): void
     {
         if ($perPage > config('page.max_page')) {
             LogSupport::add(
@@ -31,7 +31,7 @@ class Pagination
 
         $this->data[] = (object) [
             'field'    => $field,
-            'limit'    => $limit,
+            'offset'   => $offset,
             'per_page' => $perPage,
         ];
     }

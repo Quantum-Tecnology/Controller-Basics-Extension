@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\Request\Pagination;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
@@ -67,6 +68,26 @@ test('it returns comments count and limits loaded comments to 10', function () {
 
     expect($post->comments_count)->toBe(30)
         ->and($post->comments->count())->toBe(10);
+});
+
+test('it paginates nested relations and returns correct counts', function () {
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(25)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    $pagination = new Pagination();
+    $pagination->add('comments', 3, 100);
+    $pagination->add('comments.likes', 2, 100);
+
+    /** @var Post $post */
+    $post = $this->builder->fields(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->paginations($pagination)->execute(new Post())->sole();
+
+    expect($post->comments_count)->toBe(25)
+        ->and($post->comments->count())->toBe(22);
 });
 
 describe('Testing together some certain methods', function () {

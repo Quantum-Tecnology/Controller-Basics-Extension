@@ -39,9 +39,9 @@ final class QueryBuilder
     {
         foreach ($pagination->getData() as $field) {
             $this->paginations[] = [
-                'field'    => $field->column,
-                'limit'    => $field->direction,
-                'per_page' => $field->direction,
+                'field'    => $field->field,
+                'offset'   => $field->offset,
+                'per_page' => $field->per_page,
             ];
         }
 
@@ -135,6 +135,15 @@ final class QueryBuilder
             }
         }
 
+        $paginations = [];
+
+        foreach ($this->paginations as $pagination) {
+            $paginations[$pagination['field']] = [
+                'offset'   => $pagination['offset'],
+                'per_page' => $pagination['per_page'],
+            ];
+        }
+
         $this->withCount = array_fill_keys($countable, true);
 
         foreach ($paths as $path) {
@@ -143,8 +152,13 @@ final class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) use ($path, $countable) {
-                    $query->limit(10);
+                $result[$path] = function ($query) use ($path, $countable, $paginations) {
+                    $data = data_get($paginations, $path, [
+                        'per_page' => config('page.per_page'),
+                        'offset'   => 0,
+                    ]);
+
+                    $query->limit($data['per_page'])->offset($data['offset']);
 
                     $childrenCounts = [];
                     $prefix         = $path . '.';
