@@ -66,6 +66,12 @@ final class QueryBuilder
 
         $fields = array_filter($this->fields, fn ($item) => !is_array($item));
 
+        foreach ($fields as $key => $value) {
+            if (method_exists($model, $value)) {
+                unset($fields[$key]);
+            }
+        }
+
         if (filled($fields)) {
             $query->select($fields);
         }

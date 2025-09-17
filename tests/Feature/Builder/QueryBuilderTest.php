@@ -53,6 +53,23 @@ test('it creates a post with likes and comments', function () {
         ->and($response->comments->first()->likes_count)->toBe(4);
 });
 
+test('it aaaaaaaaaaaaa', function () {
+    $post    = Post::factory()->hasLikes(5)->create();
+    $comment = Comment::factory()->for($post)->count(30)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    /** @var Post $response */
+    $response = $this->builder->fields(['id', 'comments'])->execute(new Post())->sole();
+
+    expect($response->comments_count)->toBe(30)
+        ->and($response->comments->count())->toBe(10);
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
