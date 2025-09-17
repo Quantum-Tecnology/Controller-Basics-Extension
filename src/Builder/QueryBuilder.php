@@ -14,6 +14,7 @@ final class QueryBuilder
     private array $filters     = [];
     private array $paginations = [];
     private array $orders      = [];
+    private array $withCount   = [];
 
     public function fields(array $fields): self
     {
@@ -75,9 +76,9 @@ final class QueryBuilder
             $query->with($includes);
         }
 
-        //        if (filled($withCount)) {
-        //            $query->withCount($withCount);
-        //        }
+        if (filled($includes)) {
+            $query->with($includes);
+        }
 
         return $query;
     }
@@ -109,11 +110,9 @@ final class QueryBuilder
             }
         }
 
-        if ($hasNested) {
-            $paths = $this->nestedDotPaths((array) $fields);
-        } else {
-            $paths = array_values(array_filter((array) $fields, fn ($v) => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
-        }
+        $paths = $hasNested
+            ? $this->nestedDotPaths((array) $fields)
+            : array_values(array_filter((array) $fields, fn ($v) => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
 
         $result = [];
 
@@ -123,9 +122,7 @@ final class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) {
-                    return $query;
-                };
+                $result[$path] = fn ($query) => $query->limit(10);
             }
         }
 

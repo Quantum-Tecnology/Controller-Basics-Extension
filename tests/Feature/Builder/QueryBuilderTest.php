@@ -36,6 +36,22 @@ test('it loads nested relations as specified in fields', function () {
         ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
 });
 
+test('it creates a post with likes and comments', function () {
+    $post    = Post::factory()->hasLikes(5)->create();
+    $comment = Comment::factory()->for($post)->count(30)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 5],
+    ]);
+
+    /** @var Post $response */
+    $response = $this->builder->fields(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->execute(new Post())->sole();
+
+    expect($response->comments_count)->toBe(30)
+        ->and($response->comments->first()->likes_count)->toBe(3);
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
@@ -43,10 +59,13 @@ describe('Testing together some certain methods', function () {
     });
 
     it('generateIncludes returns correct includes and closures for nested relations', function () {
-        $this->method = $this->refClass->getMethod('generateIncludes');
-        $this->method->setAccessible(true);
+        $method = $this->refClass->getMethod('generateIncludes');
+        $method->setAccessible(true);
 
-        $result = $this->method->invoke($this->instance, new Post(), [
+        $property = $this->refClass->getProperty('withCount');
+        $property->setAccessible(true);
+
+        $result = $method->invoke($this->instance, new Post(), [
             'author',
             'comments',
             'comments.likes',
@@ -58,6 +77,11 @@ describe('Testing together some certain methods', function () {
             ->and($result[1])->toBe('comments.likes.comment')
             ->and($result['comments'])->toBeInstanceOf(Closure::class)
             ->and($result['comments.likes'])->toBeInstanceOf(Closure::class)
-            ->and($result['comments.likes.comment.likes'])->toBeInstanceOf(Closure::class);
+            ->and($result['comments.likes.comment.likes'])->toBeInstanceOf(Closure::class)
+            ->and(array_keys($property->getValue($this->instance)))->toBe([
+                'comments',
+                'comments.likes',
+                'comments.likes.comment.likes',
+            ]);
     });
 });
