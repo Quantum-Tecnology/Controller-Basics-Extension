@@ -25,14 +25,13 @@ test('it returns only the id field and title is null', function () {
         ->id->toBe($post->id);
 });
 
-test('aaaa', function () {
+test('it loads nested relations as specified in fields', function () {
     $post = Post::factory()->hasLikes(5)->create();
     Comment::factory()->for($post)->count(3)->hasLikes(3)->create();
 
-    dd($this->builder->fields(['id', 'comments' => ['likes' => []], 'author' => []])->execute(new Post())->sole());
-
+    /** @var Post $response */
     $response = $this->builder->fields(['id', 'comments' => ['likes' => []], 'author' => []])->execute(new Post())->sole();
 
-    expect($response)->title->toBeNull()
-        ->id->toBe($post->id);
+    expect(array_keys($response->getRelations()))->toBe(['comments', 'author'])
+        ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
 });
