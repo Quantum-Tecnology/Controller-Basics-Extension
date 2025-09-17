@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use QuantumTecnology\ControllerBasicsExtension\Builder\Enum\OrderDirection;
 
 final class QueryBuilder
 {
@@ -52,6 +53,7 @@ final class QueryBuilder
     {
         foreach ($order->getData() as $field) {
             $this->orders[] = [
+                'field'     => $field->field,
                 'column'    => $field->column,
                 'direction' => $field->direction,
             ];
@@ -138,9 +140,18 @@ final class QueryBuilder
         $paginations = [];
 
         foreach ($this->paginations as $pagination) {
-            $paginations[$pagination['field']] = [
+            $paginations[str($pagination['field'])->replace('.', '_')->toString()] = [
                 'offset'   => $pagination['offset'],
                 'per_page' => $pagination['per_page'],
+            ];
+        }
+
+        $orders = [];
+
+        foreach ($this->orders as $order) {
+            $orders[str($order['field'])->replace('.', '_')->toString()] = [
+                'column'    => $order['column'],
+                'direction' => OrderDirection::Asc === $order['direction'] ? 'asc' : 'desc',
             ];
         }
 
@@ -152,13 +163,21 @@ final class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) use ($path, $countable, $paginations) {
-                    $data = data_get($paginations, $path, [
+                $result[$path] = function ($query) use ($path, $countable, $paginations, $orders) {
+                    $pathUnderline = str($path)->replace('.', '_')->toString();
+
+                    $paginateInclude = data_get($paginations, $pathUnderline, [
                         'per_page' => config('page.per_page'),
                         'offset'   => 0,
                     ]);
 
-                    $query->limit($data['per_page'])->offset($data['offset']);
+                    $query->limit($paginateInclude['per_page'])->offset($paginateInclude['offset']);
+
+                    $orderInclude = data_get($orders, $pathUnderline, []);
+
+                    if ($orderInclude['column'] ?? null) {
+                        $query->orderBy($orderInclude['column'], $orderInclude['direction']);
+                    }
 
                     $childrenCounts = [];
                     $prefix         = $path . '.';

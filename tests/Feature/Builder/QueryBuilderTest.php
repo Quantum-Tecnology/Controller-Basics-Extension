@@ -2,7 +2,9 @@
 
 declare(strict_types = 1);
 
+use QuantumTecnology\ControllerBasicsExtension\Builder\Enum\OrderDirection;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\Request\Order;
 use QuantumTecnology\ControllerBasicsExtension\Builder\Request\Pagination;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
@@ -88,6 +90,28 @@ test('it paginates nested relations and returns correct counts', function () {
 
     expect($post->comments_count)->toBe(25)
         ->and($post->comments->count())->toBe(22);
+});
+
+test('aaaaa', function () {
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(5)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    $order = new Order();
+    $order->add('comments', 'id', OrderDirection::Desc);
+    $order->add('comments.likes', 'id', OrderDirection::Desc);
+
+    /** @var Post $post */
+    $post = $this->builder->fields(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->orders($order)->execute(new Post())->sole();
+
+    expect($post->comments->get(4))->id->toBe(1)
+        ->and($post->comments->get(4))->id->toBe(1)
+        ->and($post->comments->get(1))->id->toBe(4)
+        ->and($post->comments->get(1))->id->toBe(4);
 });
 
 describe('Testing together some certain methods', function () {

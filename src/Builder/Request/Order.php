@@ -15,10 +15,11 @@ class Order
         return $this->data;
     }
 
-    public function add(string $field, OrderDirection $direction = OrderDirection::Asc): void
+    public function add(string $field, string $column, OrderDirection $direction = OrderDirection::Asc): void
     {
         $this->data[] = (object) [
             'field'     => $field,
+            'column'    => $column,
             'direction' => $direction,
         ];
     }
