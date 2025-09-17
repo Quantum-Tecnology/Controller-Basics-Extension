@@ -22,7 +22,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        LogSupport::reset();
+        // LogSupport::reset();
         $this->setUpDatabase($this->app);
         $this->setUpRoute($this->app);
         Model::unguard();

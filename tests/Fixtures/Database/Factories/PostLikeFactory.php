@@ -7,10 +7,11 @@ namespace QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\Database\Fac
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\PostLike;
 
 final class PostLikeFactory extends Factory
 {
-    protected $model = self::class;
+    protected $model = PostLike::class;
 
     public function definition(): array
     {
