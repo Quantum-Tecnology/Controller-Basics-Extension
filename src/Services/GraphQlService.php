@@ -112,12 +112,12 @@ final readonly class GraphQlService
         }
 
         if ($builder instanceof Paginator) {
-            $response['meta'] = [
+            $response['meta'] = array_merge($response['meta'] ?? [], [
                 'per_page'       => $builder->perPage(),
                 'current_page'   => $builder->currentPage(),
                 'has_more_pages' => $builder->hasMorePages(),
                 'page_name'      => $builder->getOptions()['pageName'],
-            ];
+            ]);
         }
 
         if ($builder instanceof LengthAwarePaginator) {
