@@ -103,16 +103,16 @@ final readonly class GraphQlService
         ?array $fields,
         ?array $pagination,
     ): Collection {
-        $response = [];
+        $response = [
+            'data' => [],
+        ];
 
         foreach ($builder as $item) {
-            $response[] = $this->presenter->execute($item, $fields, $pagination);
+            $response['data'][] = $this->presenter->execute($item, $fields, $pagination);
         }
 
-        $pagination = [];
-
         if ($builder instanceof Paginator) {
-            $pagination = [
+            $response['meta'] = [
                 'per_page'       => $builder->perPage(),
                 'current_page'   => $builder->currentPage(),
                 'has_more_pages' => $builder->hasMorePages(),
@@ -121,13 +121,10 @@ final readonly class GraphQlService
         }
 
         if ($builder instanceof LengthAwarePaginator) {
-            $pagination['total']     = $builder->total();
-            $pagination['last_page'] = $builder->lastPage();
+            $response['meta']['total']     = $builder->total();
+            $response['meta']['last_page'] = $builder->lastPage();
         }
 
-        return collect([
-            'data' => $response,
-            'meta' => $pagination,
-        ]);
+        return collect($response);
     }
 }
