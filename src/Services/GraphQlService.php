@@ -69,23 +69,33 @@ final readonly class GraphQlService
         return $this->formatPaginatedResponse($builder, $fields, $pagination);
     }
 
-    public function sole(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
-    {
-        $item = $this->builderQuery->execute($model, $fields, $filters)->sole();
+    public function sole(
+        Model $model,
+        array $fields,
+        ?array $filters = [],
+        ?array $orders = [],
+        ?array $pagination = []
+    ): Collection {
+        $item = $this->builderQuery->execute($model, $fields, $orders, $filters)->sole();
 
         return collect($this->presenter($item, $fields, $pagination));
     }
 
-    public function first(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
-    {
-        $item = $this->builderQuery->execute($model, $fields, $filters)->first();
+    public function first(
+        Model $model,
+        array $fields,
+        ?array $filters = [],
+        ?array $orders = [],
+        ?array $pagination = []
+    ): Collection {
+        $item = $this->builderQuery->execute($model, $fields, $orders, $filters)->first();
 
-        return collect($this->presenter($item, $fields, [], $pagination));
+        return collect($this->presenter($item, $fields, $pagination));
     }
 
-    public function presenter(Model $model, array $fields, array $order = [], array $pagination = []): array
+    public function presenter(Model $model, array $fields, array $pagination = []): array
     {
-        return $this->presenter->execute($model, $fields, $order, $pagination);
+        return $this->presenter->execute($model, $fields, $pagination);
     }
 
     private function formatPaginatedResponse(

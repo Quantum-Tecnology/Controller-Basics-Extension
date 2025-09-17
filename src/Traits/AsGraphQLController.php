@@ -109,6 +109,7 @@ trait AsGraphQLController
             [
                 "({$keyName})" => $idFromParam,
             ] + $this->filterRouteParams($routeParams),
+            $this->getOrder(),
         );
     }
 
