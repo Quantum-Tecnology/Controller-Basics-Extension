@@ -12,9 +12,21 @@ class QueryBuilder
 {
     protected array $withCount = [];
 
-    public function execute(Model $model, array $fields, array $options = []): Builder
+    public function execute(Model $model, array $fields = [], array $options = []): Builder
     {
         $query = $model->query();
+
+        $fields = array_filter($fields, fn ($item) => !is_array($item));
+
+        foreach ($fields as $key => $value) {
+            if (method_exists($model, $value)) {
+                unset($fields[$key]);
+            }
+        }
+
+        if (filled($fields)) {
+            $query->select($fields);
+        }
 
         $includes = $this->generateIncludes($model, $fields);
 

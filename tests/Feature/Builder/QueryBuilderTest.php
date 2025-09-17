@@ -5,6 +5,25 @@ declare(strict_types = 1);
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
+beforeEach(fn () => $this->builder = app(QueryBuilder::class));
+
+test('it returns the created post with correct title', function () {
+    $post = Post::factory()->create();
+
+    $response = $this->builder->execute(new Post())->sole();
+
+    expect($response)->title->toBe($post->title);
+});
+
+test('it returns only the id field and title is null', function () {
+    $post = Post::factory()->create();
+
+    $response = $this->builder->execute(new Post(), ['id'])->sole();
+
+    expect($response)->title->toBeNull()
+        ->id->toBe($post->id);
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
