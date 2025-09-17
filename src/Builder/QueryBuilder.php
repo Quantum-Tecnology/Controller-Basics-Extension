@@ -16,16 +16,16 @@ class QueryBuilder
     {
         $query = $model->query();
 
-        $fields = array_filter($fields, fn ($item) => !is_array($item));
+        $fieldSelected = array_filter($fields, fn ($item) => !is_array($item));
 
-        foreach ($fields as $key => $value) {
+        foreach ($fieldSelected as $key => $value) {
             if (method_exists($model, $value)) {
-                unset($fields[$key]);
+                unset($fieldSelected[$key]);
             }
         }
 
-        if (filled($fields)) {
-            $query->select($fields);
+        if (filled($fieldSelected)) {
+            $query->select($fieldSelected);
         }
 
         $includes = $this->generateIncludes($model, $fields);
