@@ -18,6 +18,7 @@ test('it returns the created post with correct title', function () {
 test('it returns only the id field and title is null', function () {
     $post = Post::factory()->create();
 
+    /** @var Post $response */
     $response = $this->builder->execute(new Post(), ['id'])->sole();
 
     expect($response)->title->toBeNull()
