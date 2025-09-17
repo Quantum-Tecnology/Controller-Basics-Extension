@@ -116,6 +116,26 @@ test('it orders comments and nested likes in descending order', function () {
         ->and($comments->get(1))->id->toBe(4);
 });
 
+test('aaaa', function () {
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(5)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    $order = new Order();
+    $order->add('comments', 'id', OrderDirection::Desc);
+    $order->add('comments.likes', 'id', OrderDirection::Desc);
+
+    /** @var Post $response */
+    $response = $this->builder->fields(['id', 'comments' => ['likes' => ['comment']], 'author'])->execute(new Post())->sole();
+
+    expect($response->comments_count)->toBe(5)
+        ->and($response->comments->first()->likes_count)->toBe(4);
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
