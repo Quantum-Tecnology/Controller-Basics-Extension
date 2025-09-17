@@ -53,7 +53,7 @@ test('it creates a post with likes and comments', function () {
         ->and($response->comments->first()->likes_count)->toBe(4);
 });
 
-test('it aaaaaaaaaaaaa', function () {
+test('it returns comments count and limits loaded comments to 10', function () {
     $post    = Post::factory()->hasLikes(5)->create();
     $comment = Comment::factory()->for($post)->count(30)->create();
     $comment->first()->likes()->createMany([
