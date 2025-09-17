@@ -71,27 +71,41 @@ test('it returns comments count and limits loaded comments to 10', function () {
 });
 
 test('it paginates nested relations and returns correct counts', function () {
-    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(25)->create();
-    $comment->first()->likes()->createMany([
-        ['like' => 1],
-        ['like' => 2],
-        ['like' => 1],
-        ['like' => 5],
-    ]);
+    Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(25)->create();
 
     $fields  = ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []];
     $options = [
-        'page_offset_comments'       => 3,
-        'page_limit_comments'        => 10,
-        'page_offset_comments_likes' => 2,
-        'page_limit_comments_likes'  => 10,
+        'page_offset_comments' => 3,
+        'page_limit_comments'  => 4,
     ];
 
     /** @var Post $post */
     $post = $this->builder->execute(new Post(), $fields, $options)->sole();
 
     expect($post->comments_count)->toBe(25)
-        ->and($post->comments->count())->toBe(22);
+        ->and($post->comments->count())->toBe(4)
+        ->and($post->comments->get(0))->id->toBe(4)
+        ->and($post->comments->get(1))->id->toBe(5);
+});
+
+test('it paginates likes of a nested relation and returns correct counts', function () {
+    Comment::factory()->hasLikes(10)->create();
+
+    $fields  = ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []];
+    $options = [
+        'page_offset_comments_likes' => 2,
+        'page_limit_comments_likes'  => 2,
+    ];
+
+    /** @var Post $post */
+    $post = $this->builder->execute(new Post(), $fields, $options)->sole();
+
+    $comment = $post->comments->get(0);
+
+    expect($comment->likes_count)->toBe(10)
+        ->and($comment->likes->count())->toBe(2)
+        ->and($comment->likes->get(0))->id->toBe(3)
+        ->and($comment->likes->get(1))->id->toBe(4);
 });
 
 describe('Testing together some certain methods', function () {
@@ -113,7 +127,7 @@ describe('Testing together some certain methods', function () {
             'comments.likes',
             'comments.likes.comment',
             'comments.likes.comment.likes',
-        ]);
+        ], []);
 
         expect($result[0])->toBe('author')
             ->and($result[1])->toBe('comments.likes.comment')

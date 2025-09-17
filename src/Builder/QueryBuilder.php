@@ -28,7 +28,8 @@ class QueryBuilder
             $query->select($fieldSelected);
         }
 
-        $includes = $this->generateIncludes($model, $fields);
+        $pagination = $this->extractOptions($options, 'page_offset', 'page_limit');
+        $includes   = $this->generateIncludes($model, $fields, $pagination);
 
         if (filled($includes)) {
             $query->with($includes);
@@ -45,7 +46,7 @@ class QueryBuilder
         return $query;
     }
 
-    private function generateIncludes(Model $model, $fields): array
+    private function generateIncludes(Model $model, $fields, array $pagination): array
     {
         $hasNested = false;
 
@@ -80,15 +81,15 @@ class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) use ($path, $countable) {
+                $result[$path] = function ($query) use ($path, $countable, $pagination) {
                     $pathUnderline = str($path)->replace('.', '_')->toString();
 
-                    $paginateInclude = data_get([], $pathUnderline, [
-                        'per_page' => config('page.per_page'),
-                        'offset'   => 0,
+                    $paginateInclude = data_get($pagination, $pathUnderline, [
+                        'page_limit'  => config('page.per_page'),
+                        'page_offset' => 0,
                     ]);
 
-                    $query->limit($paginateInclude['per_page'])->offset($paginateInclude['offset']);
+                    $query->limit($paginateInclude['page_limit'])->offset($paginateInclude['page_offset']);
 
                     $orderInclude = data_get([], $pathUnderline, []);
 
