@@ -34,6 +34,14 @@ class QueryBuilder
             $query->with($includes);
         }
 
+        if (!empty($this->withCount)) {
+            $rootCounts = array_values(array_filter(array_keys($this->withCount), fn ($p) => !str_contains($p, '.')));
+
+            if (!empty($rootCounts)) {
+                $query->withCount($rootCounts);
+            }
+        }
+
         return $query;
     }
 

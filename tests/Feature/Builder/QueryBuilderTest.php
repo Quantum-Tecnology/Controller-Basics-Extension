@@ -37,6 +37,63 @@ test('it loads nested relations as specified in fields', function () {
         ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
 });
 
+test('it creates a post with likes and comments', function () {
+    $post    = Post::factory()->hasLikes(5)->create();
+    $comment = Comment::factory()->for($post)->count(30)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    /** @var Post $response */
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->sole();
+
+    expect($response->comments_count)->toBe(30)
+        ->and($response->comments->first()->likes_count)->toBe(4);
+});
+
+test('it returns comments count and limits loaded comments to 10', function () {
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(30)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    /** @var Post $post */
+    $post = $this->builder->execute(new Post(), ['id', 'comments'])->sole();
+
+    expect($post->comments_count)->toBe(30)
+        ->and($post->comments->count())->toBe(10);
+});
+
+test('it paginates nested relations and returns correct counts', function () {
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(25)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    $fields  = ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []];
+    $options = [
+        'page_offset_comments'       => 3,
+        'page_limit_comments'        => 10,
+        'page_offset_comments_likes' => 2,
+        'page_limit_comments_likes'  => 10,
+    ];
+
+    /** @var Post $post */
+    $post = $this->builder->execute(new Post(), $fields, $options)->sole();
+
+    expect($post->comments_count)->toBe(25)
+        ->and($post->comments->count())->toBe(22);
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
