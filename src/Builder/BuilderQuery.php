@@ -19,7 +19,7 @@ final readonly class BuilderQuery
     ) {
     }
 
-    public function execute($model, array $fields = [], array $filters = [], array $pagination = [])
+    public function execute($model, array $fields = [], array $filters = [], ?array $order = [], array $pagination = [])
     {
         $filters = $this->filterSupport->parse($filters);
 
@@ -36,7 +36,8 @@ final readonly class BuilderQuery
                 $withCount[$include] = fn ($query) => $this->filters($query, $filter);
             }
 
-            $paginate = data_get($pagination, str_replace('.', '_', $include));
+            $paginate  = data_get($pagination, str_replace('.', '_', $include));
+            $dataOrder = data_get($order, str_replace('.', '_', $include) . '.order');
 
             $limit = $this->paginationSupport->calculatePerPage($paginate['per_page'] ?? null, $include);
             $page  = $paginate['page'] ?? 1;
@@ -60,6 +61,7 @@ final readonly class BuilderQuery
                 ? $this->filters($query->withCount($withCountChildren), $filter)
                 : $this->filters($query->withCount($withCountChildren), $filter)
                     ->offset($offset)
+                    ->when(filled($dataOrder['column'] ?? null), fn ($query) => $query->orderBy($dataOrder['column'], $dataOrder['direction'] ?? 'asc'))
                     ->limit((string) $limit);
         }
 
