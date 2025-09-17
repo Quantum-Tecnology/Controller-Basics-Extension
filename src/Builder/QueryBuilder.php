@@ -157,6 +157,40 @@ class QueryBuilder
 
     private function extractOptions(array $options, ...$items): array
     {
-        return [];
+        $result = [];
+
+        if (empty($items)) {
+            return $result;
+        }
+
+        foreach ($options as $key => $value) {
+            // Only process string keys like "page_offset_comments"
+            if (!is_string($key)) {
+                continue;
+            }
+
+            foreach ($items as $item) {
+                // Ensure the key pattern matches: <item>_<group>
+                $prefix = mb_rtrim((string) $item, '_') . '_';
+
+                if (str_starts_with($key, $prefix)) {
+                    $group = mb_substr($key, mb_strlen($prefix));
+
+                    if (false === $group || '' === $group) {
+                        continue;
+                    }
+
+                    // Initialize group array and assign the item value
+                    $result[$group] ??= [];
+                    $result[$group][$item] = $value;
+
+                    // Keep a deterministic order of keys (alphabetical),
+                    // so test expectations using strict array identity pass
+                    ksort($result[$group]);
+                }
+            }
+        }
+
+        return $result;
     }
 }
