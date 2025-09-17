@@ -76,8 +76,12 @@ final class QueryBuilder
             $query->with($includes);
         }
 
-        if (filled($includes)) {
-            $query->with($includes);
+        if (!empty($this->withCount)) {
+            $rootCounts = array_values(array_filter(array_keys($this->withCount), fn ($p) => !str_contains($p, '.')));
+
+            if (!empty($rootCounts)) {
+                $query->withCount($rootCounts);
+            }
         }
 
         return $query;
@@ -114,7 +118,18 @@ final class QueryBuilder
             ? $this->nestedDotPaths((array) $fields)
             : array_values(array_filter((array) $fields, fn ($v) => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
 
-        $result = [];
+        $result    = [];
+        $countable = [];
+
+        foreach ($paths as $path) {
+            $relation = $this->resolveLastRelation($model, $path);
+
+            if ($relation && !($relation instanceof BelongsTo)) {
+                $countable[] = $path;
+            }
+        }
+
+        $this->withCount = array_fill_keys($countable, true);
 
         foreach ($paths as $path) {
             $relation = $this->resolveLastRelation($model, $path);
@@ -122,7 +137,23 @@ final class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = fn ($query) => $query->limit(10);
+                $result[$path] = function ($query) use ($path, $countable) {
+                    $query->limit(10);
+
+                    $childrenCounts = [];
+                    $prefix         = $path . '.';
+                    $pathDepth      = mb_substr_count($path, '.');
+
+                    foreach ($countable as $c) {
+                        if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
+                            $childrenCounts[] = mb_substr($c, mb_strlen($prefix));
+                        }
+                    }
+
+                    if (!empty($childrenCounts)) {
+                        $query->withCount($childrenCounts);
+                    }
+                };
             }
         }
 
