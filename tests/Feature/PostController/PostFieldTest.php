@@ -342,7 +342,6 @@ it('it orders nested comments and likes correctly', function () {
         'order_column.comments.likes' => 'id',
         // 'order_direction.comments.likes' => 'asc',
     ]))
-        ->dump()
         ->assertJson([
             'data' => [
                 [
