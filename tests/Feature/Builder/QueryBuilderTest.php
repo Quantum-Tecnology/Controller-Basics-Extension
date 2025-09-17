@@ -36,23 +36,16 @@ test('it loads nested relations as specified in fields', function () {
         ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
 });
 
-describe('a', function () {
+describe('Testing together some certain methods', function () {
     beforeEach(function () {
-        $refClass       = new ReflectionClass(QueryBuilder::class);
-        $this->instance = $refClass->newInstanceWithoutConstructor();
-
-        $constructor = $refClass->getConstructor();
-
-        if (null !== $constructor) {
-            $constructor->setAccessible(true);
-            $constructor->invoke($this->instance);
-        }
-
-        $this->method = $refClass->getMethod('generateIncludes');
-        $this->method->setAccessible(true);
+        $this->refClass = new ReflectionClass(QueryBuilder::class);
+        $this->instance = $this->refClass->newInstanceWithoutConstructor();
     });
 
     it('generateIncludes returns correct includes and closures for nested relations', function () {
+        $this->method = $this->refClass->getMethod('generateIncludes');
+        $this->method->setAccessible(true);
+
         $result = $this->method->invoke($this->instance, new Post(), [
             'author',
             'comments',
