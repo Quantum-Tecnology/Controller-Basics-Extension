@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class QueryBuilder
 {
@@ -72,31 +73,32 @@ final class QueryBuilder
         $withRelation = [];
         $withCount    = [];
 
-        $includes = $this->nestedDotPaths($this->fields);
+        $includes = $this->generateIncludes($model, $this->nestedDotPaths($this->fields));
+        dd($includes);
 
-        foreach ($includes as $include) {
-            if (!str_contains((string) $include, '.')) {
-                $withCount[$include] = fn ($query) => $this->executeFilters($query, $include);
-            }
-
-            $relation          = method_exists($model, $include) ? $model->$include() : null;
-            $isBelongsTo       = $relation instanceof BelongsTo;
-            $includeCamel      = str($include)->camel()->toString();
-            $includeChildren   = $this->getIncludesWithCount($includes, $include);
-            $withCountChildren = [];
-
-            foreach ($includeChildren as $child) {
-                $childCamel                     = str($child)->camel()->toString();
-                $withCountChildren[$childCamel] = fn ($query) => $this->executeFilters($query, "{$include}_{$child}");
-            }
-
-            $withRelation[$includeCamel] = fn ($query) => $isBelongsTo
-                ? $this->executeFilters($query->withCount($withCountChildren), null)
-                : $this->executeFilters($query->withCount($withCountChildren), null)
-                    ->offset(0)
-                    // ->when(filled($dataOrder['column'] ?? null), fn ($query) => $query->orderBy($dataOrder['column'], $dataOrder['direction'] ?? 'asc'))
-                    ->limit(10);
-        }
+        //        foreach ($includes as $include) {
+        //            if (!str_contains((string) $include, '.')) {
+        //                $withCount[$include] = fn ($query) => $this->executeFilters($query, $include);
+        //            }
+        //
+        //            $relation          = method_exists($model, $include) ? $model->$include() : null;
+        //            $isBelongsTo       = $relation instanceof BelongsTo;
+        //            $includeCamel      = str($include)->camel()->toString();
+        //            $includeChildren   = $this->getIncludesWithCount($includes, $include);
+        //            $withCountChildren = [];
+        //
+        //            foreach ($includeChildren as $child) {
+        //                $childCamel                     = str($child)->camel()->toString();
+        //                $withCountChildren[$childCamel] = fn ($query) => $this->executeFilters($query, "{$include}_{$child}");
+        //            }
+        //
+        //            $withRelation[$includeCamel] = fn ($query) => $isBelongsTo
+        //                ? $this->executeFilters($query->withCount($withCountChildren), null)
+        //                : $this->executeFilters($query->withCount($withCountChildren), null)
+        //                    ->offset(0)
+        //                    // ->when(filled($dataOrder['column'] ?? null), fn ($query) => $query->orderBy($dataOrder['column'], $dataOrder['direction'] ?? 'asc'))
+        //                    ->limit(10);
+        //        }
 
         if (filled($withRelation)) {
             $query->with($withRelation);
@@ -136,5 +138,25 @@ final class QueryBuilder
     private function executeFilters($query, ?string $include)
     {
         return $query;
+    }
+
+    private function generateIncludes(Model $model, $includes): array
+    {
+        return [];
+        //        $response = [];
+        //
+        //        foreach ($includes as $include) {
+        //            $method = method_exists($model, $include) ? $model->$include() : null;
+        //
+        //            if ($method instanceof BelongsTo || $method instanceof HasOne) {
+        //                $response[] = $include;
+        //            }
+        //
+        //            if (str($include)->contains('.')) {
+        //
+        //            }
+        //        }
+        //
+        //        return $response;
     }
 }

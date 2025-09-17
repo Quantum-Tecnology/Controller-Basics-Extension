@@ -30,8 +30,33 @@ test('it loads nested relations as specified in fields', function () {
     Comment::factory()->for($post)->count(3)->hasLikes(3)->create();
 
     /** @var Post $response */
-    $response = $this->builder->fields(['id', 'comments' => ['likes' => []], 'author' => []])->execute(new Post())->sole();
+    $response = $this->builder->fields(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->execute(new Post())->sole();
 
     expect(array_keys($response->getRelations()))->toBe(['comments', 'author'])
         ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
+});
+
+describe('a', function () {
+    beforeEach(function () {
+        $refClass       = new ReflectionClass(QueryBuilder::class);
+        $this->instance = $refClass->newInstanceWithoutConstructor();
+
+        $constructor = $refClass->getConstructor();
+
+        if (null !== $constructor) {
+            $constructor->setAccessible(true);
+            $constructor->invoke($this->instance);
+        }
+
+        $this->method = $refClass->getMethod('generateIncludes');
+        $this->method->setAccessible(true);
+    });
+
+    it('generateIncludes returns correct includes and closures for nested relations', function () {
+        $result = $this->method->invoke($this->instance, new Post(), ['author' => [], 'comments' => ['likes' => ['comment' => []]]]);
+        expect($result[0])->toBe('author')
+            ->and($result[1])->toBe('comments.likes.comment')
+            ->and($result['comments'])->toBeInstanceOf(Closure::class)
+            ->and($result['comments.likes'])->toBeInstanceOf(Closure::class);
+    });
 });
