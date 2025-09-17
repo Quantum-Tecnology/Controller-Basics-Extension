@@ -21,12 +21,12 @@ final readonly class GraphQLPresenter
     ) {
     }
 
-    public function execute(Model $model, ?array $fields, ?array $order = [], ?array $pagination = []): array
+    public function execute(Model $model, ?array $fields, ?array $pagination = []): array
     {
-        return $this->generate($model, $fields, $order, $pagination);
+        return $this->generate($model, $fields, $pagination);
     }
 
-    private function generate(Model $model, ?array $fields, ?array $order = [], ?array $pagination = [], ?string $relationFullName = null): array
+    private function generate(Model $model, ?array $fields, ?array $pagination = [], ?string $relationFullName = null): array
     {
         $actions         = [];
         $data            = [];
@@ -96,7 +96,7 @@ final readonly class GraphQLPresenter
             $keyCamel = Str::camel($key);
 
             if (in_array($model->{$keyCamel}()::class, [Relations\BelongsTo::class, Relations\HasOne::class])) {
-                $response['data'][$key] = $this->generate($model->{$keyCamel}, $fields[$key], $order);
+                $response['data'][$key] = $this->generate($model->{$keyCamel}, $fields[$key]);
             }
 
             if (in_array($model->{$keyCamel}()::class, [
@@ -108,7 +108,6 @@ final readonly class GraphQLPresenter
                     $response['data'][$key]['data'][] = $this->generate(
                         $value,
                         $fields[$key],
-                        $order,
                         $pagination,
                         null !== $relationFullName && '' !== $relationFullName && '0' !== $relationFullName ? $key . '.' . $relationFullName . '.' : "{$key}."
                     );

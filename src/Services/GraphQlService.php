@@ -45,7 +45,7 @@ final readonly class GraphQlService
             page: $pagination['page'] ?? null,
         );
 
-        return $this->formatPaginatedResponse($builder, $fields, $order, $pagination);
+        return $this->formatPaginatedResponse($builder, $fields, $pagination);
     }
 
     public function simplePaginate(
@@ -66,14 +66,14 @@ final readonly class GraphQlService
             page: $page,
         );
 
-        return $this->formatPaginatedResponse($builder, $fields, $order, $pagination);
+        return $this->formatPaginatedResponse($builder, $fields, $pagination);
     }
 
     public function sole(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
     {
         $item = $this->builderQuery->execute($model, $fields, $filters)->sole();
 
-        return collect($this->presenter($item, $fields, [], $pagination));
+        return collect($this->presenter($item, $fields, $pagination));
     }
 
     public function first(Model $model, array $fields, array $filters = [], array $pagination = []): Collection
@@ -91,13 +91,12 @@ final readonly class GraphQlService
     private function formatPaginatedResponse(
         Paginator $builder,
         ?array $fields,
-        ?array $order,
         ?array $pagination,
     ): Collection {
         $response = [];
 
         foreach ($builder as $item) {
-            $response[] = $this->presenter->execute($item, $fields, $order, $pagination);
+            $response[] = $this->presenter->execute($item, $fields, $pagination);
         }
 
         $pagination = [
