@@ -127,4 +127,33 @@ describe('Testing together some certain methods', function () {
             ],
         ]);
     });
+
+    it('aaaaaaaaaaaaaa', function () {
+        $method = $this->refClass->getMethod('extractFilters');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->instance, [
+            'filter(byId)'          => 1,
+            'filter_comments(byId)' => 2,
+        ], new Post(), 'filter');
+
+        expect($result)->toBe([
+            Post::class => [
+                'byId' => [
+                    [
+                        'operation' => 'by',
+                        'value'     => 1,
+                    ],
+                ],
+            ],
+            'comments' => [
+                'byId' => [
+                    [
+                        'operation' => 'by',
+                        'value'     => 2,
+                    ],
+                ],
+            ],
+        ]);
+    });
 });
