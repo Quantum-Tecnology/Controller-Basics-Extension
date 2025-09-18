@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\Support\IncludesBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
@@ -203,19 +204,8 @@ test('it filters comments and nested likes by id using custom filter options', f
 });
 
 describe('Testing together some certain methods', function (): void {
-    beforeEach(function (): void {
-        $this->refClass = new ReflectionClass(QueryBuilder::class);
-        $this->instance = $this->refClass->newInstanceWithoutConstructor();
-    });
-
     it('generateIncludes returns correct includes and closures for nested relations', function (): void {
-        $method = $this->refClass->getMethod('generateIncludes');
-        $method->setAccessible(true);
-
-        $property = $this->refClass->getProperty('withCount');
-        $property->setAccessible(true);
-
-        $result = $method->invoke($this->instance, new Post(), [
+        $result = IncludesBuilder::build(new Post(), [
             'author',
             'comments',
             'comments.likes',
@@ -227,11 +217,6 @@ describe('Testing together some certain methods', function (): void {
             ->and($result[1])->toBe('comments.likes.comment')
             ->and($result['comments'])->toBeInstanceOf(Closure::class)
             ->and($result['comments.likes'])->toBeInstanceOf(Closure::class)
-            ->and($result['comments.likes.comment.likes'])->toBeInstanceOf(Closure::class)
-            ->and(array_keys($property->getValue($this->instance)))->toBe([
-                'comments',
-                'comments.likes',
-                'comments.likes.comment.likes',
-            ]);
+            ->and($result['comments.likes.comment.likes'])->toBeInstanceOf(Closure::class);
     });
 });

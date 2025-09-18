@@ -16,19 +16,6 @@ class QueryBuilder
 {
     protected array $withCount = [];
 
-    /**
-     * Backward-compatibility wrapper kept for tests and external callers.
-     * Accepts either a GraphQL-like string or the already-normalized array.
-     */
-    public function normalizeFieldsFromArray(string | array $fields): array
-    {
-        if (is_string($fields)) {
-            return FieldParser::normalize($fields);
-        }
-
-        return $fields;
-    }
-
     public function execute(Model $model, string | array $fields = [], array $options = []): EloquentBuilder
     {
         $query = $model->query();
@@ -100,20 +87,6 @@ class QueryBuilder
         }
 
         return $query;
-    }
-
-    protected function extractFilters(Model $model, array $data, string $prefixKey = 'filter'): array
-    {
-        return FilterParser::extract($model, $data, $prefixKey);
-    }
-
-    /**
-     * Backward-compatibility wrapper for generating includes and withCount.
-     * Delegates to IncludesBuilder while updating $this->withCount by reference.
-     */
-    private function generateIncludes(Model $model, array | string $fields, array $filters = [], array $pagination = [], array $order = []): array
-    {
-        return IncludesBuilder::build($model, $fields, $filters, $pagination, $order, $this->withCount);
     }
 
     private function extractOptions(array $options, string ...$items): array

@@ -3,6 +3,8 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FieldParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FilterParser;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
 beforeEach(function (): void {
@@ -72,9 +74,7 @@ it('extractOptions returns correct nested order options array', function (): voi
 });
 
 it('extractFilters returns correct nested filters array', function (): void {
-    $method = $this->refClass->getMethod('extractFilters');
-
-    $result = $method->invoke($this->instance, new Post(), $this->dataOptions);
+    $result = FilterParser::extract(new Post(), $this->dataOptions);
 
     expect($result)->toEqual([
         Post::class => [
@@ -139,9 +139,7 @@ it('extractFilters returns correct nested filters array', function (): void {
 });
 
 it('extractFilters handles field names with "by" prefix as operation', function (): void {
-    $method = $this->refClass->getMethod('extractFilters');
-
-    $result = $method->invoke($this->instance, new Post(), [
+    $result = FilterParser::extract(new Post(), [
         'filter(byId)'          => 1,
         'filter_comments(byId)' => 2,
     ]);
@@ -167,29 +165,23 @@ it('extractFilters handles field names with "by" prefix as operation', function 
 });
 
 it('parses nested and flat field strings with spaces and braces', function (): void {
-    $method = $this->refClass->getMethod('normalizeFieldsFromArray');
-
-    $result = $method->invoke($this->instance, 'id comments { likes { comment } author { id }');
+    $result = FieldParser::normalize('id comments { likes { comment } author { id }');
 
     expect($result)->toEqual(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => ['id']]);
 
-    $result = $method->invoke($this->instance, 'id comments {likes {comment} author {id} tags');
+    $result = FieldParser::normalize('id comments {likes {comment} author {id} tags');
 
     expect($result)->toEqual(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => ['id'], 'tags']);
 });
 
 it('parses simple flat field string', function (): void {
-    $method = $this->refClass->getMethod('normalizeFieldsFromArray');
-
-    $result = $method->invoke($this->instance, 'id comments');
+    $result = FieldParser::normalize('id comments');
 
     expect($result)->toEqual(['id', 'comments']);
 });
 
 it('extractFilters handles null and not-null operations', function (): void {
-    $method = $this->refClass->getMethod('extractFilters');
-
-    $result = $method->invoke($this->instance, new Post(), [
+    $result = FilterParser::extract(new Post(), [
         'filter(id,null)'     => null,
         'filter(id,not-null)' => null,
         'filter(title)'       => null,
