@@ -55,7 +55,7 @@ test('it creates a post with likes and comments', function () {
 });
 
 test('it returns comments count and limits loaded comments to 10', function () {
-    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(30)->create();
+    $comment = Comment::factory()->for(Post::factory()->create())->count(30)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],
         ['like' => 2],
@@ -71,7 +71,7 @@ test('it returns comments count and limits loaded comments to 10', function () {
 });
 
 test('it paginates nested relations and returns correct counts', function () {
-    Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(25)->create();
+    Comment::factory()->for(Post::factory()->create())->count(25)->create();
 
     $fields  = ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []];
     $options = [
@@ -109,7 +109,7 @@ test('it paginates likes of a nested relation and returns correct counts', funct
 });
 
 test('it orders comments and nested likes in descending order', function () {
-    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(5)->create();
+    $comment = Comment::factory()->for(Post::factory()->create())->count(5)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],
         ['like' => 2],
