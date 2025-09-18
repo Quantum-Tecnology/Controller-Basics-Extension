@@ -170,4 +170,30 @@ describe('Testing together some certain methods', function () {
             ],
         ]);
     });
+
+    it('extractFilters handles null and not-null operations', function () {
+        $method = $this->refClass->getMethod('extractFilters');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->instance, new Post(), [
+            'filter(id,null)'     => null,
+            'filter(id,not-null)' => null,
+            'filter(title)'       => null,
+        ]);
+
+        expect($result)->toEqual([
+            Post::class => [
+                'id' => [
+                    [
+                        'operation' => 'null',
+                        'value'     => null,
+                    ],
+                    [
+                        'operation' => 'not-null',
+                        'value'     => null,
+                    ],
+                ],
+            ],
+        ]);
+    });
 });
