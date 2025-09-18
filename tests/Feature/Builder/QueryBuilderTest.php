@@ -200,7 +200,6 @@ test('it filters comments and nested likes by id using custom filter options', f
         ->and($comments->count())->toBe(1)
         ->and($comments->get(0)->likes_count)->toBe(2)
         ->and($comments->get(0)->likes->count())->toBe(2);
-
 });
 
 describe('Testing together some certain methods', function () {
