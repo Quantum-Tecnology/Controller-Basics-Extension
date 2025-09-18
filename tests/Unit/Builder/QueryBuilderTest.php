@@ -83,13 +83,13 @@ describe('Testing together some certain methods', function () {
                 'id' => [
                     [
                         'operation' => '=',
-                        'value'     => 1,
+                        'value'     => collect([1]),
                     ],
                 ],
                 'body' => [
                     [
                         'operation' => '=',
-                        'value'     => '2',
+                        'value'     => collect(['2']),
                     ],
                 ],
             ],
@@ -97,23 +97,23 @@ describe('Testing together some certain methods', function () {
                 'id' => [
                     [
                         'operation' => '=',
-                        'value'     => 3,
+                        'value'     => collect([3]),
                     ],
                     [
                         'operation' => '>=',
-                        'value'     => 2,
+                        'value'     => collect([2]),
                     ],
                 ],
                 'body' => [
                     [
                         'operation' => '=',
-                        'value'     => '4',
+                        'value'     => collect(['4']),
                     ],
                 ],
                 'title' => [
                     [
                         'operation' => '~',
-                        'value'     => 'testing',
+                        'value'     => collect(['testing']),
                     ],
                 ],
             ],
@@ -121,7 +121,7 @@ describe('Testing together some certain methods', function () {
                 'id' => [
                     [
                         'operation' => '=',
-                        'value'     => 10,
+                        'value'     => collect([10]),
                     ],
                 ],
             ],
@@ -142,7 +142,7 @@ describe('Testing together some certain methods', function () {
                 'byId' => [
                     [
                         'operation' => 'by',
-                        'value'     => 1,
+                        'value'     => collect([1]),
                     ],
                 ],
             ],
@@ -150,7 +150,7 @@ describe('Testing together some certain methods', function () {
                 'byId' => [
                     [
                         'operation' => 'by',
-                        'value'     => 2,
+                        'value'     => collect([2]),
                     ],
                 ],
             ],
