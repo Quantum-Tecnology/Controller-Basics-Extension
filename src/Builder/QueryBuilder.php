@@ -47,9 +47,81 @@ class QueryBuilder
         return $query;
     }
 
-    protected function extractFilters(Model $model, array $data): array
+    protected function extractFilters(array $data, Model $model, string $prefixKey = 'filter'): array
     {
-        return [];
+        $filters = [];
+
+        foreach ($data as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            // Match patterns like:
+            // - filter(field)
+            // - filter(field,op)
+            // - filter_comments(field)
+            // - filter_comments(field,op)
+            // - filter_comments_likes(field,op)
+            if (!str_starts_with($key, 'filter')) {
+                continue;
+            }
+
+            // Extract suffix after 'filter' and the inner content between parentheses
+            $openParenPos  = mb_strpos($key, '(');
+            $closeParenPos = mb_strrpos($key, ')');
+
+            if (false === $openParenPos || false === $closeParenPos || $closeParenPos < $openParenPos) {
+                continue;
+            }
+
+            $prefix = mb_substr($key, 0, $openParenPos); // e.g., 'filter' or 'filter_comments'
+            $inside = mb_substr($key, $openParenPos + 1, $closeParenPos - $openParenPos - 1); // e.g., 'id' or 'title,~'
+
+            // Determine relation group: root model or relation path indicated by underscores
+            $group = null;
+
+            if ('filter' === $prefix) {
+                $group = get_class($model);
+            } else {
+                // remove leading 'filter_'
+                $group = mb_substr($prefix, mb_strlen('filter_'));
+
+                if (false === $group || '' === $group) {
+                    $group = get_class($model);
+                }
+            }
+
+            // Parse field and optional operation split by the last comma to allow field names with commas (unlikely)
+            $field     = $inside;
+            $operation = '=';
+
+            if (str_contains($inside, ',')) {
+                [$field, $op] = array_pad(explode(',', $inside, 2), 2, null);
+                $field        = mb_trim((string) $field);
+                $operation    = mb_trim((string) ($op ?? '='));
+
+                if ('' === $operation) {
+                    $operation = '=';
+                }
+            } else {
+                $field = mb_trim($field);
+            }
+
+            if ('' === $field) {
+                continue;
+            }
+
+            // Initialize structures
+            $filters[$group] ??= [];
+            $filters[$group][$field] ??= [];
+
+            $filters[$group][$field][] = [
+                'operation' => $operation,
+                'value'     => $value,
+            ];
+        }
+
+        return $filters;
     }
 
     private function generateIncludes(Model $model, $fields, array $pagination = [], array $order = []): array
