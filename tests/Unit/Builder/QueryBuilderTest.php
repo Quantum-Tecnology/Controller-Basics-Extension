@@ -80,7 +80,7 @@ describe('Testing together some certain methods', function () {
 
         $result = $method->invoke($this->instance, $this->dataOptions, new Post(), 'filter');
 
-        expect($result)->toBe([
+        expect($result)->toEqual([
             Post::class => [
                 'id' => [
                     [
@@ -151,7 +151,7 @@ describe('Testing together some certain methods', function () {
             'filter_comments(byId)' => 2,
         ], new Post(), 'filter');
 
-        expect($result)->toBe([
+        expect($result)->toEqual([
             Post::class => [
                 'byId' => [
                     [

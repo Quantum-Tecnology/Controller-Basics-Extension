@@ -119,9 +119,18 @@ class QueryBuilder
             $filters[$group] ??= [];
             $filters[$group][$field] ??= [];
 
+            // Normalize value into a Laravel collection. If it's a pipe-separated
+            // string (e.g., "1|2|3"), split into an array of strings; otherwise,
+            // wrap the single value preserving its original type.
+            if (is_string($value) && str_contains($value, '|')) {
+                $normalized = explode('|', $value);
+            } else {
+                $normalized = [$value];
+            }
+
             $filters[$group][$field][] = [
                 'operation' => $operation,
-                'value'     => $value,
+                'value'     => collect($normalized),
             ];
         }
 
