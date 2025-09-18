@@ -5,7 +5,7 @@ declare(strict_types = 1);
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->builder = new QueryBuilder();
 
     $this->refClass = new ReflectionClass(QueryBuilder::class);
@@ -37,7 +37,7 @@ beforeEach(function () {
     ];
 });
 
-it('extractOptions returns correct nested options array', function () {
+it('extractOptions returns correct nested options array', function (): void {
     $method = $this->refClass->getMethod('extractOptions');
 
     $result = $method->invoke($this->instance, $this->dataOptions, 'page_offset', 'page_limit');
@@ -54,7 +54,7 @@ it('extractOptions returns correct nested options array', function () {
     ]);
 });
 
-it('extractOptions returns correct nested order options array', function () {
+it('extractOptions returns correct nested order options array', function (): void {
     $method = $this->refClass->getMethod('extractOptions');
 
     $result = $method->invoke($this->instance, $this->dataOptions, 'order_column', 'order_direction');
@@ -71,7 +71,7 @@ it('extractOptions returns correct nested order options array', function () {
     ]);
 });
 
-it('extractFilters returns correct nested filters array', function () {
+it('extractFilters returns correct nested filters array', function (): void {
     $method = $this->refClass->getMethod('extractFilters');
 
     $result = $method->invoke($this->instance, new Post(), $this->dataOptions);
@@ -138,7 +138,7 @@ it('extractFilters returns correct nested filters array', function () {
     ]);
 });
 
-it('extractFilters handles field names with "by" prefix as operation', function () {
+it('extractFilters handles field names with "by" prefix as operation', function (): void {
     $method = $this->refClass->getMethod('extractFilters');
 
     $result = $method->invoke($this->instance, new Post(), [
@@ -166,7 +166,7 @@ it('extractFilters handles field names with "by" prefix as operation', function 
     ]);
 });
 
-it('parses nested and flat field strings with spaces and braces', function () {
+it('parses nested and flat field strings with spaces and braces', function (): void {
     $method = $this->refClass->getMethod('normalizeFieldsFromArray');
 
     $result = $method->invoke($this->instance, 'id comments { likes { comment } author { id }');
@@ -178,7 +178,7 @@ it('parses nested and flat field strings with spaces and braces', function () {
     expect($result)->toEqual(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => ['id'], 'tags']);
 });
 
-it('parses simple flat field string', function () {
+it('parses simple flat field string', function (): void {
     $method = $this->refClass->getMethod('normalizeFieldsFromArray');
 
     $result = $method->invoke($this->instance, 'id comments');
@@ -186,7 +186,7 @@ it('parses simple flat field string', function () {
     expect($result)->toEqual(['id', 'comments']);
 });
 
-it('extractFilters handles null and not-null operations', function () {
+it('extractFilters handles null and not-null operations', function (): void {
     $method = $this->refClass->getMethod('extractFilters');
 
     $result = $method->invoke($this->instance, new Post(), [

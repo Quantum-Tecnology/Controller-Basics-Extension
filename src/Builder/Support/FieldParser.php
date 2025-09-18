@@ -20,7 +20,7 @@ final class FieldParser
         $path = [];
 
         // Helper to get a reference to the current context by path
-        $ctx = function &() use (&$root, &$path) {
+        $ctx = function &() use (&$root, &$path): array {
             $ref = &$root;
 
             foreach ($path as $seg) {
@@ -36,9 +36,9 @@ final class FieldParser
         $i = 0;
         $n = count($tokens);
 
-        $pushCurrent = function (&$current, array $path, $name) {
+        $pushCurrent = function (array &$current, array $path, $name): void {
             // At nested level (i.e., path not empty), treat non-id as relation with empty array
-            if (!empty($path) && 'id' !== $name) {
+            if ([] !== $path && 'id' !== $name) {
                 $current[$name] = [];
             } else {
                 $current[] = $name;
@@ -77,7 +77,7 @@ final class FieldParser
 
             if ('}' === $tok) {
                 // Pop one level if possible
-                if (!empty($path)) {
+                if ([] !== $path) {
                     array_pop($path);
                     $current = &$ctx();
                     // If we're now exactly one level deep, allow unwinding to root on next identifier
@@ -93,7 +93,7 @@ final class FieldParser
             $next = $tokens[$i + 1] ?? null;
 
             // If we've just closed a child under a parent, treat the next item as root-level
-            if (!empty($path) && $canUnwindToRoot) {
+            if ([] !== $path && $canUnwindToRoot) {
                 $path            = [];
                 $current         = &$ctx();
                 $canUnwindToRoot = false;

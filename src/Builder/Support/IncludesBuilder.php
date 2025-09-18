@@ -31,7 +31,7 @@ final class IncludesBuilder
 
         $paths = $hasNested
             ? RelationUtils::nestedDotPaths((array) $fields)
-            : array_values(array_filter((array) $fields, fn ($v) => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
+            : array_values(array_filter((array) $fields, fn ($v): bool => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
 
         $result    = [];
         $countable = [];
@@ -49,12 +49,12 @@ final class IncludesBuilder
 
         // Apply filters to root-level counts if provided
         foreach ($countable as $cPath) {
-            if (!str_contains($cPath, '.')) {
+            if (!str_contains((string) $cPath, '.')) {
                 $cKey          = str($cPath)->replace('.', '_')->toString();
                 $filterInclude = data_get($filters, $cKey, []);
 
                 if (!empty($filterInclude)) {
-                    $withCount[$cPath] = function ($q) use ($filterInclude) {
+                    $withCount[$cPath] = function ($q) use ($filterInclude): void {
                         self::applyFilters($q, $filterInclude);
                     };
                 }
@@ -69,7 +69,7 @@ final class IncludesBuilder
             }
 
             if ($relation instanceof BelongsTo) {
-                $pathDepth = mb_substr_count($path, '.');
+                $pathDepth = mb_substr_count((string) $path, '.');
 
                 if (0 === $pathDepth) {
                     // Determine if this root-level BelongsTo has immediate child countable relations
@@ -77,7 +77,7 @@ final class IncludesBuilder
                     $prefix            = $path . '.';
 
                     foreach ($countable as $c) {
-                        if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
+                        if (str_starts_with((string) $c, $prefix) && 1 === mb_substr_count((string) $c, '.')) {
                             $hasImmediateChild = true;
 
                             break;
@@ -86,22 +86,22 @@ final class IncludesBuilder
 
                     if ($hasImmediateChild) {
                         // Wrap with closure only when there are immediate countable children
-                        $result[$path] = function ($query) use ($path, $countable, $filters) {
+                        $result[$path] = function ($query) use ($path, $countable, $filters): void {
                             $pathUnderline = str($path)->replace('.', '_')->toString();
 
                             $childrenCounts = [];
                             $prefix         = $path . '.';
-                            $pathDepth      = mb_substr_count($path, '.');
+                            $pathDepth      = mb_substr_count((string) $path, '.');
 
                             foreach ($countable as $c) {
-                                if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
-                                    $child = mb_substr($c, mb_strlen($prefix));
+                                if (str_starts_with((string) $c, $prefix) && mb_substr_count((string) $c, '.') === $pathDepth + 1) {
+                                    $child = mb_substr((string) $c, mb_strlen($prefix));
 
                                     $childKey     = str($pathUnderline . '_' . str_replace('.', '_', $child))->toString();
                                     $childFilters = data_get($filters, $childKey, []);
 
                                     if (!empty($childFilters)) {
-                                        $childrenCounts[$child] = function ($q) use ($childFilters) {
+                                        $childrenCounts[$child] = function ($q) use ($childFilters): void {
                                             IncludesBuilder::applyFilters($q, $childFilters);
                                         };
                                     } else {
@@ -110,7 +110,7 @@ final class IncludesBuilder
                                 }
                             }
 
-                            if (!empty($childrenCounts)) {
+                            if ([] !== $childrenCounts) {
                                 $query->withCount($childrenCounts);
                             }
                         };
@@ -121,7 +121,7 @@ final class IncludesBuilder
                     $result[] = $path; // deeper BelongsTo
                 }
             } else {
-                $result[$path] = function ($query) use ($path, $countable, $filters, $order, $pagination) {
+                $result[$path] = function ($query) use ($path, $countable, $filters, $order, $pagination): void {
                     $pathUnderline = str($path)->replace('.', '_')->toString();
 
                     $paginateInclude = data_get($pagination, $pathUnderline, [
@@ -142,22 +142,22 @@ final class IncludesBuilder
                     if ($orderInclude['order_column'] ?? null) {
                         $query->orderBy(
                             $orderInclude['order_column'],
-                            when('desc' === $orderInclude['order_direction'], fn () => 'desc', fn () => 'asc')
+                            when('desc' === $orderInclude['order_direction'], fn (): string => 'desc', fn (): string => 'asc')
                         );
                     }
 
                     $childrenCounts = [];
                     $prefix         = $path . '.';
-                    $pathDepth      = mb_substr_count($path, '.');
+                    $pathDepth      = mb_substr_count((string) $path, '.');
 
                     foreach ($countable as $c) {
-                        if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
-                            $child        = mb_substr($c, mb_strlen($prefix));
+                        if (str_starts_with((string) $c, $prefix) && mb_substr_count((string) $c, '.') === $pathDepth + 1) {
+                            $child        = mb_substr((string) $c, mb_strlen($prefix));
                             $childKey     = str($pathUnderline . '_' . str_replace('.', '_', $child))->toString();
                             $childFilters = data_get($filters, $childKey, []);
 
                             if (!empty($childFilters)) {
-                                $childrenCounts[$child] = function ($q) use ($childFilters) {
+                                $childrenCounts[$child] = function ($q) use ($childFilters): void {
                                     IncludesBuilder::applyFilters($q, $childFilters);
                                 };
                             } else {
@@ -166,7 +166,7 @@ final class IncludesBuilder
                         }
                     }
 
-                    if (!empty($childrenCounts)) {
+                    if ([] !== $childrenCounts) {
                         $query->withCount($childrenCounts);
                     }
                 };
@@ -179,7 +179,7 @@ final class IncludesBuilder
     private static function applyFilters($query, array $filters = [])
     {
         foreach ($filters as $field => $items) {
-            $query = $query->where(function ($query) use ($field, $items) {
+            $query = $query->where(function ($query) use ($field, $items): void {
                 foreach ($items as $item) {
                     $op     = $item['operation'] ?? '=';
                     $values = $item['value'] ?? null;

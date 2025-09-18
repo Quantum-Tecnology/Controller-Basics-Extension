@@ -24,7 +24,15 @@ final class FilterParser
             $openParenPos  = mb_strpos($key, '(');
             $closeParenPos = mb_strrpos($key, ')');
 
-            if (false === $openParenPos || false === $closeParenPos || $closeParenPos < $openParenPos) {
+            if (false === $openParenPos) {
+                continue;
+            }
+
+            if (false === $closeParenPos) {
+                continue;
+            }
+
+            if ($closeParenPos < $openParenPos) {
                 continue;
             }
 
@@ -32,13 +40,13 @@ final class FilterParser
             $inside = mb_substr($key, $openParenPos + 1, $closeParenPos - $openParenPos - 1);
 
             if ($prefix === $prefixKey) {
-                $group = get_class($model);
+                $group = $model::class;
             } else {
                 $expected = $prefixKey . '_';
                 $group    = str_starts_with($prefix, $expected) ? mb_substr($prefix, mb_strlen($expected)) : '';
 
                 if ('' === $group) {
-                    $group = get_class($model);
+                    $group = $model::class;
                 }
             }
 
@@ -81,11 +89,7 @@ final class FilterParser
                 continue;
             }
 
-            if (is_string($value) && str_contains($value, '|')) {
-                $normalized = explode('|', $value);
-            } else {
-                $normalized = [$value];
-            }
+            $normalized = is_string($value) && str_contains($value, '|') ? explode('|', $value) : [$value];
 
             $filters[$group][$field][] = [
                 'operation' => $operation,

@@ -16,6 +16,19 @@ class QueryBuilder
 {
     protected array $withCount = [];
 
+    /**
+     * Backward-compatibility wrapper kept for tests and external callers.
+     * Accepts either a GraphQL-like string or the already-normalized array.
+     */
+    public function normalizeFieldsFromArray(string | array $fields): array
+    {
+        if (is_string($fields)) {
+            return FieldParser::normalize($fields);
+        }
+
+        return $fields;
+    }
+
     public function execute(Model $model, string | array $fields = [], array $options = []): EloquentBuilder
     {
         $query = $model->query();
@@ -25,7 +38,7 @@ class QueryBuilder
         }
 
         // Collect root-level scalar fields requested
-        $fieldSelected = array_filter($fields, fn ($item) => !is_array($item));
+        $fieldSelected = array_filter($fields, fn ($item): bool => !is_array($item));
 
         // Remove any relation names that might appear as scalars
         foreach ($fieldSelected as $key => $value) {
@@ -41,21 +54,19 @@ class QueryBuilder
         $includes   = IncludesBuilder::build($model, $fields, $filters, $pagination, $order, $this->withCount);
 
         // If there are BelongsTo includes, make sure to select their foreign keys on the parent
-        if (!empty($includes)) {
-            foreach ($includes as $key => $val) {
-                $path = is_int($key) ? $val : $key;
+        foreach ($includes as $key => $val) {
+            $path = is_int($key) ? $val : $key;
 
-                if (!is_string($path)) {
-                    continue;
-                }
-                $relation = RelationUtils::resolveLastRelation($model, $path);
+            if (!is_string($path)) {
+                continue;
+            }
+            $relation = RelationUtils::resolveLastRelation($model, $path);
 
-                if ($relation instanceof BelongsTo) {
-                    $fk = $relation->getForeignKeyName();
+            if ($relation instanceof BelongsTo) {
+                $fk = $relation->getForeignKeyName();
 
-                    if (!in_array($fk, $fieldSelected, true)) {
-                        $fieldSelected[] = $fk;
-                    }
+                if (!in_array($fk, $fieldSelected, true)) {
+                    $fieldSelected[] = $fk;
                 }
             }
         }
@@ -69,7 +80,7 @@ class QueryBuilder
             $query->with($includes);
         }
 
-        if (!empty($this->withCount)) {
+        if ([] !== $this->withCount) {
             // Only pass root-level counts to the query, preserving closures; nested counts are handled within relation closures
             $counts = [];
 
@@ -83,7 +94,7 @@ class QueryBuilder
                 }
             }
 
-            if (!empty($counts)) {
+            if ([] !== $counts) {
                 $query->withCount($counts);
             }
         }
@@ -96,31 +107,20 @@ class QueryBuilder
         return FilterParser::extract($model, $data, $prefixKey);
     }
 
-    private function generateIncludes(Model $model, $fields, array $filters = [], array $pagination = [], array $order = []): array
+    /**
+     * Backward-compatibility wrapper for generating includes and withCount.
+     * Delegates to IncludesBuilder while updating $this->withCount by reference.
+     */
+    private function generateIncludes(Model $model, array | string $fields, array $filters = [], array $pagination = [], array $order = []): array
     {
         return IncludesBuilder::build($model, $fields, $filters, $pagination, $order, $this->withCount);
     }
 
-    private function nestedDotPaths(array $fields, string $prefix = ''): array
-    {
-        return RelationUtils::nestedDotPaths($fields, $prefix);
-    }
-
-    private function resolveLastRelation(Model $model, string $path)
-    {
-        return RelationUtils::resolveLastRelation($model, $path);
-    }
-
-    private function normalizeFieldsFromArray(string $fields): array
-    {
-        return FieldParser::normalize($fields);
-    }
-
-    private function extractOptions(array $options, ...$items): array
+    private function extractOptions(array $options, string ...$items): array
     {
         $result = [];
 
-        if (empty($items)) {
+        if ([] === $items) {
             return $result;
         }
 
@@ -130,7 +130,7 @@ class QueryBuilder
             }
 
             foreach ($items as $item) {
-                $prefix = mb_rtrim((string) $item, '_') . '_';
+                $prefix = mb_rtrim($item, '_') . '_';
 
                 if (str_starts_with($key, $prefix)) {
                     $group = mb_substr($key, mb_strlen($prefix));

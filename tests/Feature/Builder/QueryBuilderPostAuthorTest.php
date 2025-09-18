@@ -8,7 +8,7 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
 beforeEach(fn () => $this->builder = app(QueryBuilder::class));
 
-test('it returns post with author', function () {
+test('it returns post with author', function (): void {
     $author = Author::factory()->create();
     Post::factory()->for($author)->create();
 
@@ -17,7 +17,7 @@ test('it returns post with author', function () {
     expect($response->author)->name->toBe($author->name);
 });
 
-test('it returns posts with author and posts count', function () {
+test('it returns posts with author and posts count', function (): void {
     $author = Author::factory()->create();
     Post::factory(3)->for($author)->create();
 
