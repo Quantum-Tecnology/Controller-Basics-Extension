@@ -108,6 +108,79 @@ test('it paginates likes of a nested relation and returns correct counts', funct
         ->and($comment->likes->get(1))->id->toBe(4);
 });
 
+test('it orders comments and nested likes in descending order', function () {
+    $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(5)->create();
+    $comment->first()->likes()->createMany([
+        ['like' => 1],
+        ['like' => 2],
+        ['like' => 1],
+        ['like' => 5],
+    ]);
+
+    /** @var Post $post */
+    $post = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []], [
+        'order_column_comments'          => 'id',
+        'order_direction_comments'       => 'desc',
+        'order_column_comments_likes'    => 'id',
+        'order_direction_comments_likes' => 'desc',
+    ])->sole();
+
+    $comments = $post->comments;
+    $likes    = $post->comments->get(4)->likes;
+
+    expect($comments->get(4))->id->toBe(1)
+        ->and($comments->get(0))->id->toBe(5)
+        ->and($likes->get(3))->id->toBe(1)
+        ->and($likes->get(0))->id->toBe(4);
+});
+
+test('it orders comments by body in ascending and descending order', function () {
+    $post = Post::factory()->create();
+
+    Comment::factory()->for($post)->create(['body' => 'b']);
+    Comment::factory()->for($post)->create(['body' => 'a']);
+
+    /** @var Post $post */
+    $post = $this->builder->execute(new Post(), ['id', 'comments'], [
+        'order_column_comments'    => 'body',
+        'order_direction_comments' => 'asc',
+    ])->sole();
+
+    $comments = $post->comments;
+
+    expect($comments->get(0))->body->toBe('a')
+        ->and($comments->get(1))->body->toBe('b');
+
+    /** @var Post $post */
+    $post = $this->builder->execute(new Post(), ['id', 'comments'], [
+        'order_column_comments'    => 'body',
+        'order_direction_comments' => 'desc',
+    ])->sole();
+
+    $comments = $post->comments;
+
+    expect($comments->get(0))->body->toBe('b')
+        ->and($comments->get(1))->body->toBe('a');
+});
+
+test('it loads nested comments and likes with correct counts', function () {
+    Comment::factory()->hasLikes(10)->create();
+
+    /** @var Post $response */
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
+        'order_column_comments'          => 'id',
+        'order_direction_comments'       => 'desc',
+        'order_column_comments_likes'    => 'id',
+        'order_direction_comments_likes' => 'desc',
+    ])->sole();
+
+    $likes = $response->comments->get(0);
+
+    expect($likes->likes_count)->toBe(10)
+        ->and($likes->likes->get(0))->id->toBe(10)
+        ->and($likes->likes->get(9))->id->toBe(1);
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
@@ -127,7 +200,7 @@ describe('Testing together some certain methods', function () {
             'comments.likes',
             'comments.likes.comment',
             'comments.likes.comment.likes',
-        ], []);
+        ]);
 
         expect($result[0])->toBe('author')
             ->and($result[1])->toBe('comments.likes.comment')

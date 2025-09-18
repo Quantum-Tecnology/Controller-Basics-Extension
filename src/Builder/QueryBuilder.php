@@ -29,7 +29,8 @@ class QueryBuilder
         }
 
         $pagination = $this->extractOptions($options, 'page_offset', 'page_limit');
-        $includes   = $this->generateIncludes($model, $fields, $pagination);
+        $order      = $this->extractOptions($options, 'order_column', 'order_direction');
+        $includes   = $this->generateIncludes($model, $fields, $pagination, $order);
 
         if (filled($includes)) {
             $query->with($includes);
@@ -46,7 +47,7 @@ class QueryBuilder
         return $query;
     }
 
-    private function generateIncludes(Model $model, $fields, array $pagination): array
+    private function generateIncludes(Model $model, $fields, array $pagination = [], array $order = []): array
     {
         $hasNested = false;
 
@@ -81,7 +82,7 @@ class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) use ($path, $countable, $pagination) {
+                $result[$path] = function ($query) use ($path, $countable, $order, $pagination) {
                     $pathUnderline = str($path)->replace('.', '_')->toString();
 
                     $paginateInclude = data_get($pagination, $pathUnderline, [
@@ -91,10 +92,15 @@ class QueryBuilder
 
                     $query->limit($paginateInclude['page_limit'])->offset($paginateInclude['page_offset']);
 
-                    $orderInclude = data_get([], $pathUnderline, []);
+                    $orderInclude = data_get($order, $pathUnderline, [
+                        'order_direction' => 'asc',
+                    ]);
 
-                    if ($orderInclude['column'] ?? null) {
-                        $query->orderBy($orderInclude['column'], $orderInclude['direction']);
+                    if ($orderInclude['order_column'] ?? null) {
+                        $query->orderBy(
+                            $orderInclude['order_column'],
+                            when('desc' === $orderInclude['order_direction'], fn () => 'desc', fn () => 'asc')
+                        );
                     }
 
                     $childrenCounts = [];
