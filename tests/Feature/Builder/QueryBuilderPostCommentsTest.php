@@ -201,6 +201,24 @@ test('it filters comments and nested likes by id using custom filter options', f
         ->and($comments->get(0)->likes->count())->toBe(2);
 });
 
+test('a', function (): void {
+    $post = Post::factory()->create();
+    Comment::factory(2)->for($post)->hasLikes(5)->create();
+    Comment::factory(2)->for($post)->create();
+
+    /** @var Post $response */
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
+        'filter_comments(id)' => '1|3',
+    ])->sole();
+
+    $comments = $response->comments;
+
+    expect($response)->comments_count->toBe(2)
+        ->and($comments->count())->toBe(2)
+        ->and($comments->get(0))->id->toBe(1)
+        ->and($comments->get(1))->id->toBe(3);
+});
+
 describe('Testing together some certain methods', function (): void {
     it('generateIncludes returns correct includes and closures for nested relations', function (): void {
         $result = IncludesBuilder::build(new Post(), [

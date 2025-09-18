@@ -184,8 +184,15 @@ final class IncludesBuilder
                     $op     = $item['operation'] ?? '=';
                     $values = $item['value'] ?? null;
 
-                    $val   = $values[0] ?? null;
-                    $query = $query->where($field, $op, $val);
+                    if (in_array($op, ['=', '=='])) {
+                        $query = $query->whereIn($field, $values);
+
+                        continue;
+                    }
+
+                    foreach ($values as $v) {
+                        $query = $query->where($field, $op, $v);
+                    }
                 }
             });
         }
