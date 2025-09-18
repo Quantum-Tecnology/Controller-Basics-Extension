@@ -27,12 +27,14 @@ describe('Testing together some certain methods', function () {
             'order_column_comments_likes'    => 'name',
             'order_direction_comments_likes' => 'desc',
             'filter(id)'                     => 1,
+            'filter(title)'                  => '1|2|3',
             'filter(body)'                   => '2',
             'filter_comments(id)'            => 3,
             'filter_comments(body)'          => '4',
             'filter_comments(title,~)'       => 'testing',
             'filter_comments(id,>=)'         => 2,
             'filter_comments_likes(id)'      => 10,
+            'filter_comments_likes(title)'   => '1|2|3',
         ];
     });
 
@@ -92,6 +94,12 @@ describe('Testing together some certain methods', function () {
                         'value'     => collect(['2']),
                     ],
                 ],
+                'title' => [
+                    [
+                        'operation' => '=',
+                        'value'     => collect(['1', '2', '3']),
+                    ],
+                ],
             ],
             'comments' => [
                 'id' => [
@@ -122,6 +130,12 @@ describe('Testing together some certain methods', function () {
                     [
                         'operation' => '=',
                         'value'     => collect([10]),
+                    ],
+                ],
+                'title' => [
+                    [
+                        'operation' => '=',
+                        'value'     => collect(['1', '2', '3']),
                     ],
                 ],
             ],
