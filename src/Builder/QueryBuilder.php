@@ -349,108 +349,15 @@ class QueryBuilder
     private function filters($query, array $filters = [])
     {
         foreach ($filters as $field => $items) {
-            foreach ($items as $item) {
-                $op     = $item['operation'] ?? '=';
-                $values = $item['value'] ?? null;
+            $query = $query->where(function ($query) use ($field, $items) {
+                foreach ($items as $item) {
+                    $op     = $item['operation'] ?? '=';
+                    $values = $item['value'] ?? null;
 
-                // Special 'by' operation: filter by model key if named like 'byId' or 'by'
-                if ('by' === mb_strtolower($op)) {
-                    // Accept either field as the actual field or use whereKey when field is 'id'/'key'
-                    $val = $values[0] ?? null;
-
-                    if (in_array(mb_strtolower($field), ['id', 'key', 'pk'], true)) {
-                        $query = $query->whereKey($val);
-                    }
-
-                    continue;
-                }
-
-                // Normalize to array of scalar values
-                if ($values instanceof \Illuminate\Support\Collection) {
-                    $values = $values->all();
-                }
-
-                if (!is_array($values)) {
-                    $values = [$values];
-                }
-
-                // Remove nulls only when operator is an inequality; let '=' handle null via whereNull
-                $nonNull = array_values(array_filter($values, fn ($v) => !is_null($v)));
-
-                // Handle special like operators
-                if ('~' === $op || 'like' === mb_strtolower($op)) {
-                    $pattern = (string) ($values[0] ?? '');
-                    $query   = $query->whereLike($field, "%{$pattern}%");
-
-                    continue;
-                }
-
-                if ('!~' === $op || 'not like' === mb_strtolower($op)) {
-                    $pattern = (string) ($values[0] ?? '');
-                    $query   = $query->whereNotLike($field, "%{$pattern}%");
-
-                    continue;
-                }
-
-                // Handle inclusion operators
-                if ('in' === mb_strtolower($op)) {
-                    $query = $query->whereIn($field, $nonNull);
-
-                    continue;
-                }
-
-                if ('not in' === mb_strtolower($op) || 'nin' === mb_strtolower($op)) {
-                    $query = $query->whereNotIn($field, $nonNull);
-
-                    continue;
-                }
-
-                // If multiple values for equality/inequality, use whereIn/whereNotIn
-                if (in_array($op, ['=', '=='], true)) {
-                    if (count($values) > 1) {
-                        $query = $query->whereIn($field, $nonNull);
-                    } else {
-                        $val = $values[0] ?? null;
-
-                        if (is_null($val)) {
-                            $query = $query->whereNull($field);
-                        } else {
-                            $query = $query->where($field, '=', $val);
-                        }
-                    }
-
-                    continue;
-                }
-
-                if (in_array($op, ['!=', '<>', '!=='], true)) {
-                    if (count($values) > 1) {
-                        $query = $query->whereNotIn($field, $nonNull);
-                    } else {
-                        $val = $values[0] ?? null;
-
-                        if (is_null($val)) {
-                            $query = $query->whereNotNull($field);
-                        } else {
-                            $query = $query->where($field, '!=', $val);
-                        }
-                    }
-
-                    continue;
-                }
-
-                // Relational operators: use the first value
-                if (in_array($op, ['<', '<=', '>', '>='], true)) {
                     $val   = $values[0] ?? null;
-                    $oper  = $op;
-                    $query = $query->where($field, $oper, $val);
-
-                    continue;
+                    $query = $query->where($field, $op, $val);
                 }
-
-                // Fallback to raw where
-                $val   = $values[0] ?? null;
-                $query = $query->where($field, $op, $val);
-            }
+            });
         }
 
         return $query;
