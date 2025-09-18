@@ -20,22 +20,48 @@ class QueryBuilder
             $fields = $this->normalizeFieldsFromArray($fields);
         }
 
+        // Collect root-level scalar fields requested
         $fieldSelected = array_filter($fields, fn ($item) => !is_array($item));
 
+        // Remove any relation names that might appear as scalars
         foreach ($fieldSelected as $key => $value) {
             if (method_exists($model, $value)) {
                 unset($fieldSelected[$key]);
             }
         }
 
-        if (filled($fieldSelected)) {
-            $query->select($fieldSelected);
-        }
-
+        // Extract include/filters/pagination before finalizing select so we can add FK for BelongsTo
         $pagination = $this->extractOptions($options, 'page_offset', 'page_limit');
         $order      = $this->extractOptions($options, 'order_column', 'order_direction');
         $filters    = $this->extractFilters($model, $options);
         $includes   = $this->generateIncludes($model, $fields, $filters, $pagination, $order);
+
+        // If there are BelongsTo includes, make sure to select their foreign keys on the parent
+        if (!empty($includes)) {
+            foreach ($includes as $key => $val) {
+                // BelongsTo are stored as numeric items (simple string paths)
+                $path = is_int($key) ? $val : $key;
+
+                if (!is_string($path)) {
+                    continue;
+                }
+
+                $relation = $this->resolveLastRelation($model, $path);
+
+                if ($relation instanceof BelongsTo) {
+                    $fk = $relation->getForeignKeyName();
+
+                    if (!in_array($fk, $fieldSelected, true)) {
+                        $fieldSelected[] = $fk;
+                    }
+                }
+            }
+        }
+
+        // Apply select after enriching with any required foreign keys
+        if (filled($fieldSelected)) {
+            $query->select($fieldSelected);
+        }
 
         if (filled($includes)) {
             $query->with($includes);
@@ -214,6 +240,11 @@ class QueryBuilder
 
         foreach ($paths as $path) {
             $relation = $this->resolveLastRelation($model, $path);
+
+            // Skip invalid paths that don't resolve to a relation (e.g., leaf attributes like author.name)
+            if (!$relation) {
+                continue;
+            }
 
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
