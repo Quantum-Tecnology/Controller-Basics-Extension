@@ -47,7 +47,7 @@ class QueryBuilder
         return $query;
     }
 
-    protected function extractFilters(array $data): array
+    protected function extractFilters(Model $model, array $data): array
     {
         return [];
     }

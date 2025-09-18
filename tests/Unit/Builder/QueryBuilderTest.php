@@ -75,7 +75,7 @@ describe('Testing together some certain methods', function () {
         $method = $this->refClass->getMethod('extractFilters');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->instance, $this->dataOptions, 'filter');
+        $result = $method->invoke($this->instance, $this->dataOptions, new Post(), 'filter');
 
         expect($result)->toBe([
             Post::class => [
