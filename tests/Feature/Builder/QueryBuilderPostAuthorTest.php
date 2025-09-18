@@ -16,3 +16,13 @@ test('it returns post with author', function () {
 
     expect($response->author)->name->toBe($author->name);
 });
+
+test('it returns posts with author and posts count', function () {
+    $author = Author::factory()->create();
+    Post::factory(3)->for($author)->create();
+
+    $response = $this->builder->execute(new Post(), 'id author { name posts {id author {name posts {id}}} }')->get();
+
+    expect($response->get(0)->author->posts_count)->toBe(3)
+        ->and($response->get(0)->author->posts->get(0)->author->posts()->get(0))->toBe(3);
+});
