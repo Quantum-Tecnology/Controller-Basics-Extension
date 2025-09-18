@@ -47,6 +47,11 @@ class QueryBuilder
         return $query;
     }
 
+    protected function extractFilters(array $data): array
+    {
+        return [];
+    }
+
     private function generateIncludes(Model $model, $fields, array $pagination = [], array $order = []): array
     {
         $hasNested = false;
