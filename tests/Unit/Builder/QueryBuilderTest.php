@@ -128,7 +128,7 @@ describe('Testing together some certain methods', function () {
         ]);
     });
 
-    it('aaaaaaaaaaaaaa', function () {
+    it('extractFilters handles field names with "by" prefix as operation', function () {
         $method = $this->refClass->getMethod('extractFilters');
         $method->setAccessible(true);
 
