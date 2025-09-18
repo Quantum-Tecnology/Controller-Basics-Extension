@@ -38,10 +38,21 @@ class QueryBuilder
         }
 
         if (!empty($this->withCount)) {
-            $rootCounts = array_values(array_filter(array_keys($this->withCount), fn ($p) => !str_contains($p, '.')));
+            // Only pass root-level counts to the query, preserving closures; nested counts are handled within relation closures
+            $counts = [];
 
-            if (!empty($rootCounts)) {
-                $query->withCount($rootCounts);
+            foreach ($this->withCount as $k => $v) {
+                if (!str_contains($k, '.')) {
+                    if (true === $v) {
+                        $counts[] = $k;
+                    } else {
+                        $counts[$k] = $v; // closure or constraints
+                    }
+                }
+            }
+
+            if (!empty($counts)) {
+                $query->withCount($counts);
             }
         }
 
@@ -165,7 +176,22 @@ class QueryBuilder
             }
         }
 
+        // Prepare withCount for all countable relations (store keys); root-level may get filter closures later
         $this->withCount = array_fill_keys($countable, true);
+
+        // Apply filters to root-level counts if provided
+        foreach ($countable as $cPath) {
+            if (!str_contains($cPath, '.')) {
+                $cKey          = str($cPath)->replace('.', '_')->toString();
+                $filterInclude = data_get($filters, $cKey, []);
+
+                if (!empty($filterInclude)) {
+                    $this->withCount[$cPath] = function ($q) use ($filterInclude) {
+                        $this->filters($q, $filterInclude);
+                    };
+                }
+            }
+        }
 
         foreach ($paths as $path) {
             $relation = $this->resolveLastRelation($model, $path);
@@ -202,7 +228,18 @@ class QueryBuilder
 
                     foreach ($countable as $c) {
                         if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
-                            $childrenCounts[] = mb_substr($c, mb_strlen($prefix));
+                            $child = mb_substr($c, mb_strlen($prefix));
+                            // Determine filters for the child relation count, e.g., comments_likes
+                            $childKey     = str($pathUnderline . '_' . str_replace('.', '_', $child))->toString();
+                            $childFilters = data_get($filters, $childKey, []);
+
+                            if (!empty($childFilters)) {
+                                $childrenCounts[$child] = function ($q) use ($childFilters) {
+                                    $this->filters($q, $childFilters);
+                                };
+                            } else {
+                                $childrenCounts[] = $child;
+                            }
                         }
                     }
 
@@ -296,9 +333,108 @@ class QueryBuilder
 
     private function filters($query, array $filters = [])
     {
-        foreach ($filters as $field => $filter) {
-            foreach ($filter as $item) {
-                $query = $query->where($field, $item['operation'], $item['value']);
+        foreach ($filters as $field => $items) {
+            foreach ($items as $item) {
+                $op     = $item['operation'] ?? '=';
+                $values = $item['value'] ?? null;
+
+                // Special 'by' operation: filter by model key if named like 'byId' or 'by'
+                if ('by' === mb_strtolower($op)) {
+                    // Accept either field as the actual field or use whereKey when field is 'id'/'key'
+                    $val = $values[0] ?? null;
+
+                    if (in_array(mb_strtolower($field), ['id', 'key', 'pk'], true)) {
+                        $query = $query->whereKey($val);
+                    }
+
+                    continue;
+                }
+
+                // Normalize to array of scalar values
+                if ($values instanceof \Illuminate\Support\Collection) {
+                    $values = $values->all();
+                }
+
+                if (!is_array($values)) {
+                    $values = [$values];
+                }
+
+                // Remove nulls only when operator is an inequality; let '=' handle null via whereNull
+                $nonNull = array_values(array_filter($values, fn ($v) => !is_null($v)));
+
+                // Handle special like operators
+                if ('~' === $op || 'like' === mb_strtolower($op)) {
+                    $pattern = (string) ($values[0] ?? '');
+                    $query   = $query->whereLike($field, "%{$pattern}%");
+
+                    continue;
+                }
+
+                if ('!~' === $op || 'not like' === mb_strtolower($op)) {
+                    $pattern = (string) ($values[0] ?? '');
+                    $query   = $query->whereNotLike($field, "%{$pattern}%");
+
+                    continue;
+                }
+
+                // Handle inclusion operators
+                if ('in' === mb_strtolower($op)) {
+                    $query = $query->whereIn($field, $nonNull);
+
+                    continue;
+                }
+
+                if ('not in' === mb_strtolower($op) || 'nin' === mb_strtolower($op)) {
+                    $query = $query->whereNotIn($field, $nonNull);
+
+                    continue;
+                }
+
+                // If multiple values for equality/inequality, use whereIn/whereNotIn
+                if (in_array($op, ['=', '=='], true)) {
+                    if (count($values) > 1) {
+                        $query = $query->whereIn($field, $nonNull);
+                    } else {
+                        $val = $values[0] ?? null;
+
+                        if (is_null($val)) {
+                            $query = $query->whereNull($field);
+                        } else {
+                            $query = $query->where($field, '=', $val);
+                        }
+                    }
+
+                    continue;
+                }
+
+                if (in_array($op, ['!=', '<>', '!=='], true)) {
+                    if (count($values) > 1) {
+                        $query = $query->whereNotIn($field, $nonNull);
+                    } else {
+                        $val = $values[0] ?? null;
+
+                        if (is_null($val)) {
+                            $query = $query->whereNotNull($field);
+                        } else {
+                            $query = $query->where($field, '!=', $val);
+                        }
+                    }
+
+                    continue;
+                }
+
+                // Relational operators: use the first value
+                if (in_array($op, ['<', '<=', '>', '>='], true)) {
+                    $val   = $values[0] ?? null;
+                    $oper  = $op;
+                    $query = $query->where($field, $oper, $val);
+
+                    continue;
+                }
+
+                // Fallback to raw where
+                $val   = $values[0] ?? null;
+                $query = $query->where($field, $op, $val);
             }
         }
 
