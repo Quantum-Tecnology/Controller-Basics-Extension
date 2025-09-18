@@ -78,7 +78,7 @@ describe('Testing together some certain methods', function () {
         $method = $this->refClass->getMethod('extractFilters');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->instance, $this->dataOptions, new Post(), 'filter');
+        $result = $method->invoke($this->instance, new Post(), $this->dataOptions);
 
         expect($result)->toEqual([
             Post::class => [
@@ -146,10 +146,10 @@ describe('Testing together some certain methods', function () {
         $method = $this->refClass->getMethod('extractFilters');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->instance, [
+        $result = $method->invoke($this->instance, new Post(), [
             'filter(byId)'          => 1,
             'filter_comments(byId)' => 2,
-        ], new Post(), 'filter');
+        ]);
 
         expect($result)->toEqual([
             Post::class => [

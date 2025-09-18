@@ -30,7 +30,8 @@ class QueryBuilder
 
         $pagination = $this->extractOptions($options, 'page_offset', 'page_limit');
         $order      = $this->extractOptions($options, 'order_column', 'order_direction');
-        $includes   = $this->generateIncludes($model, $fields, $pagination, $order);
+        $filters    = $this->extractFilters($model, $options);
+        $includes   = $this->generateIncludes($model, $fields, $filters, $pagination, $order);
 
         if (filled($includes)) {
             $query->with($includes);
@@ -47,7 +48,7 @@ class QueryBuilder
         return $query;
     }
 
-    protected function extractFilters(array $data, Model $model, string $prefixKey = 'filter'): array
+    protected function extractFilters(Model $model, array $data, string $prefixKey = 'filter'): array
     {
         $filters = [];
 
@@ -137,7 +138,7 @@ class QueryBuilder
         return $filters;
     }
 
-    private function generateIncludes(Model $model, $fields, array $pagination = [], array $order = []): array
+    private function generateIncludes(Model $model, $fields, array $filters = [], array $pagination = [], array $order = []): array
     {
         $hasNested = false;
 
@@ -172,7 +173,7 @@ class QueryBuilder
             if ($relation instanceof BelongsTo) {
                 $result[] = $path;
             } else {
-                $result[$path] = function ($query) use ($path, $countable, $order, $pagination) {
+                $result[$path] = function ($query) use ($path, $countable, $filters, $order, $pagination) {
                     $pathUnderline = str($path)->replace('.', '_')->toString();
 
                     $paginateInclude = data_get($pagination, $pathUnderline, [
@@ -180,7 +181,9 @@ class QueryBuilder
                         'page_offset' => 0,
                     ]);
 
-                    $query->limit($paginateInclude['page_limit'])->offset($paginateInclude['page_offset']);
+                    $filterInclude = data_get($filters, $pathUnderline, []);
+
+                    $this->filters($query, $filterInclude)->limit($paginateInclude['page_limit'])->offset($paginateInclude['page_offset']);
 
                     $orderInclude = data_get($order, $pathUnderline, [
                         'order_direction' => 'asc',
@@ -289,5 +292,16 @@ class QueryBuilder
         }
 
         return $result;
+    }
+
+    private function filters($query, array $filters = [])
+    {
+        foreach ($filters as $field => $filter) {
+            foreach ($filter as $item) {
+                $query = $query->where($field, $item['operation'], $item['value']);
+            }
+        }
+
+        return $query;
     }
 }

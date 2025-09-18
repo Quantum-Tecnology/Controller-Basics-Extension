@@ -181,6 +181,28 @@ test('it loads nested comments and likes with correct counts', function () {
         ->and($likes->likes->get(9))->id->toBe(1);
 });
 
+test('it filters comments and nested likes by id using custom filter options', function () {
+    $post = Post::factory()->create();
+    Comment::factory()->for($post)->hasLikes(5)->create();
+    Comment::factory()->for($post)->hasLikes(5)->create();
+    Comment::factory()->for($post)->create();
+    Comment::factory()->for($post)->create();
+
+    /** @var Post $response */
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
+        'filter_comments(id,<)'        => 2,
+        'filter_comments_likes(id,<=)' => 2,
+    ])->sole();
+
+    $comments = $response->comments;
+
+    expect($response)->comments_count->toBe(1)
+        ->and($comments->count())->toBe(1)
+        ->and($comments->get(0)->likes_count)->toBe(2)
+        ->and($comments->get(0)->likes->count())->toBe(2);
+
+});
+
 describe('Testing together some certain methods', function () {
     beforeEach(function () {
         $this->refClass = new ReflectionClass(QueryBuilder::class);
