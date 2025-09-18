@@ -247,7 +247,59 @@ class QueryBuilder
             }
 
             if ($relation instanceof BelongsTo) {
-                $result[] = $path;
+                $pathDepth = mb_substr_count($path, '.');
+
+                if (0 === $pathDepth) {
+                    // Determine if this root-level BelongsTo has immediate child countable relations
+                    $hasImmediateChild = false;
+                    $prefix            = $path . '.';
+
+                    foreach ($countable as $c) {
+                        if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
+                            $hasImmediateChild = true;
+
+                            break;
+                        }
+                    }
+
+                    if ($hasImmediateChild) {
+                        // Wrap with closure only when there are immediate countable children
+                        $result[$path] = function ($query) use ($path, $countable, $filters) {
+                            $pathUnderline = str($path)->replace('.', '_')->toString();
+
+                            $childrenCounts = [];
+                            $prefix         = $path . '.';
+                            $pathDepth      = mb_substr_count($path, '.');
+
+                            foreach ($countable as $c) {
+                                if (str_starts_with($c, $prefix) && mb_substr_count($c, '.') === $pathDepth + 1) {
+                                    $child = mb_substr($c, mb_strlen($prefix));
+
+                                    $childKey     = str($pathUnderline . '_' . str_replace('.', '_', $child))->toString();
+                                    $childFilters = data_get($filters, $childKey, []);
+
+                                    if (!empty($childFilters)) {
+                                        $childrenCounts[$child] = function ($q) use ($childFilters) {
+                                            $this->filters($q, $childFilters);
+                                        };
+                                    } else {
+                                        $childrenCounts[] = $child;
+                                    }
+                                }
+                            }
+
+                            if (!empty($childrenCounts)) {
+                                $query->withCount($childrenCounts);
+                            }
+                        };
+                    } else {
+                        // No immediate children to count; include as plain string
+                        $result[] = $path;
+                    }
+                } else {
+                    // Keep deeper BelongsTo includes as plain strings (no closure)
+                    $result[] = $path;
+                }
             } else {
                 $result[$path] = function ($query) use ($path, $countable, $filters, $order, $pagination) {
                     $pathUnderline = str($path)->replace('.', '_')->toString();

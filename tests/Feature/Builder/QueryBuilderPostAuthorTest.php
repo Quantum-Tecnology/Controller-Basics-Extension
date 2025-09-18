@@ -24,5 +24,5 @@ test('it returns posts with author and posts count', function () {
     $response = $this->builder->execute(new Post(), 'id author { name posts {id author {name posts {id}}} }')->get();
 
     expect($response->get(0)->author->posts_count)->toBe(3)
-        ->and($response->get(0)->author->posts->get(0)->author->posts()->get(0))->toBe(3);
+        ->and($response->get(0)->author->posts->get(0)->author->posts->count())->toBe(3);
 });
