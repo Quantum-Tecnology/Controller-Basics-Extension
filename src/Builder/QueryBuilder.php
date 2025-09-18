@@ -56,17 +56,17 @@ class QueryBuilder
                 continue;
             }
 
-            // Match patterns like:
-            // - filter(field)
-            // - filter(field,op)
-            // - filter_comments(field)
-            // - filter_comments(field,op)
-            // - filter_comments_likes(field,op)
-            if (!str_starts_with($key, 'filter')) {
+            // Expected patterns (using custom prefixKey):
+            // - {prefixKey}(field)
+            // - {prefixKey}(field,op)
+            // - {prefixKey}_comments(field)
+            // - {prefixKey}_comments(field,op)
+            // - {prefixKey}_comments_likes(field,op)
+            if (!str_starts_with($key, $prefixKey)) {
                 continue;
             }
 
-            // Extract suffix after 'filter' and the inner content between parentheses
+            // Extract suffix after the prefix and the inner content between parentheses
             $openParenPos  = mb_strpos($key, '(');
             $closeParenPos = mb_strrpos($key, ')');
 
@@ -78,20 +78,19 @@ class QueryBuilder
             $inside = mb_substr($key, $openParenPos + 1, $closeParenPos - $openParenPos - 1); // e.g., 'id' or 'title,~'
 
             // Determine relation group: root model or relation path indicated by underscores
-            $group = null;
-
-            if ('filter' === $prefix) {
+            if ($prefix === $prefixKey) {
                 $group = get_class($model);
             } else {
-                // remove leading 'filter_'
-                $group = mb_substr($prefix, mb_strlen('filter_'));
+                // remove leading '{prefixKey}_'
+                $expected = $prefixKey . '_';
+                $group    = str_starts_with($prefix, $expected) ? mb_substr($prefix, mb_strlen($expected)) : '';
 
-                if (false === $group || '' === $group) {
+                if ('' === $group) {
                     $group = get_class($model);
                 }
             }
 
-            // Parse field and optional operation split by the last comma to allow field names with commas (unlikely)
+            // Parse field and optional operation split by the first comma
             $field     = $inside;
             $operation = '=';
 
@@ -105,6 +104,11 @@ class QueryBuilder
                 }
             } else {
                 $field = mb_trim($field);
+
+                // Special rule: if field starts with 'by' and no explicit operation, use 'by'
+                if (str_starts_with($field, 'by')) {
+                    $operation = 'by';
+                }
             }
 
             if ('' === $field) {
@@ -260,7 +264,7 @@ class QueryBuilder
                 if (str_starts_with($key, $prefix)) {
                     $group = mb_substr($key, mb_strlen($prefix));
 
-                    if (false === $group || '' === $group) {
+                    if ('' === $group) {
                         continue;
                     }
 
