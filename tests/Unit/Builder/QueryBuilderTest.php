@@ -166,7 +166,7 @@ it('extractFilters handles field names with "by" prefix as operation', function 
     ]);
 });
 
-it('a', function () {
+it('parses nested and flat field strings with spaces and braces', function () {
     $method = $this->refClass->getMethod('normalizeFieldsFromArray');
 
     $result = $method->invoke($this->instance, 'id comments { likes { comment } author { id }');
@@ -178,7 +178,7 @@ it('a', function () {
     expect($result)->toEqual(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => ['id'], 'tags']);
 });
 
-it('b', function () {
+it('parses simple flat field string', function () {
     $method = $this->refClass->getMethod('normalizeFieldsFromArray');
 
     $result = $method->invoke($this->instance, 'id comments');

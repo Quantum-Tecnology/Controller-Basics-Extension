@@ -369,6 +369,110 @@ class QueryBuilder
 
     private function normalizeFieldsFromArray(string $fields): array
     {
-        return [];
+        // Tokenize into identifiers and braces, ignore other characters
+        preg_match_all('/[A-Za-z0-9_]+|\{|\}/u', $fields, $matches);
+        $tokens = $matches[0] ?? [];
+
+        // Root accumulator and path-based navigation to avoid reference loss
+        $root = [];
+        $path = [];
+
+        // Helper to get a reference to the current context by path
+        $ctx = function &() use (&$root, &$path) {
+            $ref = &$root;
+
+            foreach ($path as $seg) {
+                $ref = &$ref[$seg];
+            }
+
+            return $ref;
+        };
+
+        // Current context by reference
+        $current = &$ctx();
+
+        $canUnwindToRoot = false; // after closing a child under a parent
+
+        $i = 0;
+        $n = count($tokens);
+
+        $pushCurrent = function (&$current, array $path, $name) {
+            // At nested level (i.e., path not empty), treat non-id as relation with empty array
+            if (!empty($path) && 'id' !== $name) {
+                $current[$name] = [];
+            } else {
+                $current[] = $name;
+            }
+        };
+
+        while ($i < $n) {
+            $tok = $tokens[$i];
+
+            if ('{' === $tok) {
+                // Begin a new nested block on the last added relation
+                $lastKey = null;
+
+                foreach (array_reverse(array_keys($current)) as $k) {
+                    if (!is_int($k) && is_array($current[$k])) {
+                        $lastKey = $k;
+
+                        break;
+                    }
+                }
+
+                if (null === $lastKey) {
+                    ++$i;
+
+                    continue;
+                }
+
+                // Dive into the relation
+                $path[]          = $lastKey;
+                $current         = &$ctx();
+                $canUnwindToRoot = false;
+                ++$i;
+
+                continue;
+            }
+
+            if ('}' === $tok) {
+                // Pop one level if possible
+                if (!empty($path)) {
+                    array_pop($path);
+                    $current = &$ctx();
+                    // If we're now exactly one level deep, allow unwinding to root on next identifier
+                    $canUnwindToRoot = 1 === count($path);
+                }
+                ++$i;
+
+                continue;
+            }
+
+            // Identifier
+            $name = $tok;
+            $next = $tokens[$i + 1] ?? null;
+
+            // If we've just closed a child under a parent, treat the next item as root-level
+            if (!empty($path) && $canUnwindToRoot) {
+                $path            = [];
+                $current         = &$ctx();
+                $canUnwindToRoot = false;
+            }
+
+            if ('{' === $next) {
+                // Prepare a relation key for the upcoming block
+                $current[$name] = [];
+                ++$i;
+
+                continue;
+            }
+
+            // Otherwise, push as scalar or nested relation (heuristic)
+            $pushCurrent($current, $path, $name);
+            $canUnwindToRoot = false;
+            ++$i;
+        }
+
+        return $root;
     }
 }
