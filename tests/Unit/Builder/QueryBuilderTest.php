@@ -5,195 +5,208 @@ declare(strict_types = 1);
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
-beforeEach(fn () => $this->builder = new QueryBuilder());
+beforeEach(function () {
+    $this->builder = new QueryBuilder();
 
-describe('Testing together some certain methods', function () {
-    beforeEach(function () {
-        $this->refClass = new ReflectionClass(QueryBuilder::class);
-        $this->instance = $this->refClass->newInstanceWithoutConstructor();
+    $this->refClass = new ReflectionClass(QueryBuilder::class);
+    $this->instance = $this->refClass->newInstanceWithoutConstructor();
 
-        $this->dataOptions = [
-            'author',
-            'comments',
-            'comments.likes',
-            'comments.likes.comment',
-            'comments.likes.comment.likes',
-            'page_offset_comments'           => 3,
-            'page_limit_comments'            => 25,
-            'page_offset_comments_likes'     => 2,
-            'page_limit_comments_likes'      => 10,
-            'order_column_comments'          => 'id',
-            'order_direction_comments'       => 'asc',
-            'order_column_comments_likes'    => 'name',
-            'order_direction_comments_likes' => 'desc',
-            'filter(id)'                     => 1,
-            'filter(title)'                  => '1|2|3',
-            'filter(body)'                   => '2',
-            'filter_comments(id)'            => 3,
-            'filter_comments(body)'          => '4',
-            'filter_comments(title,~)'       => 'testing',
-            'filter_comments(id,>=)'         => 2,
-            'filter_comments_likes(id)'      => 10,
-            'filter_comments_likes(title)'   => '1|2|3',
-        ];
-    });
+    $this->dataOptions = [
+        'author',
+        'comments',
+        'comments.likes',
+        'comments.likes.comment',
+        'comments.likes.comment.likes',
+        'page_offset_comments'           => 3,
+        'page_limit_comments'            => 25,
+        'page_offset_comments_likes'     => 2,
+        'page_limit_comments_likes'      => 10,
+        'order_column_comments'          => 'id',
+        'order_direction_comments'       => 'asc',
+        'order_column_comments_likes'    => 'name',
+        'order_direction_comments_likes' => 'desc',
+        'filter(id)'                     => 1,
+        'filter(title)'                  => '1|2|3',
+        'filter(body)'                   => '2',
+        'filter_comments(id)'            => 3,
+        'filter_comments(body)'          => '4',
+        'filter_comments(title,~)'       => 'testing',
+        'filter_comments(id,>=)'         => 2,
+        'filter_comments_likes(id)'      => 10,
+        'filter_comments_likes(title)'   => '1|2|3',
+    ];
+});
 
-    it('extractOptions returns correct nested options array', function () {
-        $method = $this->refClass->getMethod('extractOptions');
-        $method->setAccessible(true);
+it('extractOptions returns correct nested options array', function () {
+    $method = $this->refClass->getMethod('extractOptions');
 
-        $result = $method->invoke($this->instance, $this->dataOptions, 'page_offset', 'page_limit');
+    $result = $method->invoke($this->instance, $this->dataOptions, 'page_offset', 'page_limit');
 
-        expect($result)->toBe([
-            'comments' => [
-                'page_limit'  => 25,
-                'page_offset' => 3,
-            ],
-            'comments_likes' => [
-                'page_limit'  => 10,
-                'page_offset' => 2,
-            ],
-        ]);
-    });
+    expect($result)->toBe([
+        'comments' => [
+            'page_limit'  => 25,
+            'page_offset' => 3,
+        ],
+        'comments_likes' => [
+            'page_limit'  => 10,
+            'page_offset' => 2,
+        ],
+    ]);
+});
 
-    it('extractOptions returns correct nested order options array', function () {
-        $method = $this->refClass->getMethod('extractOptions');
-        $method->setAccessible(true);
+it('extractOptions returns correct nested order options array', function () {
+    $method = $this->refClass->getMethod('extractOptions');
 
-        $result = $method->invoke($this->instance, $this->dataOptions, 'order_column', 'order_direction');
+    $result = $method->invoke($this->instance, $this->dataOptions, 'order_column', 'order_direction');
 
-        expect($result)->toBe([
-            'comments' => [
-                'order_column'    => 'id',
-                'order_direction' => 'asc',
-            ],
-            'comments_likes' => [
-                'order_column'    => 'name',
-                'order_direction' => 'desc',
-            ],
-        ]);
-    });
+    expect($result)->toBe([
+        'comments' => [
+            'order_column'    => 'id',
+            'order_direction' => 'asc',
+        ],
+        'comments_likes' => [
+            'order_column'    => 'name',
+            'order_direction' => 'desc',
+        ],
+    ]);
+});
 
-    it('extractFilters returns correct nested filters array', function () {
-        $method = $this->refClass->getMethod('extractFilters');
-        $method->setAccessible(true);
+it('extractFilters returns correct nested filters array', function () {
+    $method = $this->refClass->getMethod('extractFilters');
 
-        $result = $method->invoke($this->instance, new Post(), $this->dataOptions);
+    $result = $method->invoke($this->instance, new Post(), $this->dataOptions);
 
-        expect($result)->toEqual([
-            Post::class => [
-                'id' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect([1]),
-                    ],
-                ],
-                'body' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect(['2']),
-                    ],
-                ],
-                'title' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect(['1', '2', '3']),
-                    ],
+    expect($result)->toEqual([
+        Post::class => [
+            'id' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect([1]),
                 ],
             ],
-            'comments' => [
-                'id' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect([3]),
-                    ],
-                    [
-                        'operation' => '>=',
-                        'value'     => collect([2]),
-                    ],
-                ],
-                'body' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect(['4']),
-                    ],
-                ],
-                'title' => [
-                    [
-                        'operation' => '~',
-                        'value'     => collect(['testing']),
-                    ],
+            'body' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect(['2']),
                 ],
             ],
-            'comments_likes' => [
-                'id' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect([10]),
-                    ],
-                ],
-                'title' => [
-                    [
-                        'operation' => '=',
-                        'value'     => collect(['1', '2', '3']),
-                    ],
+            'title' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect(['1', '2', '3']),
                 ],
             ],
-        ]);
-    });
-
-    it('extractFilters handles field names with "by" prefix as operation', function () {
-        $method = $this->refClass->getMethod('extractFilters');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($this->instance, new Post(), [
-            'filter(byId)'          => 1,
-            'filter_comments(byId)' => 2,
-        ]);
-
-        expect($result)->toEqual([
-            Post::class => [
-                'byId' => [
-                    [
-                        'operation' => 'by',
-                        'value'     => collect([1]),
-                    ],
+        ],
+        'comments' => [
+            'id' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect([3]),
+                ],
+                [
+                    'operation' => '>=',
+                    'value'     => collect([2]),
                 ],
             ],
-            'comments' => [
-                'byId' => [
-                    [
-                        'operation' => 'by',
-                        'value'     => collect([2]),
-                    ],
+            'body' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect(['4']),
                 ],
             ],
-        ]);
-    });
-
-    it('extractFilters handles null and not-null operations', function () {
-        $method = $this->refClass->getMethod('extractFilters');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($this->instance, new Post(), [
-            'filter(id,null)'     => null,
-            'filter(id,not-null)' => null,
-            'filter(title)'       => null,
-        ]);
-
-        expect($result)->toEqual([
-            Post::class => [
-                'id' => [
-                    [
-                        'operation' => 'null',
-                        'value'     => null,
-                    ],
-                    [
-                        'operation' => 'not-null',
-                        'value'     => null,
-                    ],
+            'title' => [
+                [
+                    'operation' => '~',
+                    'value'     => collect(['testing']),
                 ],
             ],
-        ]);
-    });
+        ],
+        'comments_likes' => [
+            'id' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect([10]),
+                ],
+            ],
+            'title' => [
+                [
+                    'operation' => '=',
+                    'value'     => collect(['1', '2', '3']),
+                ],
+            ],
+        ],
+    ]);
+});
+
+it('extractFilters handles field names with "by" prefix as operation', function () {
+    $method = $this->refClass->getMethod('extractFilters');
+
+    $result = $method->invoke($this->instance, new Post(), [
+        'filter(byId)'          => 1,
+        'filter_comments(byId)' => 2,
+    ]);
+
+    expect($result)->toEqual([
+        Post::class => [
+            'byId' => [
+                [
+                    'operation' => 'by',
+                    'value'     => collect([1]),
+                ],
+            ],
+        ],
+        'comments' => [
+            'byId' => [
+                [
+                    'operation' => 'by',
+                    'value'     => collect([2]),
+                ],
+            ],
+        ],
+    ]);
+});
+
+it('a', function () {
+    $method = $this->refClass->getMethod('normalizeFieldsFromArray');
+
+    $result = $method->invoke($this->instance, 'id comments { likes { comment } author { id }');
+
+    expect($result)->toEqual(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => ['id']]);
+
+    $result = $method->invoke($this->instance, 'id comments {likes {comment} author {id} tags');
+
+    expect($result)->toEqual(['id', 'comments' => ['likes' => ['comment' => []]], 'author' => ['id'], 'tags']);
+});
+
+it('b', function () {
+    $method = $this->refClass->getMethod('normalizeFieldsFromArray');
+
+    $result = $method->invoke($this->instance, 'id comments');
+
+    expect($result)->toEqual(['id', 'comments']);
+});
+
+it('extractFilters handles null and not-null operations', function () {
+    $method = $this->refClass->getMethod('extractFilters');
+
+    $result = $method->invoke($this->instance, new Post(), [
+        'filter(id,null)'     => null,
+        'filter(id,not-null)' => null,
+        'filter(title)'       => null,
+    ]);
+
+    expect($result)->toEqual([
+        Post::class => [
+            'id' => [
+                [
+                    'operation' => 'null',
+                    'value'     => null,
+                ],
+                [
+                    'operation' => 'not-null',
+                    'value'     => null,
+                ],
+            ],
+        ],
+    ]);
 });

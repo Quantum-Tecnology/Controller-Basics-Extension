@@ -12,9 +12,13 @@ class QueryBuilder
 {
     protected array $withCount = [];
 
-    public function execute(Model $model, array $fields = [], array $options = []): Builder
+    public function execute(Model $model, string | array $fields = [], array $options = []): Builder
     {
         $query = $model->query();
+
+        if (is_string($fields)) {
+            $fields = $this->normalizeFieldsFromArray($fields);
+        }
 
         $fieldSelected = array_filter($fields, fn ($item) => !is_array($item));
 
@@ -361,5 +365,10 @@ class QueryBuilder
         }
 
         return $query;
+    }
+
+    private function normalizeFieldsFromArray(string $fields): array
+    {
+        return [];
     }
 }
