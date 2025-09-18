@@ -184,10 +184,8 @@ test('it loads nested comments and likes with correct counts', function (): void
 
 test('it filters comments and nested likes by id using custom filter options', function (): void {
     $post = Post::factory()->create();
-    Comment::factory()->for($post)->hasLikes(5)->create();
-    Comment::factory()->for($post)->hasLikes(5)->create();
-    Comment::factory()->for($post)->create();
-    Comment::factory()->for($post)->create();
+    Comment::factory(2)->for($post)->hasLikes(5)->create();
+    Comment::factory(2)->for($post)->create();
 
     /** @var Post $response */
     $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
