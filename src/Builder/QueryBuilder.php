@@ -127,9 +127,24 @@ class QueryBuilder
                 continue;
             }
 
+            // If value is null and no explicit null/not-null op, ignore this filter
+            if (is_null($value) && !in_array(mb_strtolower($operation), ['null', 'not-null'], true)) {
+                continue;
+            }
+
             // Initialize structures
             $filters[$group] ??= [];
             $filters[$group][$field] ??= [];
+
+            // Handle special null/not-null operations: store value as null (not a collection)
+            if (in_array(mb_strtolower($operation), ['null', 'not-null'], true)) {
+                $filters[$group][$field][] = [
+                    'operation' => $operation,
+                    'value'     => null,
+                ];
+
+                continue;
+            }
 
             // Normalize value into a Laravel collection. If it's a pipe-separated
             // string (e.g., "1|2|3"), split into an array of strings; otherwise,
