@@ -32,6 +32,7 @@ describe('Testing together some certain methods', function () {
             'filter_comments(body)'          => '4',
             'filter_comments(title,~)'       => 'testing',
             'filter_comments(id,>=)'         => 2,
+            'filter_comments_likes(id)'      => 10,
         ];
     });
 
@@ -113,6 +114,14 @@ describe('Testing together some certain methods', function () {
                     [
                         'operation' => '~',
                         'value'     => 'testing',
+                    ],
+                ],
+            ],
+            'comments_likes' => [
+                'id' => [
+                    [
+                        'operation' => '=',
+                        'value'     => 10,
                     ],
                 ],
             ],
