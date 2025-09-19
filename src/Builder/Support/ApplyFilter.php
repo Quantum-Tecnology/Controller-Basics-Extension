@@ -8,15 +8,7 @@ class ApplyFilter
 {
     public static function execute($query, array $filters = [])
     {
-        $table = null;
-
-        if (blank($table) && method_exists($query, 'getTable')) {
-            $table = $query->getTable();
-        }
-
-        if (blank($table) && $query?->getQuery()?->getQuery()?->from) {
-            $table = $query->getQuery()->getQuery()->from;
-        }
+        $table = $query->getTable();
 
         foreach ($filters as $field => $items) {
             $query = $query->where(function ($query) use ($table, $field, $items): void {
