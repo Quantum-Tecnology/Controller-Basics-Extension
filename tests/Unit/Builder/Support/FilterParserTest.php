@@ -6,7 +6,7 @@ use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FieldParser;
 use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FilterParser;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->dataOptions = [
         'author',
         'comments',

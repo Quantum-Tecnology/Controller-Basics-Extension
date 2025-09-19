@@ -30,7 +30,16 @@ final class IncludesBuilder
         }
 
         $paths = $hasNested
-            ? RelationUtils::nestedDotPaths((array) $fields)
+            ? (function () use ($model, $fields): array {
+                // Include top-level relation names even when nested fields are present
+                $topLevelRelations = array_values(array_filter((array) $fields, fn ($v): bool => is_string($v) && method_exists($model, $v)));
+                $nestedPaths       = RelationUtils::nestedDotPaths((array) $fields);
+
+                // Merge while preserving order and removing duplicates, prioritizing nested paths first
+                $merged = array_values(array_unique(array_merge($nestedPaths, $topLevelRelations)));
+
+                return $merged;
+            })()
             : array_values(array_filter((array) $fields, fn ($v): bool => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
 
         $result    = [];

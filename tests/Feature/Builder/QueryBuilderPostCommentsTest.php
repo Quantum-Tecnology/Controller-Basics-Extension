@@ -32,7 +32,7 @@ test('it loads nested relations as specified in fields', function (): void {
     Comment::factory()->for($post)->count(3)->hasLikes(3)->create();
 
     /** @var Post $response */
-    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->sole();
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'])->sole();
 
     expect(array_keys($response->getRelations()))->toBe(['comments', 'author'])
         ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
@@ -49,7 +49,7 @@ test('it creates a post with likes and comments', function (): void {
     ]);
 
     /** @var Post $response */
-    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []])->sole();
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'])->sole();
 
     expect($response->comments_count)->toBe(30)
         ->and($response->comments->first()->likes_count)->toBe(4);
@@ -74,7 +74,7 @@ test('it returns comments count and limits loaded comments to 10', function (): 
 test('it paginates nested relations and returns correct counts', function (): void {
     Comment::factory()->for(Post::factory()->create())->count(25)->create();
 
-    $fields  = ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []];
+    $fields  = ['id', 'comments' => ['likes' => ['comment']], 'author'];
     $options = [
         'page_offset_comments' => 3,
         'page_limit_comments'  => 4,
@@ -92,7 +92,7 @@ test('it paginates nested relations and returns correct counts', function (): vo
 test('it paginates likes of a nested relation and returns correct counts', function (): void {
     Comment::factory()->hasLikes(10)->create();
 
-    $fields  = ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []];
+    $fields  = ['id', 'comments' => ['likes' => ['comment']], 'author'];
     $options = [
         'page_offset_comments_likes' => 2,
         'page_limit_comments_likes'  => 2,
@@ -119,7 +119,7 @@ test('it orders comments and nested likes in descending order', function (): voi
     ]);
 
     /** @var Post $post */
-    $post = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment' => []]], 'author' => []], [
+    $post = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
         'order_column_comments'          => 'id',
         'order_direction_comments'       => 'desc',
         'order_column_comments_likes'    => 'id',
@@ -219,7 +219,7 @@ test('it filters comments by multiple ids using filter_comments(id)', function (
         ->and($comments->get(1))->id->toBe(3);
 });
 
-it('it filters posts by id using filter(id)', function () {
+it('it filters posts by id using filter(id)', function (): void {
     Post::factory(10)->create();
 
     /** @var Post $response */
