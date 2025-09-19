@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace QuantumTecnology\ControllerBasicsExtension\Builder\Support;
+namespace QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support;
 
 class ApplyFilter
 {

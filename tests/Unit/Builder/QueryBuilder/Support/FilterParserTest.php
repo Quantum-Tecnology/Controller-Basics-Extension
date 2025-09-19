@@ -2,8 +2,8 @@
 
 declare(strict_types = 1);
 
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FieldParser;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FilterParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FieldParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FilterParser;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
 beforeEach(function (): void {

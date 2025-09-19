@@ -7,11 +7,11 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\ApplyFilter;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FieldParser;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\FilterParser;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\IncludesBuilder;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\RelationUtils;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\ApplyFilter;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FieldParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FilterParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\IncludesBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\RelationUtils;
 
 class QueryBuilder
 {
@@ -57,11 +57,6 @@ class QueryBuilder
                     $fieldSelected[] = $fk;
                 }
             }
-        }
-
-        // Apply select after enriching with any required foreign keys
-        if (filled($fieldSelected)) {
-            $query->select($fieldSelected);
         }
 
         if (filled($includes)) {

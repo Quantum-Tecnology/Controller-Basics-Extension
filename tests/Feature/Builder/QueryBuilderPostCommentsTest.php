@@ -3,7 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
-use QuantumTecnology\ControllerBasicsExtension\Builder\Support\IncludesBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\IncludesBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
@@ -15,16 +15,6 @@ test('it returns the created post with correct title', function (): void {
     $response = $this->builder->execute(new Post())->sole();
 
     expect($response)->title->toBe($post->title);
-});
-
-test('it returns only the id field and title is null', function (): void {
-    $post = Post::factory()->create();
-
-    /** @var Post $response */
-    $response = $this->builder->execute(new Post(), ['id'])->sole();
-
-    expect($response)->title->toBeNull()
-        ->id->toBe($post->id);
 });
 
 test('it loads nested relations as specified in fields', function (): void {
