@@ -55,7 +55,7 @@ final class IncludesBuilder
 
                 if (!empty($filterInclude)) {
                     $withCount[$cPath] = function ($q) use ($filterInclude): void {
-                        self::applyFilters($q, $filterInclude);
+                        ApplyFilter::execute($q, $filterInclude);
                     };
                 }
             }
@@ -102,7 +102,7 @@ final class IncludesBuilder
 
                                     if (!empty($childFilters)) {
                                         $childrenCounts[$child] = function ($q) use ($childFilters): void {
-                                            IncludesBuilder::applyFilters($q, $childFilters);
+                                            ApplyFilter::execute($q, $childFilters);
                                         };
                                     } else {
                                         $childrenCounts[] = $child;
@@ -131,7 +131,7 @@ final class IncludesBuilder
 
                     $filterInclude = data_get($filters, $pathUnderline, []);
 
-                    IncludesBuilder::applyFilters($query, $filterInclude)
+                    ApplyFilter::execute($query, $filterInclude)
                         ->limit($paginateInclude['page_limit'])
                         ->offset($paginateInclude['page_offset']);
 
@@ -158,7 +158,7 @@ final class IncludesBuilder
 
                             if (!empty($childFilters)) {
                                 $childrenCounts[$child] = function ($q) use ($childFilters): void {
-                                    IncludesBuilder::applyFilters($q, $childFilters);
+                                    ApplyFilter::execute($q, $childFilters);
                                 };
                             } else {
                                 $childrenCounts[] = $child;
@@ -174,29 +174,5 @@ final class IncludesBuilder
         }
 
         return $result;
-    }
-
-    private static function applyFilters($query, array $filters = [])
-    {
-        foreach ($filters as $field => $items) {
-            $query = $query->where(function ($query) use ($field, $items): void {
-                foreach ($items as $item) {
-                    $op     = $item['operation'] ?? '=';
-                    $values = $item['value'] ?? null;
-
-                    if (in_array($op, ['=', '=='])) {
-                        $query = $query->whereIn($field, $values);
-
-                        continue;
-                    }
-
-                    foreach ($values as $v) {
-                        $query = $query->where($field, $op, $v);
-                    }
-                }
-            });
-        }
-
-        return $query;
     }
 }

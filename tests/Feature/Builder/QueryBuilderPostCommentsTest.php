@@ -201,7 +201,7 @@ test('it filters comments and nested likes by id using custom filter options', f
         ->and($comments->get(0)->likes->count())->toBe(2);
 });
 
-test('a', function (): void {
+test('it filters comments by multiple ids using filter_comments(id)', function (): void {
     $post = Post::factory()->create();
     Comment::factory(2)->for($post)->hasLikes(5)->create();
     Comment::factory(2)->for($post)->create();
@@ -217,6 +217,19 @@ test('a', function (): void {
         ->and($comments->count())->toBe(2)
         ->and($comments->get(0))->id->toBe(1)
         ->and($comments->get(1))->id->toBe(3);
+});
+
+it('it filters posts by id using filter(id)', function () {
+    Post::factory(10)->create();
+
+    /** @var Post $response */
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
+        'filter(id)' => '2|4',
+    ])->get();
+
+    expect($response->count())->toBe(2)
+        ->and($response->get(0))->id->toBe(2)
+        ->and($response->get(1))->id->toBe(4);
 });
 
 describe('Testing together some certain methods', function (): void {
