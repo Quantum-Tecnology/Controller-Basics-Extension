@@ -7,6 +7,7 @@ namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use QuantumTecnology\ControllerBasicsExtension\Builder\GraphBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
@@ -39,6 +40,19 @@ trait AsGraphQLController
         ]);
     }
 
+    public function store(GraphBuilder $graphBuilder, Request $request): JsonResponse
+    {
+        $dataValues = $this->getDataRequest('store');
+
+        $fields = request()->query('fields');
+
+        $modelStore = $this->execute($this->model(), $dataValues);
+
+        return response()->json([
+            'data' => $graphBuilder->execute($modelStore, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
+        ]);
+    }
+
     public function update(GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
         $dataValues = $this->getDataRequest('update');
@@ -54,12 +68,25 @@ trait AsGraphQLController
         ]);
     }
 
+    public function destroy(GraphBuilder $graphBuilder, Request $request): Response
+    {
+        $dataValues = $this->getDataRequest('destroy', true);
+
+        $fields = request()->query('fields');
+
+        $model = $this->findBy($fields);
+
+        DB::transaction(fn () => $model->delete());
+
+        return response()->noContent();
+    }
+
     protected function allowedFields(): ?array
     {
         return null;
     }
 
-    protected function findBy(string | array $fields): Model
+    protected function findBy(string | array | null $fields = []): Model
     {
         $routeParams = request()->route()?->parameters() ?: [];
         $idFromParam = array_pop($routeParams);
@@ -67,7 +94,7 @@ trait AsGraphQLController
 
         return app(QueryBuilder::class)->execute(
             $this->model(),
-            $fields,
+            $fields ?: [],
             [
                 "filter_({$keyName})" => $idFromParam,
             ] + $this->filterRouteParams($routeParams) + request()->query(),
