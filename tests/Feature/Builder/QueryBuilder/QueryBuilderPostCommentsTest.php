@@ -209,6 +209,17 @@ test('it filters comments by multiple ids using filter_comments(id)', function (
         ->and($comments->get(1))->id->toBe(3);
 });
 
+test('it filters posts by id and returns the correct post', function (): void {
+    $post = Post::factory(5)->create();
+
+    /* @var Post $response */
+    $response = $this->builder->execute(new Post(), ['id', 'comments' => ['likes' => ['comment']], 'author'], [
+        'filter(id)' => '2',
+    ])->sole();
+
+    expect($response->id)->toBe(2);
+});
+
 it('it filters posts by id using filter(id)', function (): void {
     Post::factory(10)->create();
 

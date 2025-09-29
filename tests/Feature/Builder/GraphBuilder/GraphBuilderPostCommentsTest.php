@@ -234,7 +234,7 @@ test('returns post with limited comments like and meta with options', function (
     ]);
 });
 
-test('100', function () {
+test('returns post with only selected fields for comments and author', function () {
     $a = Author::factory()->create();
     $p = Post::factory()->for($a)->create();
     $c = Comment::factory()->for($p)->create();
