@@ -72,7 +72,7 @@ trait AsGraphQLController
 
     public function destroy(GraphBuilder $graphBuilder, Request $request): Response
     {
-        $dataValues = $this->getDataRequest('destroy', true);
+        $this->getDataRequest('destroy', true);
 
         $fields = request()->query('fields');
 
@@ -131,7 +131,6 @@ trait AsGraphQLController
 
         if (blank($action)) {
             $request = app($class);
-            $request->validated();
 
             return $request->validated();
         }
@@ -140,7 +139,6 @@ trait AsGraphQLController
 
         if (class_exists($value)) {
             $request = app($value);
-            $request->validated();
 
             return $request->validated();
         }
