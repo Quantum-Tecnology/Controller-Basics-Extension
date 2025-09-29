@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\GraphBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
 beforeEach(function () {
@@ -103,40 +104,6 @@ test('returns all posts with meta total', function (): void {
     })->toArray());
 });
 
-test('returns post with limited comments and meta', function (): void {
-    $p = Post::factory()->hasComments(25)->create();
-
-    $fields = 'id title comments { id }';
-
-    $queryBuilder = $this->queryBuilder->execute(new Post(), $fields)->get();
-
-    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields)->toArray();
-
-    $commentsMap = [
-        'data' => $p->comments()->limit(15)->get()->map(function ($comment) {
-            return [
-                'data' => [
-                    'id' => $comment->id,
-                ],
-            ];
-        })->toArray(),
-        'meta' => [
-            'total' => 25,
-            'page'  => 1,
-        ],
-    ];
-
-    expect($response['data'])->toBe([
-        [
-            'data' => [
-                'id'       => $p->id,
-                'title'    => $p->title,
-                'comments' => $commentsMap,
-            ],
-        ],
-    ]);
-});
-
 test('returns post with author relationship', function (): void {
     $p = Post::factory()->create();
 
@@ -161,4 +128,102 @@ test('returns post with author relationship', function (): void {
                 ],
             ],
         ]);
+});
+
+test('returns post with limited comments and meta', function (): void {
+    $p = Post::factory()->hasComments(25)->create();
+
+    $fields = 'id title comments { id }';
+
+    $queryBuilder = $this->queryBuilder->execute(new Post(), $fields)->get();
+
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields)->toArray();
+
+    $commentsMap = [
+        'data' => $p->comments()->limit(10)->get()->map(function ($comment) {
+            return [
+                'data' => [
+                    'id' => $comment->id,
+                ],
+            ];
+        })->toArray(),
+        'meta' => [
+            'total' => 25,
+            'page'  => 1,
+        ],
+    ];
+
+    expect($response['data'])->toBe([
+        [
+            'data' => [
+                'id'       => $p->id,
+                'title'    => $p->title,
+                'comments' => $commentsMap,
+            ],
+        ],
+    ]);
+});
+
+test('returns post with paginated comments on page 2', function (): void {
+    $p = Post::factory()->hasComments(25)->create();
+
+    $fields = 'id title comments { id }';
+
+    $options = [
+        'page_offset_comments' => 2,
+    ];
+
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields, options: $options)->get();
+
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, options: $options)->toArray();
+
+    $comments = $response['data'][0]['data']['comments'];
+    unset($response['data'][0]['data']['comments']);
+
+    expect($response['data'])->toBe([
+        [
+            'data' => [
+                'id'    => $p->id,
+                'title' => $p->title,
+            ],
+        ],
+    ])->and($comments['meta'])->toBe([
+        'total' => 25,
+        'page'  => 2,
+    ]);
+});
+
+test('returns post with limited comments like and meta', function (): void {
+    $p       = Post::factory()->create();
+    $comment = Comment::factory()->for($p)->hasLikes(25)->create();
+
+    $fields = 'id title comments { likes {id} }';
+
+    $queryBuilder = $this->queryBuilder->execute(new Post(), $fields)->get();
+
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields)->toArray();
+
+    expect($response['data'][0]['data']['comments']['data'][0]['data']['likes']['meta'])->toBe([
+        'total' => 25,
+        'page'  => 1,
+    ]);
+});
+
+test('returns post with limited comments like and meta with options', function (): void {
+    $p       = Post::factory()->create();
+    $comment = Comment::factory()->for($p)->hasLikes(25)->create();
+
+    $fields  = 'id title comments { likes {id} }';
+    $options = [
+        'page_offset_comments_likes' => 2,
+    ];
+
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields, options: $options)->get();
+
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, options: $options)->toArray();
+
+    expect($response['data'][0]['data']['comments']['data'][0]['data']['likes']['meta'])->toBe([
+        'total' => 25,
+        'page'  => 2,
+    ]);
 });

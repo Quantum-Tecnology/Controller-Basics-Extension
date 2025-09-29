@@ -22,7 +22,7 @@ class GraphBuilder
      * @param Model|Paginator|Collection $data
      * @param array|string               $fields GraphQL-like fields (e.g., "id title comments { id }")
      */
-    public function execute($data, array | string $fields): Collection
+    public function execute($data, array | string $fields, array $options = []): Collection
     {
         if (is_string($fields)) {
             $fields = QueryBuilderFieldParser::normalize($fields);
@@ -35,8 +35,8 @@ class GraphBuilder
         // Normalize iterable dataset
         $iterable = $unique ? collect([$data]) : ($paginator ? collect($data->items()) : collect($data));
 
-        $mapped = $iterable->map(function (Model $model) use ($fields, $paginator): array {
-            return $this->buildItem($model, $fields, $paginator);
+        $mapped = $iterable->map(function (Model $model) use ($fields, $paginator, $options): array {
+            return $this->buildItem($model, null, $fields, $paginator, $options);
         });
 
         // Build meta
@@ -77,7 +77,7 @@ class GraphBuilder
     /**
      * Build a single item's representation according to requested fields and nested relations.
      */
-    private function buildItem(Model $model, array $fields, bool $skipDateScalars = false): array
+    private function buildItem(Model $model, ?string $fatherRelated, array $fields, bool $skipDateScalars = false, array $options = []): array
     {
         $result = [];
 
@@ -135,24 +135,26 @@ class GraphBuilder
 
                 if ($related instanceof Model) {
                     $result[$name] = [
-                        'data' => $this->buildItem($related, $nestedFields, $skipDateScalars),
+                        'data' => $this->buildItem($related, null, $nestedFields, $skipDateScalars, $options),
                     ];
                 }
 
                 continue;
             }
 
-            // To-many: limit to 15 by default and add meta
-            $total   = $relation->count();
-            $page    = 1;
-            $limit   = 15;
-            $records = $relation->limit($limit)->get();
+            $records = $model->{$name};
+
+            if ($fatherRelated) {
+                $fatherRelated = "{$fatherRelated}_{$name}";
+            } else {
+                $fatherRelated = $name;
+            }
 
             $result[$name] = [
-                'data' => $records->map(fn (Model $m) => ['data' => $this->buildItem($m, $nestedFields, $skipDateScalars)])->toArray(),
+                'data' => $records->map(fn (Model $m) => ['data' => $this->buildItem($m, $name, $nestedFields, $skipDateScalars, $options)])->toArray(),
                 'meta' => [
-                    'total' => $total,
-                    'page'  => $page,
+                    'total' => $model->{$name . '_count'} ?? null,
+                    'page'  => $options['page_offset_' . $fatherRelated] ?? 1,
                 ],
             ];
         }

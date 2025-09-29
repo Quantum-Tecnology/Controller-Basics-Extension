@@ -141,8 +141,8 @@ final class IncludesBuilder
                     $filterInclude = data_get($filters, $pathUnderline, []);
 
                     ApplyFilter::execute($query, $filterInclude)
-                        ->limit($paginateInclude['page_limit'])
-                        ->offset($paginateInclude['page_offset']);
+                        ->limit($paginateInclude['page_limit'] ?? config('page.per_page'))
+                        ->offset($paginateInclude['page_offset'] ?? 1);
 
                     $orderInclude = data_get($order, $pathUnderline, [
                         'order_direction' => 'asc',
