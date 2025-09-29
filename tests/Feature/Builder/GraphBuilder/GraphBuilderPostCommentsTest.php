@@ -11,7 +11,7 @@ beforeEach(function () {
     $this->graphBuilder = app(GraphBuilder::class);
 });
 
-test('0', function (): void {
+test('returns post with id and title', function (): void {
     $p = Post::factory()->create();
 
     $fields       = 'id title';
@@ -25,7 +25,7 @@ test('0', function (): void {
     ]);
 });
 
-test('100', function (): void {
+test('paginates posts with id, title, and created_at', function (): void {
     $p = Post::factory(15)->create();
 
     $fields = 'id title created_at';
@@ -55,7 +55,7 @@ test('100', function (): void {
     ]);
 });
 
-test('101', function (): void {
+test('simple pagination returns correct post data', function (): void {
     $p = Post::factory(15)->create();
 
     $fields = 'id title created_at';
@@ -83,7 +83,7 @@ test('101', function (): void {
     ]);
 });
 
-test('200', function (): void {
+test('returns all posts with meta total', function (): void {
     Post::factory(15)->create();
 
     $fields = 'id title created_at';
@@ -108,7 +108,7 @@ test('200', function (): void {
     ]);
 });
 
-test('300', function (): void {
+test('returns post with limited comments and meta', function (): void {
     $p = Post::factory()->hasComments(25)->create();
 
     $fields = 'id title comments { id }';
@@ -142,7 +142,7 @@ test('300', function (): void {
     ]);
 });
 
-test('400', function (): void {
+test('returns post with author relationship', function (): void {
     $p = Post::factory()->create();
 
     $author = $p->author;
