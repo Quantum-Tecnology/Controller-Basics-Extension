@@ -22,7 +22,7 @@ class QueryBuilder
         $query = $model->query();
 
         if (is_string($fields)) {
-            $fields = FieldParser::normalize($fields);
+            $fields = (new FieldParser())->normalize($fields);
         }
 
         // Collect root-level scalar fields requested

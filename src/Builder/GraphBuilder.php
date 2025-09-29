@@ -25,7 +25,7 @@ class GraphBuilder
     public function execute($data, array | string $fields, ?array $onlyFields = null, array $options = []): Collection
     {
         if (is_string($fields)) {
-            $fields = QueryBuilderFieldParser::normalize($fields);
+            $fields = (new QueryBuilderFieldParser())->normalize($fields);
         }
 
         if ($onlyFields && is_array($onlyFields)) {
@@ -187,6 +187,36 @@ class GraphBuilder
 
     private function filterFields(array $fields, array $onlyFields): array
     {
-        return $fields;
+        // Keep only scalar fields that are explicitly allowed in $onlyFields.
+        // Drop any nested relations regardless of their requested subfields.
+        if (empty($onlyFields)) {
+            return [];
+        }
+
+        // Build a set of allowed scalar names from onlyFields. Ignore nested arrays/associative keys.
+        $allowedScalars = [];
+
+        foreach ($onlyFields as $k => $v) {
+            if (is_int($k) && is_string($v)) {
+                $allowedScalars[$v] = true;
+            }
+        }
+
+        $filtered = [];
+
+        foreach ($fields as $key => $value) {
+            if (is_int($key)) {
+                // Scalar field
+                if (isset($allowedScalars[$value])) {
+                    $filtered[] = $value;
+                }
+
+                continue;
+            }
+
+            // Relation (key is string): skip entirely per onlyFields rule
+        }
+
+        return $filtered;
     }
 }

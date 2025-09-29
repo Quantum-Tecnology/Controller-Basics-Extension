@@ -10,7 +10,7 @@ final class FieldParser
      * Normalize a GraphQL-like field string into nested array format used by QueryBuilder.
      * Example: "id,title,author{id,name},comments{id,likes}".
      */
-    public static function normalize(string $fields): array
+    public function normalize(string $fields): array
     {
         // Tokenize into identifiers and braces, ignore other characters
         preg_match_all('/[A-Za-z0-9_]+|\{|\}/u', $fields, $matches);

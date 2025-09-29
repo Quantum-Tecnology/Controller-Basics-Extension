@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\GraphBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Author;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
@@ -227,14 +228,37 @@ test('returns post with limited comments like and meta with options', function (
 });
 
 test('100', function () {
-    $p = Post::factory()->hasComments(1)->create();
+    $a = Author::factory()->create();
+    $p = Post::factory()->for($a)->create();
+    $c = Comment::factory()->for($p)->create();
 
-    $fields       = 'id title comments { id } author { id }';
+    $fields       = 'id title comments { id body } author { id name }';
     $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->sole();
 
-    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, onlyFields: ['id']);
+    //    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, onlyFields: ['id', 'comments' => ['id'], 'author' => ['id']]);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
-        'id' => $p->id,
+        'id'       => $p->id,
+        'comments' => [
+            'data' => [
+                0 => [
+                    'data' => [
+                        'id'   => $c->id,
+                        'body' => $c->body,
+                    ],
+                ],
+            ],
+            'meta' => [
+                'total' => 1,
+                'page'  => 1,
+            ],
+        ],
+        'author' => [
+            'data' => [
+                'id'   => $a->id,
+                'name' => $a->name,
+            ],
+        ],
     ]);
 });
