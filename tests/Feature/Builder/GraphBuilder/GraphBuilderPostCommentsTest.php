@@ -2,7 +2,6 @@
 
 declare(strict_types = 1);
 
-use Illuminate\Support\Collection;
 use QuantumTecnology\ControllerBasicsExtension\Builder\GraphBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
@@ -15,10 +14,10 @@ beforeEach(function () {
 test('0', function (): void {
     $p = Post::factory()->create();
 
-    $fields   = 'id title';
-    $response = $this->queryBuilder->execute(new Post(), fields: $fields)->sole();
+    $fields       = 'id title';
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->sole();
 
-    $response = $this->graphBuilder->execute($response, fields: $fields);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
         'id'    => $p->id,
@@ -31,9 +30,9 @@ test('100', function (): void {
 
     $fields = 'id title created_at';
 
-    $response = $this->queryBuilder->execute(new Post(), fields: $fields)->paginate(perPage: 2);
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->paginate(perPage: 2);
 
-    $response = $this->graphBuilder->execute($response, fields: $fields);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
         'data' => collect([0, 1])->map(function ($i) use ($p) {
@@ -61,9 +60,9 @@ test('101', function (): void {
 
     $fields = 'id title created_at';
 
-    $response = $this->queryBuilder->execute(new Post(), fields: $fields)->simplePaginate(perPage: 2);
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->simplePaginate(perPage: 2);
 
-    $response = $this->graphBuilder->execute($response, fields: $fields);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
         'data' => collect([0, 1])->map(function ($i) use ($p) {
@@ -89,9 +88,9 @@ test('200', function (): void {
 
     $fields = 'id title created_at';
 
-    $response = $this->queryBuilder->execute(new Post(), fields: $fields)->get();
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->get();
 
-    $response = $this->graphBuilder->execute($response, fields: $fields);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
         'data' => $response->each(function ($p) {
@@ -112,34 +111,33 @@ test('200', function (): void {
 test('300', function (): void {
     $p = Post::factory()->hasComments(25)->create();
 
-    $comments = $p->comments;
-
     $fields = 'id title comments { id }';
 
-    $response = $this->queryBuilder->execute(new Post(), $fields)->get();
+    $queryBuilder = $this->queryBuilder->execute(new Post(), $fields)->get();
 
-    $response = $this->graphBuilder->execute($response, fields: $fields);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields)->toArray();
 
-    expect($response->toArray())->toBe([
-        'data' => $response->each(function ($p) use ($comments) {
+    $commentsMap = [
+        'data' => $p->comments()->limit(15)->get()->map(function ($comment) {
             return [
                 'data' => [
-                    'id'       => $p->id,
-                    'title'    => $p->title,
-                    'comments' => [
-                        'data' => Collection::times(10, function ($i) use ($comments) {
-                            return [
-                                'data' => [
-                                    'id' => $comments->get($i)->id,
-                                ],
-                            ];
-                        }),
-                    ],
+                    'id' => $comment->id,
                 ],
             ];
-        }),
+        })->toArray(),
         'meta' => [
-            'total' => 15,
+            'total' => 25,
+            'page'  => 1,
+        ],
+    ];
+
+    expect($response['data'])->toBe([
+        [
+            'data' => [
+                'id'       => $p->id,
+                'title'    => $p->title,
+                'comments' => $commentsMap,
+            ],
         ],
     ]);
 });
@@ -151,27 +149,21 @@ test('400', function (): void {
 
     $field = 'id title author { id }';
 
-    $response = $this->queryBuilder->execute(new Post(), fields: $field)->get();
-    $response = $this->graphBuilder->execute($response, fields: $field);
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $field)->get();
+    $response     = $this->graphBuilder->execute($queryBuilder, fields: $field)->toArray();
 
-    dd($response);
-
-    expect($response->toArray())->toBe([
-        'data' => $response->each(function ($p) use ($author) {
-            return [
+    expect($response['meta']['total'])->toBe(1)
+        ->and($response['data'])->toBe([
+            [
                 'data' => [
-                    'id'     => $p['data']['id'],
-                    'title'  => $p['data']['title'],
+                    'id'     => $p->id,
+                    'title'  => $p->title,
                     'author' => [
                         'data' => [
                             'id' => $author->id,
                         ],
                     ],
                 ],
-            ];
-        })->toArray(),
-        'meta' => [
-            'total' => 15,
-        ],
-    ]);
+            ],
+        ]);
 });

@@ -32,6 +32,14 @@ class GraphBuilder
 
         $meta = [];
 
+        if (!$unique) {
+            $meta = [
+                'meta' => [
+                    'total' => $response->count(),
+                ],
+            ];
+        }
+
         if ($paginator) {
 
             if ($data instanceof Paginator) {
