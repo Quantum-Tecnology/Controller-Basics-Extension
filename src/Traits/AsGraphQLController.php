@@ -44,7 +44,8 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('store');
 
-        $fields = request()->query('fields');
+        $keyName = $this->model()->getKeyName();
+        $fields  = request()->query('fields', [$keyName]);
 
         $modelStore = $this->execute($this->model(), $dataValues);
 
@@ -57,7 +58,8 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('update');
 
-        $fields = request()->query('fields');
+        $keyName = $this->model()->getKeyName();
+        $fields  = request()->query('fields', [$keyName]);
 
         $model = $this->findBy($fields);
 
@@ -134,7 +136,7 @@ trait AsGraphQLController
             return $request->validated();
         }
 
-        $value = mb_substr($value, 0, -7) . '\\' . ucfirst($action) . 'Request';
+        $value = mb_substr($value, 0, -10) . '\\' . ucfirst($action) . 'Request';
 
         if (class_exists($value)) {
             $request = app($value);
