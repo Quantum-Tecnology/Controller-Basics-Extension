@@ -40,7 +40,7 @@ trait AsGraphQLController
         return null;
     }
 
-    protected function findBy(array $fields): Builder
+    protected function findBy(string | array $fields): Builder
     {
         $routeParams = request()->route()?->parameters() ?: [];
         $idFromParam = array_pop($routeParams);
@@ -50,7 +50,7 @@ trait AsGraphQLController
             $this->model(),
             $fields,
             [
-                "filter_{$keyName}" => $idFromParam,
+                "filter_({$keyName})" => $idFromParam,
             ] + request()->query(),
         );
     }
