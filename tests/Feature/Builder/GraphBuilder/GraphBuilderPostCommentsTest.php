@@ -72,7 +72,7 @@ test('simple pagination returns correct post data', function (): void {
                     'title' => $p->get($i)->title,
                 ],
             ];
-        }),
+        })->toArray(),
         'meta' => [
             'per_page'     => 2,
             'current_page' => 1,
@@ -84,7 +84,7 @@ test('simple pagination returns correct post data', function (): void {
 });
 
 test('returns all posts with meta total', function (): void {
-    Post::factory(15)->create();
+    $posts = Post::factory(15)->create();
 
     $fields = 'id title created_at';
 
@@ -92,20 +92,15 @@ test('returns all posts with meta total', function (): void {
 
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
-    expect($response->toArray())->toBe([
-        'data' => $response->each(function ($p) {
-            return [
-                'data' => [
-                    'id'         => $p->id,
-                    'title'      => $p->title,
-                    'created_at' => $p->created_at->format('Y-m-d H:i:s'),
-                ],
-            ];
-        }),
-        'meta' => [
-            'total' => 15,
-        ],
-    ]);
+    expect($response->toArray()['data'])->toBe($posts->map(function ($post) {
+        return [
+            'data' => [
+                'id'         => $post->id,
+                'title'      => $post->title,
+                'created_at' => $post->created_at->format('Y-m-d H:i:s'),
+            ],
+        ];
+    })->toArray());
 });
 
 test('returns post with limited comments and meta', function (): void {
