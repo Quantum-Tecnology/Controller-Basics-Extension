@@ -49,11 +49,12 @@ class GraphBuilder
         if ($paginator) {
             // SimplePaginator and LengthAwarePaginator
             $meta['meta'] = [
-                'per_page'     => $data->perPage(),
-                'current_page' => $data->currentPage(),
-                'from'         => $data->firstItem(),
-                'to'           => $data->lastItem(),
-                'path'         => $data->path(),
+                'per_page'       => $data->perPage(),
+                'current_page'   => $data->currentPage(),
+                'from'           => $data->firstItem(),
+                'to'             => $data->lastItem(),
+                'path'           => $data->path(),
+                'has_more_pages' => $data->hasMorePages(),
             ];
 
             if ($data instanceof LengthAwarePaginator) {
@@ -149,12 +150,16 @@ class GraphBuilder
             $records = $model->{$name};
 
             $fatherRelated = $fatherRelated ? "{$fatherRelated}_{$name}" : $name;
+            $total         = $model->{$name . '_count'} ?? 0;
+            $page          = $options['page_offset_' . $fatherRelated] ?? 1;
+            $limit         = $options['page_limit_' . $fatherRelated] ?? config('page.per_page');
 
             $result[$name] = [
                 'data' => $records->map(fn (Model $m) => ['data' => $this->buildItem($m, $name, $nestedFields, $skipDateScalars, $options)])->toArray(),
                 'meta' => [
-                    'total' => $model->{$name . '_count'} ?? null,
-                    'page'  => $options['page_offset_' . $fatherRelated] ?? 1,
+                    'total'          => $total,
+                    'page'           => $page,
+                    'has_more_pages' => $limit * $page < $total,
                 ],
             ];
         }

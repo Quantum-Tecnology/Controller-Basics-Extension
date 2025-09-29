@@ -46,13 +46,14 @@ test('paginates posts with id, title, and created_at', function (): void {
             ];
         })->toArray(),
         'meta' => [
-            'per_page'     => 2,
-            'current_page' => 1,
-            'from'         => 1,
-            'to'           => 2,
-            'path'         => 'http://localhost',
-            'total'        => 15,
-            'last_page'    => 8,
+            'per_page'       => 2,
+            'current_page'   => 1,
+            'from'           => 1,
+            'to'             => 2,
+            'path'           => 'http://localhost',
+            'has_more_pages' => true,
+            'total'          => 15,
+            'last_page'      => 8,
         ],
     ]);
 });
@@ -76,11 +77,12 @@ test('simple pagination returns correct post data', function (): void {
             ];
         })->toArray(),
         'meta' => [
-            'per_page'     => 2,
-            'current_page' => 1,
-            'from'         => 1,
-            'to'           => 2,
-            'path'         => 'http://localhost',
+            'per_page'       => 2,
+            'current_page'   => 1,
+            'from'           => 1,
+            'to'             => 2,
+            'path'           => 'http://localhost',
+            'has_more_pages' => true,
         ],
     ]);
 });
@@ -149,8 +151,9 @@ test('returns post with limited comments and meta', function (): void {
             ];
         })->toArray(),
         'meta' => [
-            'total' => 25,
-            'page'  => 1,
+            'total'          => 25,
+            'page'           => 1,
+            'has_more_pages' => true,
         ],
     ];
 
@@ -189,8 +192,9 @@ test('returns post with paginated comments on page 2', function (): void {
             ],
         ],
     ])->and($comments['meta'])->toBe([
-        'total' => 25,
-        'page'  => 2,
+        'total'          => 25,
+        'page'           => 2,
+        'has_more_pages' => true,
     ]);
 });
 
@@ -204,16 +208,18 @@ test('returns post with limited comments like and meta', function (): void {
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields)->toArray();
 
     expect($response['data'][0]['data']['comments']['data'][0]['data']['likes']['meta'])->toBe([
-        'total' => 25,
-        'page'  => 1,
+        'total'          => 25,
+        'page'           => 1,
+        'has_more_pages' => true,
     ]);
 });
 
 test('returns post with limited comments like and meta with options', function (): void {
-    Comment::factory()->hasLikes(25)->create();
+    Comment::factory()->hasLikes(26)->create();
 
     $fields  = 'id title comments { likes {id} }';
     $options = [
+        'page_limit_comments_likes'  => 13,
         'page_offset_comments_likes' => 2,
     ];
 
@@ -222,8 +228,9 @@ test('returns post with limited comments like and meta with options', function (
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, options: $options)->toArray();
 
     expect($response['data'][0]['data']['comments']['data'][0]['data']['likes']['meta'])->toBe([
-        'total' => 25,
-        'page'  => 2,
+        'total'          => 26,
+        'page'           => 2,
+        'has_more_pages' => false,
     ]);
 });
 
@@ -248,8 +255,9 @@ test('100', function () {
                 ],
             ],
             'meta' => [
-                'total' => 1,
-                'page'  => 1,
+                'total'          => 1,
+                'page'           => 1,
+                'has_more_pages' => false,
             ],
         ],
         'author' => [
