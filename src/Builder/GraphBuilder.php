@@ -187,18 +187,22 @@ class GraphBuilder
 
     private function filterFields(array $fields, array $onlyFields): array
     {
-        // Keep only scalar fields that are explicitly allowed in $onlyFields.
-        // Drop any nested relations regardless of their requested subfields.
+        // Recursively keep only the scalar fields and relations specified in $onlyFields.
+        // - Root-level integer-indexed strings in $onlyFields define allowed scalars at this level.
+        // - String keys in $onlyFields define allowed relations and their subfield rules.
         if (empty($onlyFields)) {
             return [];
         }
 
-        // Build a set of allowed scalar names from onlyFields. Ignore nested arrays/associative keys.
-        $allowedScalars = [];
+        // Build sets for quick checks
+        $allowedScalars   = [];
+        $allowedRelations = [];
 
         foreach ($onlyFields as $k => $v) {
             if (is_int($k) && is_string($v)) {
                 $allowedScalars[$v] = true;
+            } elseif (is_string($k) && is_array($v)) {
+                $allowedRelations[$k] = $v;
             }
         }
 
@@ -206,7 +210,7 @@ class GraphBuilder
 
         foreach ($fields as $key => $value) {
             if (is_int($key)) {
-                // Scalar field
+                // Scalar field at this level
                 if (isset($allowedScalars[$value])) {
                     $filtered[] = $value;
                 }
@@ -214,7 +218,11 @@ class GraphBuilder
                 continue;
             }
 
-            // Relation (key is string): skip entirely per onlyFields rule
+            // Relation: include only if explicitly allowed, and recursively filter its subfields
+            if (array_key_exists($key, $allowedRelations) && is_array($value)) {
+                $nested         = $this->filterFields($value, $allowedRelations[$key]);
+                $filtered[$key] = $nested;
+            }
         }
 
         return $filtered;

@@ -10,7 +10,7 @@ final class FieldParser
      * Normalize a GraphQL-like field string into nested array format used by QueryBuilder.
      * Example: "id,title,author{id,name},comments{id,likes}".
      */
-    public function normalize(string $fields): array
+    public static function normalize(string $fields): array
     {
         // Tokenize into identifiers and braces, ignore other characters
         preg_match_all('/[A-Za-z0-9_]+|\{|\}/u', $fields, $matches);
@@ -37,12 +37,8 @@ final class FieldParser
         $n = count($tokens);
 
         $pushCurrent = function (array &$current, array $path, $name): void {
-            // At nested level (i.e., path not empty), treat non-id as relation with empty array
-            if ([] !== $path && 'id' !== $name) {
-                $current[$name] = [];
-            } else {
-                $current[] = $name;
-            }
+            // Push as scalar identifier. Relations are only created when followed by '{'.
+            $current[] = $name;
         };
 
         while ($i < $n) {
@@ -107,7 +103,15 @@ final class FieldParser
                 continue;
             }
 
-            // Otherwise, push as scalar or nested relation (heuristic)
+            // If we're at depth >= 2 and the next token closes the block, treat as a relation key
+            if ('}' === $next && count($path) >= 2) {
+                $current[$name] = [];
+                ++$i;
+
+                continue;
+            }
+
+            // Otherwise, push as scalar
             $pushCurrent($current, $path, $name);
             $canUnwindToRoot = false;
             ++$i;

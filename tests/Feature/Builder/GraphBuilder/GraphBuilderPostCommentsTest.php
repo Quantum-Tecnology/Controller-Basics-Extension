@@ -235,17 +235,15 @@ test('100', function () {
     $fields       = 'id title comments { id body } author { id name }';
     $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->sole();
 
-    //    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, onlyFields: ['id', 'comments' => ['id'], 'author' => ['id']]);
-    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, onlyFields: ['id', 'comments' => ['id'], 'author' => ['id']]);
 
     expect($response->toArray())->toBe([
         'id'       => $p->id,
         'comments' => [
             'data' => [
-                0 => [
+                [
                     'data' => [
-                        'id'   => $c->id,
-                        'body' => $c->body,
+                        'id' => $c->id,
                     ],
                 ],
             ],
@@ -256,8 +254,7 @@ test('100', function () {
         ],
         'author' => [
             'data' => [
-                'id'   => $a->id,
-                'name' => $a->name,
+                'id' => $a->id,
             ],
         ],
     ]);
