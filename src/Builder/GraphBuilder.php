@@ -22,10 +22,14 @@ class GraphBuilder
      * @param Model|Paginator|Collection $data
      * @param array|string               $fields GraphQL-like fields (e.g., "id title comments { id }")
      */
-    public function execute($data, array | string $fields, array $options = []): Collection
+    public function execute($data, array | string $fields, ?array $onlyFields = null, array $options = []): Collection
     {
         if (is_string($fields)) {
             $fields = QueryBuilderFieldParser::normalize($fields);
+        }
+
+        if ($onlyFields && is_array($onlyFields)) {
+            $fields = $this->filterFields($fields, $onlyFields);
         }
 
         $unique      = $data instanceof Model;
@@ -179,5 +183,10 @@ class GraphBuilder
         }
 
         return $enum->value;
+    }
+
+    private function filterFields(array $fields, array $onlyFields): array
+    {
+        return $fields;
     }
 }

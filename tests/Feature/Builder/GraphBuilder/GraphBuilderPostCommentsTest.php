@@ -194,8 +194,7 @@ test('returns post with paginated comments on page 2', function (): void {
 });
 
 test('returns post with limited comments like and meta', function (): void {
-    $p       = Post::factory()->create();
-    $comment = Comment::factory()->for($p)->hasLikes(25)->create();
+    Comment::factory()->hasLikes(25)->create();
 
     $fields = 'id title comments { likes {id} }';
 
@@ -210,8 +209,7 @@ test('returns post with limited comments like and meta', function (): void {
 });
 
 test('returns post with limited comments like and meta with options', function (): void {
-    $p       = Post::factory()->create();
-    $comment = Comment::factory()->for($p)->hasLikes(25)->create();
+    Comment::factory()->hasLikes(25)->create();
 
     $fields  = 'id title comments { likes {id} }';
     $options = [
@@ -225,5 +223,18 @@ test('returns post with limited comments like and meta with options', function (
     expect($response['data'][0]['data']['comments']['data'][0]['data']['likes']['meta'])->toBe([
         'total' => 25,
         'page'  => 2,
+    ]);
+});
+
+test('100', function () {
+    $p = Post::factory()->hasComments(1)->create();
+
+    $fields       = 'id title comments { id } author { id }';
+    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->sole();
+
+    $response = $this->graphBuilder->execute($queryBuilder, fields: $fields, onlyFields: ['id']);
+
+    expect($response->toArray())->toBe([
+        'id' => $p->id,
     ]);
 });
