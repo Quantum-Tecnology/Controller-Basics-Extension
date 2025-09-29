@@ -17,7 +17,7 @@ test('returns post with id and title', function (): void {
     $p = Post::factory()->create();
 
     $fields       = 'id title';
-    $queryBuilder = $this->queryBuilder->execute(new Post(), fields: $fields)->sole();
+    $queryBuilder = $this->queryBuilder->execute($p, fields: $fields)->sole();
 
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
