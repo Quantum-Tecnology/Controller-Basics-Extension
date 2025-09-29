@@ -4,10 +4,9 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use QuantumTecnology\ControllerBasicsExtension\Builder\GraphBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
 
@@ -15,8 +14,9 @@ trait AsGraphQLController
 {
     abstract protected function model(): Model;
 
-    public function index(QueryBuilder $queryBuilder, GraphBuilder $graphBuilder, Request $request): Collection
+    public function index(QueryBuilder $queryBuilder, GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
+        $fields = request()->query('fields');
         $result = $queryBuilder->execute($this->model(), $request->query('fields'), $request->query());
 
         if ($request->query('order_column')) {
@@ -25,14 +25,16 @@ trait AsGraphQLController
 
         $query = $result->simplePaginate();
 
-        return $graphBuilder->execute($query, $request->query('fields'), $this->allowedFields());
+        return response()->json($graphBuilder->execute($query, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()));
     }
 
-    public function show(GraphBuilder $graphBuilder, Request $request): Collection
+    public function show(GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $response = $this->findBy($request->query('fields'))->sole();
+        $fields = request()->query('fields');
 
-        return $graphBuilder->execute($response, $request->query('fields'), $request->query());
+        return response()->json([
+            'data' => $graphBuilder->execute($this->findBy($fields), fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
+        ]);
     }
 
     protected function allowedFields(): ?array
@@ -40,7 +42,7 @@ trait AsGraphQLController
         return null;
     }
 
-    protected function findBy(string | array $fields): Builder
+    protected function findBy(string | array $fields): Model
     {
         $routeParams = request()->route()?->parameters() ?: [];
         $idFromParam = array_pop($routeParams);
@@ -52,6 +54,6 @@ trait AsGraphQLController
             [
                 "filter_({$keyName})" => $idFromParam,
             ] + request()->query(),
-        );
+        )->sole();
     }
 }
