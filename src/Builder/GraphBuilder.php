@@ -144,11 +144,7 @@ class GraphBuilder
 
             $records = $model->{$name};
 
-            if ($fatherRelated) {
-                $fatherRelated = "{$fatherRelated}_{$name}";
-            } else {
-                $fatherRelated = $name;
-            }
+            $fatherRelated = $fatherRelated ? "{$fatherRelated}_{$name}" : $name;
 
             $result[$name] = [
                 'data' => $records->map(fn (Model $m) => ['data' => $this->buildItem($m, $name, $nestedFields, $skipDateScalars, $options)])->toArray(),
