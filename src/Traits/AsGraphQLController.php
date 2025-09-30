@@ -11,6 +11,10 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use QuantumTecnology\ControllerBasicsExtension\Builder\GraphBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Services\Interfaces\DeleteServiceInterface;
+use QuantumTecnology\ControllerBasicsExtension\Services\Interfaces\IndexServiceInterface;
+use QuantumTecnology\ControllerBasicsExtension\Services\Interfaces\StoreServiceInterface;
+use QuantumTecnology\ControllerBasicsExtension\Services\Interfaces\UpdateServiceInterface;
 use QuantumTecnology\ControllerBasicsExtension\Services\RelationshipService;
 
 trait AsGraphQLController
@@ -19,8 +23,13 @@ trait AsGraphQLController
 
     public function index(QueryBuilder $queryBuilder, GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
+        $this->getDataRequest('index', true);
+
         $fields = request()->query('fields');
-        $result = $queryBuilder->execute($this->model(), $request->query('fields'), $request->query());
+
+        $result = $this->getService() && $this->getService() instanceof IndexServiceInterface
+            ? $this->getService()->index($fields, $request->search, $request->query())
+            : $queryBuilder->execute($this->model(), $request->query('fields'), $request->query());
 
         if ($request->query('order_column')) {
             $result->orderBy($request->query('order_column'), $request->query('order_direction'));
@@ -28,46 +37,72 @@ trait AsGraphQLController
 
         $query = $result->simplePaginate();
 
-        return response()->json($graphBuilder->execute($query, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()));
+        $data = $graphBuilder->execute($query, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query());
+
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $this->allowedFields();
+        }
+
+        return response()->json($data);
     }
 
     public function show(GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
         $fields = request()->query('fields');
 
-        return response()->json([
+        $data = [
             'data' => $graphBuilder->execute($this->findBy($fields), fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
-        ]);
+        ];
+
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $this->allowedFields();
+        }
+
+        return response()->json($data);
     }
 
     public function store(GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
         $dataValues = $this->getDataRequest('store');
 
+        $modelSave = $this->getService() && $this->getService() instanceof StoreServiceInterface
+            ? $this->getService()->store($dataValues)
+            : $this->execute($this->model(), $dataValues);
+
         $keyName = $this->model()->getKeyName();
         $fields  = request()->query('fields', [$keyName]);
 
-        $modelStore = $this->execute($this->model(), $dataValues);
+        $data = [
+            'data' => $graphBuilder->execute($modelSave, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
+        ];
 
-        return response()->json([
-            'data' => $graphBuilder->execute($modelStore, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
-        ]);
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $this->allowedFields();
+        }
+
+        return response()->json($data);
     }
 
     public function update(GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
         $dataValues = $this->getDataRequest('update');
+        $keyName    = $this->model()->getKeyName();
+        $fields     = request()->query('fields', [$keyName]);
+        $model      = $this->findBy($fields);
 
-        $keyName = $this->model()->getKeyName();
-        $fields  = request()->query('fields', [$keyName]);
+        $modelSave = $this->getService() && $this->getService() instanceof UpdateServiceInterface
+            ? $this->getService()->update($model, $dataValues)
+            : $this->execute($model, $dataValues);
 
-        $model = $this->findBy($fields);
+        $data = [
+            'data' => $graphBuilder->execute($modelSave, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
+        ];
 
-        $modelUpdate = $this->execute($model, $dataValues);
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $this->allowedFields();
+        }
 
-        return response()->json([
-            'data' => $graphBuilder->execute($modelUpdate, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
-        ]);
+        return response()->json($data);
     }
 
     public function destroy(GraphBuilder $graphBuilder, Request $request): Response
@@ -78,7 +113,9 @@ trait AsGraphQLController
 
         $model = $this->findBy($fields);
 
-        DB::transaction(fn () => $model->delete());
+        DB::transaction(fn () => $modelSave = $this->getService() && $this->getService() instanceof DeleteServiceInterface
+            ? $this->getService()->delete($model)
+            : $model->delete());
 
         return response()->noContent();
     }
@@ -153,5 +190,10 @@ trait AsGraphQLController
     protected function execute(Model $model, array $data)
     {
         return DB::transaction(fn () => app(RelationshipService::class)->execute($model, $data));
+    }
+
+    private function getService()
+    {
+        return when(method_exists($this, 'service'), fn () => app($this->service()));
     }
 }
