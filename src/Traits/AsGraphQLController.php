@@ -29,9 +29,10 @@ trait AsGraphQLController
     ): JsonResponse {
         $this->getDataRequest('index', true);
 
-        $keyName    = $this->model()->getKeyName();
-        $fields     = request()->query('fields', [$keyName]);
-        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
 
         $filter = array_filter($request->query(), fn ($item) => str_starts_with($item, 'filter'), ARRAY_FILTER_USE_KEY);
 
@@ -65,9 +66,10 @@ trait AsGraphQLController
 
     public function show(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $keyName    = $this->model()->getKeyName();
-        $fields     = request()->query('fields', [$keyName]);
-        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
 
         $data = [
             'data' => $graphBuilder->execute(
@@ -93,9 +95,10 @@ trait AsGraphQLController
             ? $this->getService()->store($dataValues)
             : $this->execute($this->model(), $dataValues);
 
-        $keyName    = $this->model()->getKeyName();
-        $fields     = request()->query('fields', [$keyName]);
-        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
 
         $data = [
             'data' => $graphBuilder->execute(
@@ -115,11 +118,12 @@ trait AsGraphQLController
 
     public function update(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $dataValues = $this->getDataRequest('update');
-        $keyName    = $this->model()->getKeyName();
-        $fields     = request()->query('fields', [$keyName]);
-        $model      = $this->findBy($fields);
-        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
+        $dataValues   = $this->getDataRequest('update');
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $model        = $this->findBy($fields);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
 
         $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
             ? $this->getService()->update($model, $dataValues)
