@@ -69,11 +69,12 @@ trait AsGraphQLController
             ? $this->getService()->store($dataValues)
             : $this->execute($this->model(), $dataValues);
 
-        $keyName = $this->model()->getKeyName();
-        $fields  = request()->query('fields', [$keyName]);
+        $keyName    = $this->model()->getKeyName();
+        $fields     = request()->query('fields', [$keyName]);
+        $onlyFields = array_merge([$keyName], $this->allowedFields());
 
         $data = [
-            'data' => $graphBuilder->execute($modelSave, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
+            'data' => $graphBuilder->execute($modelSave, fields: $fields, onlyFields: $onlyFields, options: $request->query()),
         ];
 
         if (app()->isLocal()) {
@@ -89,13 +90,14 @@ trait AsGraphQLController
         $keyName    = $this->model()->getKeyName();
         $fields     = request()->query('fields', [$keyName]);
         $model      = $this->findBy($fields);
+        $onlyFields = array_merge([$keyName], $this->allowedFields());
 
         $modelSave = $this->getService() && $this->getService() instanceof UpdateServiceInterface
             ? $this->getService()->update($model, $dataValues)
             : $this->execute($model, $dataValues);
 
         $data = [
-            'data' => $graphBuilder->execute($modelSave, fields: $fields, onlyFields: $this->allowedFields(), options: $request->query()),
+            'data' => $graphBuilder->execute($modelSave, fields: $fields, onlyFields: $onlyFields, options: $request->query()),
         ];
 
         if (app()->isLocal()) {
