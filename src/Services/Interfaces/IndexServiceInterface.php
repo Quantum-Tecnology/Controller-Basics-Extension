@@ -6,5 +6,5 @@ namespace QuantumTecnology\ControllerBasicsExtension\Services\Interfaces;
 
 interface IndexServiceInterface
 {
-    public function index(array | string | null $fields = [], ?string $search = null, ?array $options = []);
+    public function index(array | string | null $fields = [], ?string $search = null, ?array $filters = []);
 }
