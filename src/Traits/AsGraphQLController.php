@@ -30,9 +30,8 @@ trait AsGraphQLController
         $this->getDataRequest('index', true);
 
         $fields = request()->query('fields');
-
         $result = $this->getService() && $this->getService() instanceof Interfaces\IndexServiceInterface
-            ? $this->getService()->index($fields, $request->search, $request->query())
+            ? $this->getService()->index($fields, $request->search, array_filter($request->query(), fn ($item) => str_starts_with($item, 'filter'), ARRAY_FILTER_USE_KEY))
             : $queryBuilder->execute($this->model(), $request->query('fields'), $request->query());
 
         if ($request->query('order_column')) {
