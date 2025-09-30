@@ -112,7 +112,7 @@ trait AsGraphQLController
         return response()->json($data);
     }
 
-    public function destroy(GraphBuilder $graphBuilder, Request $request): Response
+    public function destroy(): Response
     {
         $this->getDataRequest('destroy', true);
 
