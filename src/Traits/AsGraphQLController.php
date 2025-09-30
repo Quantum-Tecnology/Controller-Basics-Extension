@@ -31,14 +31,20 @@ trait AsGraphQLController
 
         $keyName    = $this->model()->getKeyName();
         $fields     = request()->query('fields', [$keyName]);
-        $onlyFields = array_merge([$keyName], $this->allowedFields());
+        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
+
+        $filter = array_filter($request->query(), fn ($item) => str_starts_with($item, 'filter'), ARRAY_FILTER_USE_KEY);
 
         $result = $this->getService() && $this->getService() instanceof Interfaces\IndexServiceInterface
-            ? $this->getService()->index($fields, $request->search, array_filter($request->query(), fn ($item) => str_starts_with($item, 'filter'), ARRAY_FILTER_USE_KEY))
+            ? $this->getService()->index($fields, $request->search, $filter + $this->routeParams())
             : $queryBuilder->execute($this->model(), $request->query('fields'), $request->query());
 
         if ($request->query('order_column')) {
             $result->orderBy($request->query('order_column'), $request->query('order_direction'));
+        }
+
+        if (app()->isLocal() && $request->has('sql')) {
+            $result->ddRawSql();
         }
 
         $query = $result->simplePaginate();
@@ -61,7 +67,7 @@ trait AsGraphQLController
     {
         $keyName    = $this->model()->getKeyName();
         $fields     = request()->query('fields', [$keyName]);
-        $onlyFields = array_merge([$keyName], $this->allowedFields());
+        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
 
         $data = [
             'data' => $graphBuilder->execute(
@@ -81,7 +87,7 @@ trait AsGraphQLController
 
     public function store(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $dataValues = $this->getDataRequest('store');
+        $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
         $modelSave = $this->getService() && $this->getService() instanceof Interfaces\StoreServiceInterface
             ? $this->getService()->store($dataValues)
@@ -89,7 +95,7 @@ trait AsGraphQLController
 
         $keyName    = $this->model()->getKeyName();
         $fields     = request()->query('fields', [$keyName]);
-        $onlyFields = array_merge([$keyName], $this->allowedFields());
+        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
 
         $data = [
             'data' => $graphBuilder->execute(
@@ -113,7 +119,7 @@ trait AsGraphQLController
         $keyName    = $this->model()->getKeyName();
         $fields     = request()->query('fields', [$keyName]);
         $model      = $this->findBy($fields);
-        $onlyFields = array_merge([$keyName], $this->allowedFields());
+        $onlyFields = array_values(array_unique(array_merge([$keyName], $this->allowedFields())));
 
         $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
             ? $this->getService()->update($model, $dataValues)
@@ -157,23 +163,29 @@ trait AsGraphQLController
 
     protected function findBy(string | array | null $fields = []): Model
     {
-        $routeParams = request()->route()?->parameters() ?: [];
+        $routeParams = $this->routeParams();
         $idFromParam = array_pop($routeParams);
         $keyName     = $this->model()->getKeyName();
 
-        return app(Builder\QueryBuilder::class)->execute(
+        $result = app(Builder\QueryBuilder::class)->execute(
             $this->model(),
             $fields ?: [],
             [
-                "filter_({$keyName})" => $idFromParam,
-            ] + $this->filterRouteParams($routeParams) + request()->query(),
-        )->sole();
+                "filter({$keyName})" => $idFromParam,
+            ] + $routeParams,
+        );
+
+        if (app()->isLocal() && request()->has('sql')) {
+            $result->ddRawSql();
+        }
+
+        return $result->sole();
     }
 
-    protected function filterRouteParams(array $data): array
+    protected function routeParams($filter = true): array
     {
-        return collect($data)
-            ->mapWithKeys(fn ($value, $key) => ['filter_(' . $key . ')' => $value])
+        return collect(request()->route()?->parameters() ?: [])
+            ->mapWithKeys(fn ($value, $key) => [($filter ? ('filter(' . $key . ')') : $key) => $value])
             ->all();
     }
 
