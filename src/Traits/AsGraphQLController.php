@@ -21,6 +21,11 @@ trait AsGraphQLController
 {
     abstract protected function model(): Model;
 
+    public function service(): ?string
+    {
+        return null;
+    }
+
     public function index(QueryBuilder $queryBuilder, GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
         $this->getDataRequest('index', true);
@@ -196,6 +201,6 @@ trait AsGraphQLController
 
     private function getService()
     {
-        return when(method_exists($this, 'service'), fn () => app($this->service()));
+        return when($this->service(), fn () => app($this->service()));
     }
 }
