@@ -51,7 +51,7 @@ trait AsGraphQLController
         );
 
         if (app()->isLocal()) {
-            $data['allowed_fields'] = $this->allowedFields();
+            $data['allowed_fields'] = $onlyFields;
         }
 
         return response()->json($data);
@@ -59,19 +59,21 @@ trait AsGraphQLController
 
     public function show(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $fields = request()->query('fields');
+        $keyName    = $this->model()->getKeyName();
+        $fields     = request()->query('fields', [$keyName]);
+        $onlyFields = array_merge([$keyName], $this->allowedFields());
 
         $data = [
             'data' => $graphBuilder->execute(
                 data: $this->findBy($fields),
                 fields: $fields,
-                onlyFields: $this->allowedFields(),
+                onlyFields: $onlyFields,
                 options: $request->query()
             ),
         ];
 
         if (app()->isLocal()) {
-            $data['allowed_fields'] = $this->allowedFields();
+            $data['allowed_fields'] = $onlyFields;
         }
 
         return response()->json($data);
@@ -99,7 +101,7 @@ trait AsGraphQLController
         ];
 
         if (app()->isLocal()) {
-            $data['allowed_fields'] = $this->allowedFields();
+            $data['allowed_fields'] = $onlyFields;
         }
 
         return response()->json($data);
@@ -127,7 +129,7 @@ trait AsGraphQLController
         ];
 
         if (app()->isLocal()) {
-            $data['allowed_fields'] = $this->allowedFields();
+            $data['allowed_fields'] = $onlyFields;
         }
 
         return response()->json($data);
