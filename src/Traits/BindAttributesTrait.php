@@ -40,6 +40,16 @@ trait BindAttributesTrait
                     $this->{$key} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
                     unset($this->{$attribute});
                 }
+
+                $f = array_keys(array_filter(config('bind.attributes'), fn ($item) => $item === $key));
+
+                if (filled($f) && !in_array($key, $this->exceptBindFields())) {
+                    $field = $f[0];
+
+                    $this->setAttribute($field, $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null);
+                    $this->{$field} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
+                    unset($this->{$key});
+                }
             });
     }
 

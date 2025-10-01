@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V3.2.1 (01/10/2025)
+
+# PT-BR
+
+- Aprimorar o BindAttributesTrait para apoiar a ligação de atributos dinâmicos. @bhcosta90
+
+# EN
+
+- Enhance BindAttributesTrait to support dynamic attribute binding. @bhcosta90
+
 ## V3.2.0 (16/09/2025)
 
 # PT-BR
