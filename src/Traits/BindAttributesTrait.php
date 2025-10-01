@@ -41,14 +41,19 @@ trait BindAttributesTrait
                     unset($this->{$attribute});
                 }
 
-                $f = array_keys(array_filter(config('bind.attributes'), fn ($item) => $item === $key));
+                $f = array_filter(config('bind.attributes'), fn ($item) => $item === $key);
 
                 if (filled($f) && !in_array($key, $this->exceptBindFields())) {
-                    $field = $f[0];
+                    $keyName = array_keys($f)[0];
+                    $value   = array_values($f)[0];
 
-                    $this->setAttribute($field, $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null);
-                    $this->{$field} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
-                    unset($this->{$key});
+                    if (isset($f[$key])) {
+                        $field = $f[$key];
+
+                        $this->setAttribute($field, $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null);
+                        $this->{$field} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
+                        unset($this->{$key});
+                    }
                 }
             });
     }
