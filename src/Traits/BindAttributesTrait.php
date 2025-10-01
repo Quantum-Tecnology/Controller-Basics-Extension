@@ -52,8 +52,9 @@ trait BindAttributesTrait
 
                         $this->setAttribute($field, $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null);
                         $this->{$field} = $this->getDirty()[$key] ?? $this->getDirty()[$attribute] ?? null;
-                        unset($this->{$key});
                     }
+
+                    unset($this->{$key});
                 }
             });
     }
