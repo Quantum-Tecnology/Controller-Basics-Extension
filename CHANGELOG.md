@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V3.3.0 (27/10/2025)
+
+# PT-BR
+
+- Adicionado a tipagem StreamedResponse no controller para que funcione a exportação via csv. @GustavoSantarosa
+
+# EN
+
+- Added StreamedResponse typing in the controller to enable CSV export functionality. @GustavoSantarosa
+
 ## V3.2.1 (01/10/2025)
 
 # PT-BR
