@@ -5,10 +5,11 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 trait IndexControllerTrait
 {
-    public function index(): JsonResponse
+    public function index(): JsonResponse | StreamedResponse
     {
         $this->checkIncludes();
         $result = $this->getService()->index();
