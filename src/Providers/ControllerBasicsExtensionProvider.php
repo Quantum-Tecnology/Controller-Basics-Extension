@@ -16,9 +16,10 @@ final class ControllerBasicsExtensionProvider extends ServiceProvider
     public function register(): void
     {
         foreach ([
-            'hashids' => __DIR__ . '/../Config/hashids.php',
-            'bind'    => __DIR__ . '/../Config/bind.php',
-            'page'    => __DIR__ . '/../Config/page.php',
+            'hashids'  => __DIR__ . '/../Config/hashids.php',
+            'bind'     => __DIR__ . '/../Config/bind.php',
+            'page'     => __DIR__ . '/../Config/page.php',
+            'fallback' => __DIR__ . '/../Config/fallback.php',
         ] as $key => $path) {
             $this->mergeConfigFrom($path, $key);
         }
@@ -27,9 +28,10 @@ final class ControllerBasicsExtensionProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/hashids.php' => __DIR__ . '/../hashids.php',
-            __DIR__ . '/../config/bind.php'    => __DIR__ . '/../bind.php',
-            __DIR__ . '/../config/page.php'    => __DIR__ . '/../page.php',
+            __DIR__ . '/../config/hashids.php'  => __DIR__ . '/../hashids.php',
+            __DIR__ . '/../config/bind.php'     => __DIR__ . '/../bind.php',
+            __DIR__ . '/../config/page.php'     => __DIR__ . '/../page.php',
+            __DIR__ . '/../config/fallback.php' => __DIR__ . '/../fallback.php',
         ], 'config');
 
         /* $this->app->make(Kernel::class)

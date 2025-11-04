@@ -1,5 +1,17 @@
 # CHANGE LOG
 
+## V3.4.0 (04/11/2025)
+
+# PT-BR
+
+- Adicionado um provider para fallback automatico para redis, caso o banco de dados esteja indisponivel. @GustavoSantarosa
+- Adicionado uma classe de suporte para routing. @GustavoSantarosa
+
+# EN
+
+- Added automatic fallback provider for Redis in case the database is unavailable. @GustavoSantarosa
+- Added support class for routing. @GustavoSantarosa
+
 ## V3.3.0 (27/10/2025)
 
 # PT-BR
