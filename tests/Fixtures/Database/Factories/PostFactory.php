@@ -19,6 +19,7 @@ final class PostFactory extends Factory
         return [
             'author_id'  => Author::factory(),
             'title'      => $this->faker->sentence(3),
+            'body'       => $this->faker->sentence(3),
             'status'     => $this->faker->randomElement(PostStatusEnum::cases()),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
