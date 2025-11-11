@@ -22,19 +22,35 @@ class ApplyFilter
                     $lowerOp = is_string($op) ? mb_strtolower($op) : $op;
 
                     if ('null' === $lowerOp) {
-                        $query->whereNull($qualifiedField);
+
+                        $values ? $query->whereNull($qualifiedField) : $query->whereNotNull($qualifiedField);
 
                         continue;
                     }
 
                     if ('not-null' === $lowerOp) {
-                        $query->whereNotNull($qualifiedField);
+                        $values ? $query->whereNotNull($qualifiedField) : $query->whereNull($qualifiedField);
+
+                        continue;
+                    }
+
+                    if (in_array($newValue = $values->first(), ['true', 'false'], true)) {
+                        $newValue = 'true' === $newValue;
+                        $query->where($qualifiedField, $op, $newValue);
 
                         continue;
                     }
 
                     if (in_array($op, ['=', '=='], true)) {
                         $query->whereIn($qualifiedField, $values);
+
+                        continue;
+                    }
+
+                    if (str_starts_with($field, 'by_')) {
+                        $newFilter = str($field)->camel()->toString();
+
+                        $query->{$newFilter}(collect(explode('|', $op)), $values);
 
                         continue;
                     }
