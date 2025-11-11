@@ -10,11 +10,10 @@ class RoutingSupport
      * Retorna um callable que carrega rotas e registra uma rota de health-check.
      *
      * @param string $routesRelativePath Caminho relativo ao arquivo de rotas a partir do base_path()
-     * @return callable
      */
     public static function makeRoutesLoader(string $routesRelativePath = 'routes/api.php'): callable
     {
-        return function () use ($routesRelativePath) {
+        return function () use ($routesRelativePath): void {
             // carrega o arquivo de rotas fornecido
             require base_path($routesRelativePath);
 

@@ -71,7 +71,7 @@ class QueryBuilder
             $counts = [];
 
             foreach ($this->withCount as $k => $v) {
-                if (!str_contains($k, '.')) {
+                if (!str_contains((string) $k, '.')) {
                     if (true === $v) {
                         $counts[] = $k;
                     } else {

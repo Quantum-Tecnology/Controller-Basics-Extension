@@ -85,7 +85,7 @@ class Decoder
         array_walk($inputs, function (&$value, $key): void {
             if (!blank($value) && !is_int($value) && self::isIdentifier($key) && is_array($value)) {
 
-                $value = collect($value)->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(fn ($decoded): bool => self::wasDecoded($decoded))->all();
+                $value = collect($value)->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(self::wasDecoded(...))->all();
             }
         });
 
@@ -93,7 +93,7 @@ class Decoder
             self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
             if (!blank($value) && is_string($value) && self::isIdentifier($key)) {
-                $value = collect(explode(',', $value))->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(fn ($decoded): bool => self::wasDecoded($decoded))->implode(',');
+                $value = collect(explode(',', $value))->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(self::wasDecoded(...))->implode(',');
 
                 $decoded = current(Hashids::decode($value));
 

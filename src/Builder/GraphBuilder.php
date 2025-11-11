@@ -42,9 +42,7 @@ class GraphBuilder
         // Normalize iterable dataset
         $iterable = $unique ? collect([$data]) : ($paginator ? collect($data->items()) : collect($data));
 
-        $mapped = $iterable->map(function (Model $model) use ($fields, $paginator, $options): array {
-            return $this->buildItem($model, null, $fields, $paginator, $options);
-        });
+        $mapped = $iterable->map(fn (Model $model): array => $this->buildItem($model, null, $fields, $paginator, $options));
 
         // Build meta
         $meta = [];
@@ -77,8 +75,8 @@ class GraphBuilder
 
         return collect([
             'data' => $lengthAware
-                ? $mapped->map(fn (array $item) => ['data' => $item])->toArray()
-                : $mapped->map(fn (array $item) => ['data' => $item]),
+                ? $mapped->map(fn (array $item): array => ['data' => $item])->toArray()
+                : $mapped->map(fn (array $item): array => ['data' => $item]),
         ] + $meta);
     }
 
@@ -104,11 +102,9 @@ class GraphBuilder
         // Map scalar fields with formatting
         foreach ($scalars as $field) {
             // Skip unknown attributes gracefully
-            if (!array_key_exists($field, $model->getAttributes()) && !\array_key_exists($field, $this->getAllModelComputed($model))) {
-                // Allow timestamps commonly present on models
-                if (!in_array($field, ['created_at', 'updated_at', 'deleted_at'], true)) {
-                    continue;
-                }
+            // Allow timestamps commonly present on models
+            if (!array_key_exists($field, $model->getAttributes()) && !\array_key_exists($field, $this->getAllModelComputed($model)) && !in_array($field, ['created_at', 'updated_at', 'deleted_at'], true)) {
+                continue;
             }
 
             $value = $model->{$field} ?? null;
@@ -158,7 +154,7 @@ class GraphBuilder
             $limit         = $options['page_limit_' . $fatherRelated] ?? config('page.per_page');
 
             $result[$name] = [
-                'data' => $records->map(fn (Model $m) => ['data' => $this->buildItem($m, $name, $nestedFields, $skipDateScalars, $options)])->toArray(),
+                'data' => $records->map(fn (Model $m): array => ['data' => $this->buildItem($m, $name, $nestedFields, $skipDateScalars, $options)])->toArray(),
                 'meta' => [
                     'total'          => $total,
                     'page'           => $page,
@@ -198,7 +194,7 @@ class GraphBuilder
         // Recursively keep only the scalar fields and relations specified in $onlyFields.
         // - Root-level integer-indexed strings in $onlyFields define allowed scalars at this level.
         // - String keys in $onlyFields define allowed relations and their subfield rules.
-        if (empty($onlyFields)) {
+        if ([] === $onlyFields) {
             return [];
         }
 

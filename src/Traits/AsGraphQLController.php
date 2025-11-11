@@ -34,7 +34,7 @@ trait AsGraphQLController
         $onlyFields   = $this->allowedFields();
         $onlyFields[] = $keyName;
 
-        $filter = array_filter($request->query(), fn ($item) => str_starts_with($item, 'filter'), ARRAY_FILTER_USE_KEY);
+        $filter = array_filter($request->query(), fn ($item): bool => str_starts_with((string) $item, 'filter'), ARRAY_FILTER_USE_KEY);
 
         $result = $this->getService() && $this->getService() instanceof Interfaces\IndexServiceInterface
             ? $this->getService()->index($fields, $request->search, $filter + $this->routeParams())
@@ -189,7 +189,7 @@ trait AsGraphQLController
     protected function routeParams($filter = true): array
     {
         return collect(request()->route()?->parameters() ?: [])
-            ->mapWithKeys(fn ($value, $key) => [($filter ? ('filter(' . $key . ')') : $key) => $value])
+            ->mapWithKeys(fn ($value, $key): array => [($filter ? ('filter(' . $key . ')') : $key) => $value])
             ->all();
     }
 

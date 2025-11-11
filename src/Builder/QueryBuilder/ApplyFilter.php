@@ -47,7 +47,7 @@ class ApplyFilter
                         continue;
                     }
 
-                    if (str_starts_with($field, 'by_')) {
+                    if (str_starts_with((string) $field, 'by_')) {
                         $newFilter = str($field)->camel()->toString();
 
                         $query->{$newFilter}(collect(explode('|', $op)), $values);

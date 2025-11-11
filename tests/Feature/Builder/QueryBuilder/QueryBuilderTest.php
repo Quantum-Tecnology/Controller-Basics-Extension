@@ -8,7 +8,7 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
 beforeEach(fn () => $this->builder = app(QueryBuilder::class));
 
-test('it returns the created post with correct title', function () {
+test('it returns the created post with correct title', function (): void {
     $post = Post::factory()->create();
 
     $response = $this->builder->execute(new Post())->sole();
@@ -16,7 +16,7 @@ test('it returns the created post with correct title', function () {
     expect($response)->title->toBe($post->title);
 });
 
-test('it loads nested relations as specified in fields', function () {
+test('it loads nested relations as specified in fields', function (): void {
     $post = Post::factory()->hasLikes(5)->create();
     Comment::factory()->for($post)->count(3)->hasLikes(3)->create();
 
@@ -29,7 +29,7 @@ test('it loads nested relations as specified in fields', function () {
         ->and(array_keys($response->comments->first()->getRelations()))->toBe(['likes']);
 });
 
-test('it creates a post with likes and comments', function () {
+test('it creates a post with likes and comments', function (): void {
     $post    = Post::factory()->hasLikes(5)->create();
     $comment = Comment::factory()->for($post)->count(30)->create();
     $comment->first()->likes()->createMany([
@@ -48,7 +48,7 @@ test('it creates a post with likes and comments', function () {
         ->and($response->comments->first()->likes_count)->toBe(4);
 });
 
-test('it returns comments count and limits loaded comments to 10', function () {
+test('it returns comments count and limits loaded comments to 10', function (): void {
     $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(30)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],
@@ -64,7 +64,7 @@ test('it returns comments count and limits loaded comments to 10', function () {
         ->and($post->comments->count())->toBe(10);
 });
 
-test('it paginates nested relations and returns correct counts', function () {
+test('it paginates nested relations and returns correct counts', function (): void {
     $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(25)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],
@@ -83,7 +83,7 @@ test('it paginates nested relations and returns correct counts', function () {
         ->and($post->comments->count())->toBe(24);
 });
 
-test('it orders comments and nested likes in descending order', function () {
+test('it orders comments and nested likes in descending order', function (): void {
     $comment = Comment::factory()->for(Post::factory()->hasLikes(5)->create())->count(5)->create();
     $comment->first()->likes()->createMany([
         ['like' => 1],

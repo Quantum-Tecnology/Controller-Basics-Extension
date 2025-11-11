@@ -8,7 +8,7 @@ use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Author;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->queryBuilder = app(QueryBuilder::class);
     $this->graphBuilder = app(GraphBuilder::class);
 });
@@ -37,14 +37,12 @@ test('paginates posts with id, title, and created_at', function (): void {
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
-        'data' => collect([0, 1])->map(function ($i) use ($p) {
-            return [
-                'data' => [
-                    'id'    => $p[$i]->id,
-                    'title' => $p[$i]->title,
-                ],
-            ];
-        })->toArray(),
+        'data' => collect([0, 1])->map(fn ($i): array => [
+            'data' => [
+                'id'    => $p[$i]->id,
+                'title' => $p[$i]->title,
+            ],
+        ])->toArray(),
         'meta' => [
             'per_page'       => 2,
             'current_page'   => 1,
@@ -68,14 +66,12 @@ test('simple pagination returns correct post data', function (): void {
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
     expect($response->toArray())->toBe([
-        'data' => collect([0, 1])->map(function ($i) use ($p) {
-            return [
-                'data' => [
-                    'id'    => $p->get($i)->id,
-                    'title' => $p->get($i)->title,
-                ],
-            ];
-        })->toArray(),
+        'data' => collect([0, 1])->map(fn ($i): array => [
+            'data' => [
+                'id'    => $p->get($i)->id,
+                'title' => $p->get($i)->title,
+            ],
+        ])->toArray(),
         'meta' => [
             'per_page'       => 2,
             'current_page'   => 1,
@@ -96,15 +92,13 @@ test('returns all posts with meta total', function (): void {
 
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields);
 
-    expect($response->toArray()['data'])->toBe($posts->map(function ($post) {
-        return [
-            'data' => [
-                'id'         => $post->id,
-                'title'      => $post->title,
-                'created_at' => $post->created_at->format('Y-m-d H:i:s'),
-            ],
-        ];
-    })->toArray());
+    expect($response->toArray()['data'])->toBe($posts->map(fn ($post): array => [
+        'data' => [
+            'id'         => $post->id,
+            'title'      => $post->title,
+            'created_at' => $post->created_at->format('Y-m-d H:i:s'),
+        ],
+    ])->toArray());
 });
 
 test('returns post with author relationship', function (): void {
@@ -143,13 +137,11 @@ test('returns post with limited comments and meta', function (): void {
     $response = $this->graphBuilder->execute($queryBuilder, fields: $fields)->toArray();
 
     $commentsMap = [
-        'data' => $p->comments()->limit(10)->get()->map(function ($comment) {
-            return [
-                'data' => [
-                    'id' => $comment->id,
-                ],
-            ];
-        })->toArray(),
+        'data' => $p->comments()->limit(10)->get()->map(fn ($comment): array => [
+            'data' => [
+                'id' => $comment->id,
+            ],
+        ])->toArray(),
         'meta' => [
             'total'          => 25,
             'page'           => 1,
@@ -234,7 +226,7 @@ test('returns post with limited comments like and meta with options', function (
     ]);
 });
 
-test('returns post with only selected fields for comments and author', function () {
+test('returns post with only selected fields for comments and author', function (): void {
     $a = Author::factory()->create();
     $p = Post::factory()->for($a)->create();
     $c = Comment::factory()->for($p)->create();
