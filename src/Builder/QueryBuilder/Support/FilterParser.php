@@ -83,7 +83,7 @@ final class FilterParser
             if (in_array(mb_strtolower($operation), ['null', 'not-null'], true)) {
                 $filters[$group][$field][] = [
                     'operation' => $operation,
-                    'value'     => null,
+                    'value'     => 'true' === $value,
                 ];
 
                 continue;
