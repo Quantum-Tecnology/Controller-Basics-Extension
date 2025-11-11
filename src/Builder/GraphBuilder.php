@@ -31,7 +31,7 @@ class GraphBuilder
             $fields = (new QueryBuilderFieldParser())->normalize($fields);
         }
 
-        if ($onlyFields && is_array($onlyFields)) {
+        if ($onlyFields) {
             $fields = $this->filterFields($fields, $onlyFields);
         }
 
