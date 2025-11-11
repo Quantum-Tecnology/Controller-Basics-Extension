@@ -6,7 +6,8 @@
   "require": {
     "php": "^8.2",
     "quantumtecnology/service-basics-extension": "^3.0.7",
-    "vinkla/hashids": "^13.0 | ^12.0"
+    "vinkla/hashids": "^13.0 | ^12.0",
+    "quantumtecnology/handler-basics-extension": "2.2.0"
   },
   "autoload": {
     "files": [
