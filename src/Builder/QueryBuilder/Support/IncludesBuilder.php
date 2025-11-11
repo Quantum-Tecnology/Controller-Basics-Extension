@@ -16,8 +16,14 @@ final class IncludesBuilder
      *
      * @return array Includes array compatible with Eloquent::with()
      */
-    public static function build(Model $model, string | array $fields, array $filters = [], array $pagination = [], array $order = [], array &$withCount = []): array
-    {
+    public static function build(
+        Model $model,
+        string | array $fields,
+        array $filters = [],
+        array $pagination = [],
+        array $order = [],
+        array &$withCount = []
+    ): array {
         $hasNested = false;
 
         foreach ((array) $fields as $value) {
