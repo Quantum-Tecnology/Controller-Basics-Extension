@@ -3,7 +3,7 @@
 declare(strict_types = 1);
 
 use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\IncludesBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\IncludesBuilder;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Comment;
 use QuantumTecnology\ControllerBasicsExtension\Tests\Fixtures\App\Models\Post;
 

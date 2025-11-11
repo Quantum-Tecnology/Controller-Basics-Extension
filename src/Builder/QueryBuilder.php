@@ -7,11 +7,11 @@ namespace QuantumTecnology\ControllerBasicsExtension\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\ApplyFilter;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FieldParser;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FilterParser;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\IncludesBuilder;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\RelationUtils;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\ApplyFilter;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\FieldParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\FilterParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\IncludesBuilder;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\RelationUtils;
 
 class QueryBuilder
 {

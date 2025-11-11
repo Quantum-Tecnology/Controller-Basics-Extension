@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support;
+namespace QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FieldParser as QueryBuilderFieldParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\FieldParser as QueryBuilderFieldParser;
 
 class GraphBuilder
 {

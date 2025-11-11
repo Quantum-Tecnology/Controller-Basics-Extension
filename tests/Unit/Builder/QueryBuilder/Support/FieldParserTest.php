@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\Support\FieldParser;
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder\FieldParser;
 
 beforeEach(function () {
     $this->execute = new FieldParser();
