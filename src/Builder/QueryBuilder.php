@@ -17,8 +17,11 @@ class QueryBuilder
 {
     protected array $withCount = [];
 
-    public function execute(Model $model, string | array $fields = [], array $options = []): EloquentBuilder
-    {
+    public function execute(
+        Model $model,
+        string | array $fields = [],
+        array $options = []
+    ): EloquentBuilder {
         $query = $model->query();
 
         if (is_string($fields)) {
