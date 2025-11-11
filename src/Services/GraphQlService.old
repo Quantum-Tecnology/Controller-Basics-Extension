@@ -103,27 +103,30 @@ final readonly class GraphQlService
         ?array $fields,
         ?array $pagination,
     ): Collection {
-        $response = [];
-
-        foreach ($builder as $item) {
-            $response[] = $this->presenter->execute($item, $fields, $pagination);
-        }
-
-        $pagination = [
-            'per_page'       => $builder->perPage(),
-            'current_page'   => $builder->currentPage(),
-            'has_more_pages' => $builder->hasMorePages(),
-            'page_name'      => $builder->getOptions()['pageName'],
+        $response = [
+            'data' => [],
         ];
 
-        if ($builder instanceof LengthAwarePaginator) {
-            $pagination['total']     = $builder->total();
-            $pagination['last_page'] = $builder->lastPage();
+        foreach ($builder as $item) {
+            $response['data'][] = $this->presenter->execute($item, $fields, $pagination);
         }
 
-        return collect([
-            'data' => $response,
-            'meta' => $pagination,
-        ]);
+        if ($builder instanceof Paginator) {
+            $response['meta'] = array_merge($response['meta'] ?? [], [
+                'per_page'       => $builder->perPage(),
+                'current_page'   => $builder->currentPage(),
+                'has_more_pages' => $builder->hasMorePages(),
+                'page_name'      => $builder->getOptions()['pageName'],
+            ]);
+        }
+
+        if ($builder instanceof LengthAwarePaginator) {
+            $response['meta'] = array_merge($response['meta'] ?? [], [
+                'total'     => $builder->total(),
+                'last_page' => $builder->lastPage(),
+            ]);
+        }
+
+        return collect($response);
     }
 }

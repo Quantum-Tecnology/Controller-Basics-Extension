@@ -5,10 +5,11 @@ declare(strict_types = 1);
 namespace QuantumTecnology\ControllerBasicsExtension\Contracts;
 
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 interface ControllerInterface
 {
-    public function index(): JsonResponse;
+    public function index(): JsonResponse | StreamedResponse;
 
     public function show(int $id): JsonResponse;
 
