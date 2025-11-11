@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## X.X.X
+
+# PT-BR
+
+- Adicionando graphql builder para filtros, fields e includes. @bhcosta90
+
+# EN
+
+- Adding GraphQL builder for filters, fields, and includes. @bhcosta90
+
 ## V3.4.0 (04/11/2025)
 
 # PT-BR
