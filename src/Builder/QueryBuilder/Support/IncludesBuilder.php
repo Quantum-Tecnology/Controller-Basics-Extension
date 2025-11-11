@@ -12,12 +12,11 @@ final class IncludesBuilder
     /**
      * Build the includes array for Eloquent::with() and prepare withCount entries.
      *
-     * @param array|string $fields
-     * @param array        $withCount Output parameter, will be filled with root/nested count info
+     * @param array $withCount Output parameter, will be filled with root/nested count info
      *
      * @return array Includes array compatible with Eloquent::with()
      */
-    public static function build(Model $model, $fields, array $filters = [], array $pagination = [], array $order = [], array &$withCount = []): array
+    public static function build(Model $model, string | array $fields, array $filters = [], array $pagination = [], array $order = [], array &$withCount = []): array
     {
         $hasNested = false;
 
@@ -31,14 +30,11 @@ final class IncludesBuilder
 
         $paths = $hasNested
             ? (function () use ($model, $fields): array {
-                // Include top-level relation names even when nested fields are present
                 $topLevelRelations = array_values(array_filter((array) $fields, fn ($v): bool => is_string($v) && method_exists($model, $v)));
                 $nestedPaths       = RelationUtils::nestedDotPaths((array) $fields);
 
                 // Merge while preserving order and removing duplicates, prioritizing nested paths first
-                $merged = array_values(array_unique(array_merge($nestedPaths, $topLevelRelations)));
-
-                return $merged;
+                return array_values(array_unique(array_merge($nestedPaths, $topLevelRelations)));
             })()
             : array_values(array_filter((array) $fields, fn ($v): bool => is_string($v) && str_contains($v, '.') || (is_string($v) && method_exists($model, $v))));
 
