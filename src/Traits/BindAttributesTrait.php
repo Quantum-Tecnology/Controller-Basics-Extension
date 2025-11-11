@@ -41,7 +41,7 @@ trait BindAttributesTrait
                     unset($this->{$attribute});
                 }
 
-                $field = array_keys(array_filter(config('bind.attributes'), fn ($item) => $item === $key))[0] ?? null;
+                $field = array_keys(array_filter(config('bind.attributes'), fn ($item): bool => $item === $key))[0] ?? null;
 
                 if (filled($field) && !in_array($key, $this->exceptBindFields())) {
 

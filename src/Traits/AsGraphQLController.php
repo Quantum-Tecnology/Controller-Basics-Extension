@@ -135,7 +135,7 @@ trait AsGraphQLController
     protected function filterRouteParams(array $data): array
     {
         return collect($data)
-            ->mapWithKeys(fn ($value, $key) => ['(' . $key . ')' => $value])
+            ->mapWithKeys(fn ($value, $key): array => ['(' . $key . ')' => $value])
             ->all();
     }
 

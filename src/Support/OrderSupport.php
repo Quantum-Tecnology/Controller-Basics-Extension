@@ -26,7 +26,11 @@ class OrderSupport
         $underscoreGroup = [];
 
         foreach ($data as $key => $value) {
-            if ('order_column' === $key || 'order_direction' === $key) {
+            if ('order_column' === $key) {
+                continue;
+            }
+
+            if ('order_direction' === $key) {
                 continue;
             }
 
@@ -77,24 +81,22 @@ class OrderSupport
             }
 
             // Determine if we should use generic children order for single-level only case
-            $nonEmptyPaths      = array_filter(array_keys($paths), fn ($p) => '' !== $p);
+            $nonEmptyPaths      = array_filter(array_keys($paths), fn ($p): bool => '' !== $p);
             $useGenericChildren = false;
 
-            if (!empty($nonEmptyPaths)) {
-                // if there is exactly one child path and it has only one segment and there is no base order and no other nested paths
-                if (1 === count($nonEmptyPaths) && !isset($paths[''])) {
-                    $only = $nonEmptyPaths[0];
+            // if there is exactly one child path and it has only one segment and there is no base order and no other nested paths
+            if (!([] === $nonEmptyPaths) && (1 === count($nonEmptyPaths) && !isset($paths['']))) {
+                $only = $nonEmptyPaths[0];
 
-                    if (0 === mb_substr_count($only, '.')) {
-                        $fields = $paths[$only] ?? [];
+                if (0 === mb_substr_count($only, '.')) {
+                    $fields = $paths[$only] ?? [];
 
-                        if (isset($fields['column'])) {
-                            $useGenericChildren                 = true;
-                            $result[$base]['children']['order'] = [
-                                'column'    => $fields['column'],
-                                'direction' => $this->normalizeDirection($fields['direction'] ?? null),
-                            ];
-                        }
+                    if (isset($fields['column'])) {
+                        $useGenericChildren                 = true;
+                        $result[$base]['children']['order'] = [
+                            'column'    => $fields['column'],
+                            'direction' => $this->normalizeDirection($fields['direction'] ?? null),
+                        ];
                     }
                 }
             }

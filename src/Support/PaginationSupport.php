@@ -17,7 +17,7 @@ class PaginationSupport
                 continue;
             }
 
-            if (preg_match('/^(per_page|page)_(.+)$/', $key, $matches)) {
+            if (preg_match('/^(per_page|page)_(.+)$/', (string) $key, $matches)) {
                 [$type, $rawPath] = [$matches[1], $matches[2]];
                 $pathParts        = explode('.', $rawPath);
 

@@ -15,7 +15,6 @@ class FallbackProvider extends ServiceProvider
     public function register(): void
     {
         if (!(bool) config('fallback.on_boot', true)) {
-            return;
         }
     }
 
@@ -42,7 +41,7 @@ class FallbackProvider extends ServiceProvider
             // Using default connection; adjust if you use custom names
             \Illuminate\Support\Facades\Redis::connection('default')->ping();
             $redisAvailable = true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $redisAvailable = false;
         }
 

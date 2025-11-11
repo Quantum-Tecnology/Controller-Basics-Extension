@@ -120,7 +120,7 @@ final readonly class BuilderQuery
                     $data[0] = filter_var($data[0], FILTER_VALIDATE_BOOLEAN);
                 }
 
-                if (str_starts_with($column, 'by')) {
+                if (str_starts_with((string) $column, 'by')) {
                     $query->{$column}(collect($data));
 
                     continue;
