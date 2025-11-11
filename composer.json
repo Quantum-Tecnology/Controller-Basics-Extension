@@ -5,7 +5,7 @@
   "description": "Controller Basics Extension",
   "require": {
     "php": "^8.2",
-    "quantumtecnology/service-basics-extension": "^3.0",
+    "quantumtecnology/service-basics-extension": "^3.0.7",
     "vinkla/hashids": "^13.0 | ^12.0"
   },
   "autoload": {
@@ -17,9 +17,9 @@
     }
   },
   "autoload-dev": {
-      "psr-4": {
-          "QuantumTecnology\\ControllerBasicsExtension\\Tests\\": "tests/"
-      }
+    "psr-4": {
+      "QuantumTecnology\\ControllerBasicsExtension\\Tests\\": "tests/"
+    }
   },
   "scripts": {
     "format": [
@@ -47,7 +47,8 @@
   "support": {
     "email": "gustavo-computacao@hotmail.com"
   },
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "extra": {
     "laravel": {
       "providers": [
