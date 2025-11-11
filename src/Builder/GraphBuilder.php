@@ -19,10 +19,13 @@ class GraphBuilder
     /**
      * Build a graph-like response using requested fields and relations.
      *
-     * @param Model|Paginator|Collection $data
-     * @param array|string               $fields GraphQL-like fields (e.g., "id title comments { id }")
+     * @param array|string $fields GraphQL-like fields (e.g., "id title comments { id }")
      */
-    public function execute($data, array | string $fields, ?array $onlyFields = null, array $options = []): Collection
+    public function execute(
+        Model | Paginator | Collection $data,
+        array | string $fields,
+        ?array $onlyFields = null,
+        array $options = []): Collection
     {
         if (is_string($fields)) {
             $fields = (new QueryBuilderFieldParser())->normalize($fields);
