@@ -4,182 +4,193 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
-use QuantumTecnology\ControllerBasicsExtension\Services\GraphQlService;
+use QuantumTecnology\ControllerBasicsExtension\Builder;
+use QuantumTecnology\ControllerBasicsExtension\Services\Interfaces;
 use QuantumTecnology\ControllerBasicsExtension\Services\RelationshipService;
-use QuantumTecnology\ControllerBasicsExtension\Support\FieldSupport;
-use QuantumTecnology\ControllerBasicsExtension\Support\LogSupport;
-use QuantumTecnology\ControllerBasicsExtension\Support\OrderSupport;
-use QuantumTecnology\ControllerBasicsExtension\Support\PaginationSupport;
 
 trait AsGraphQLController
 {
     abstract protected function model(): Model;
 
-    public function index(): JsonResponse
+    public function service(): ?string
     {
-        $response = $this->getGraphQlService()->paginate(
-            $this->model(),
-            $this->getFields(),
-            $this->getFilters(),
-            $this->getOrder(),
-            $this->getPagination(),
-        );
+        return null;
+    }
 
-        if (!app()->isProduction() && filled($this->allowedFields())) {
-            $response->put('allowed_fields', $this->allowedFields());
+    public function index(
+        Builder\QueryBuilder $queryBuilder,
+        Builder\GraphBuilder $graphBuilder,
+        Request $request
+    ): JsonResponse {
+        $this->getDataRequest('index', true);
+
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
+
+        $filter = array_filter($request->query(), fn ($item): bool => str_starts_with((string) $item, 'filter'), ARRAY_FILTER_USE_KEY);
+
+        $result = $this->getService() && $this->getService() instanceof Interfaces\IndexServiceInterface
+            ? $this->getService()->index($fields, $request->search, $filter + $this->routeParams())
+            : $queryBuilder->execute($this->model(), $request->query('fields'), $request->query());
+
+        if ($request->query('order_column')) {
+            $result->orderBy($request->query('order_column'), $request->query('order_direction'));
         }
 
-        return response()->json($response);
-    }
+        if (app()->isLocal() && $request->has('sql')) {
+            $result->ddRawSql();
+        }
 
-    public function show(): JsonResponse
-    {
-        $response = $this->getGraphQlService()->presenter(
-            $this->findBy()->sole(),
-            $this->getFields(),
-            $this->getPagination(),
+        $query = $result->simplePaginate();
+
+        $data = $graphBuilder->execute(
+            data: $query,
+            fields: $fields,
+            onlyFields: $onlyFields,
+            options: $request->query()
         );
 
-        return response()->json($response);
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $onlyFields;
+        }
+
+        return response()->json($data);
     }
 
-    public function store(): JsonResponse
+    public function show(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $model      = $this->model();
-        $dataValues = $this->getDataRequest('store');
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
 
-        $model = $this->execute($model, $dataValues);
+        $data = [
+            'data' => $graphBuilder->execute(
+                data: $this->findBy($fields),
+                fields: $fields,
+                onlyFields: $onlyFields,
+                options: $request->query()
+            ),
+        ];
 
-        $response = $this->getGraphQlService()->presenter(
-            $model,
-            $this->getFields(),
-            $this->getPagination(),
-        );
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $onlyFields;
+        }
 
-        return response()->json($response, Response::HTTP_CREATED);
+        return response()->json($data);
     }
 
-    public function update(): JsonResponse
+    public function store(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
     {
-        $dataValues = $this->getDataRequest('update');
+        $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
-        $model = $this->findBy()->sole();
+        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\StoreServiceInterface
+            ? $this->getService()->store($dataValues)
+            : $this->execute($this->model(), $dataValues);
 
-        $model = $this->execute($model, $dataValues);
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
 
-        $response = $this->getGraphQlService()->presenter(
-            $model,
-            $this->getFields(),
-            $this->getPagination(),
-        );
+        $data = [
+            'data' => $graphBuilder->execute(
+                data: $modelSave,
+                fields: $fields,
+                onlyFields: $onlyFields,
+                options: $request->query()
+            ),
+        ];
 
-        return response()->json($response);
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $onlyFields;
+        }
+
+        return response()->json($data);
+    }
+
+    public function update(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
+    {
+        $dataValues   = $this->getDataRequest('update');
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $model        = $this->findBy($fields);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
+
+        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
+            ? $this->getService()->update($model, $dataValues)
+            : $this->execute($model, $dataValues);
+
+        $data = [
+            'data' => $graphBuilder->execute(
+                data: $modelSave,
+                fields: $fields,
+                onlyFields: $onlyFields,
+                options: $request->query()
+            ),
+        ];
+
+        if (app()->isLocal()) {
+            $data['allowed_fields'] = $onlyFields;
+        }
+
+        return response()->json($data);
     }
 
     public function destroy(): Response
     {
         $this->getDataRequest('destroy', true);
 
-        $model = $this->findBy()->sole();
+        $fields = request()->query('fields');
 
-        DB::transaction(function () use ($model) {
-            $model->delete();
+        $model = $this->findBy($fields);
 
-            return $model;
-        });
+        DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\DeleteServiceInterface
+            ? $this->getService()->delete($model)
+            : $model->delete());
 
         return response()->noContent();
     }
 
-    protected function findBy(): Builder
+    protected function allowedFields(): ?array
     {
-        $routeParams = request()->route()?->parameters() ?: [];
+        return null;
+    }
+
+    protected function findBy(string | array | null $fields = []): Model
+    {
+        $routeParams = $this->routeParams();
         $idFromParam = array_pop($routeParams);
         $keyName     = $this->model()->getKeyName();
 
-        return $this->getBuilderQuery()->execute(
+        $result = app(Builder\QueryBuilder::class)->execute(
             $this->model(),
-            $this->getFields(),
+            $fields ?: [],
             [
-                "({$keyName})" => $idFromParam,
-            ] + $this->filterRouteParams($routeParams),
-            $this->getOrder(),
+                "filter({$keyName})" => $idFromParam,
+            ] + $routeParams,
         );
+
+        if (app()->isLocal() && request()->has('sql')) {
+            $result->ddRawSql();
+        }
+
+        return $result->sole();
     }
 
-    protected function getFilters(): array
+    protected function routeParams($filter = true): array
     {
-        $queries = request()->query();
-        $params  = request()->route()?->parameters();
-
-        $response = array_filter(
-            $queries,
-            fn ($key): int | false => preg_match('/^filter_?(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', (string) $key),
-            ARRAY_FILTER_USE_KEY
-        );
-
-        $response = array_combine(
-            array_map(fn (int | string $key): string => mb_substr((string) $key, 6), array_keys($response)),
-            array_values($response)
-        );
-
-        return array_merge($response, $this->filterRouteParams($params));
-    }
-
-    protected function filterRouteParams(array $data): array
-    {
-        return collect($data)
-            ->mapWithKeys(fn ($value, $key): array => ['(' . $key . ')' => $value])
+        return collect(request()->route()?->parameters() ?: [])
+            ->mapWithKeys(fn ($value, $key): array => [($filter ? ('filter(' . $key . ')') : $key) => $value])
             ->all();
-    }
-
-    protected function getFields(): array
-    {
-        $queries   = request()->query();
-        $requested = app(FieldSupport::class)->parse($queries['fields'] ?? '');
-
-        $allowed = $this->allowedFields() ?? [];
-        $denied  = [];
-
-        if ($allowed) {
-            $requested = $this->filterRequestedFields($requested, $allowed, $denied);
-        }
-
-        foreach ($denied as $field) {
-            LogSupport::add("Field '{$field}' is not allowed in the request.");
-        }
-
-        return $requested;
-    }
-
-    protected function getPagination(): array
-    {
-        $queries = request()->query();
-
-        return app(PaginationSupport::class)->parse($queries);
-    }
-
-    protected function getOrder(): array
-    {
-        $queries = request()->query();
-
-        return app(OrderSupport::class)->parse($queries);
-    }
-
-    protected function getGraphQlService(): GraphQlService
-    {
-        return app(GraphQlService::class);
-    }
-
-    protected function getBuilderQuery(): BuilderQuery
-    {
-        return app(BuilderQuery::class);
     }
 
     /** @codeCoverageIgnore */
@@ -203,16 +214,14 @@ trait AsGraphQLController
 
         if (blank($action)) {
             $request = app($class);
-            $request->validated();
 
             return $request->validated();
         }
 
-        $value = mb_substr($value, 0, -7) . '\\' . ucfirst($action) . 'Request';
+        $value = mb_substr($value, 0, -10) . '\\' . ucfirst($action) . 'Request';
 
         if (class_exists($value)) {
             $request = app($value);
-            $request->validated();
 
             return $request->validated();
         }
@@ -224,34 +233,13 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function allowedFields(): array
-    {
-        return [];
-    }
-
     protected function execute(Model $model, array $data)
     {
         return DB::transaction(fn () => app(RelationshipService::class)->execute($model, $data));
     }
 
-    protected function filterRequestedFields(array $requested, array $allowed, array &$denied = [], string $path = ''): array
+    private function getService()
     {
-        $result = [];
-
-        foreach ($requested as $key => $value) {
-            if (is_int($key)) {
-                if (in_array($value, $allowed, true)) {
-                    $result[] = $value;
-                } else {
-                    $denied[] = mb_ltrim($path . '.' . $value, '.');
-                }
-            } elseif (isset($allowed[$key]) && is_array($allowed[$key]) && is_array($value)) {
-                $result[$key] = $this->filterRequestedFields($value, $allowed[$key], $denied, mb_ltrim($path . '.' . $key, '.'));
-            } else {
-                $denied[] = mb_ltrim($path . '.' . $key, '.');
-            }
-        }
-
-        return $result;
+        return when($this->service(), fn () => app($this->service()));
     }
 }

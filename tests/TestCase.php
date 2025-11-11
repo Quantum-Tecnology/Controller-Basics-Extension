@@ -22,7 +22,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        LogSupport::reset();
+        // LogSupport::reset();
         $this->setUpDatabase($this->app);
         $this->setUpRoute($this->app);
         Model::unguard();
@@ -69,6 +69,7 @@ abstract class TestCase extends BaseTestCase
             $table->increments('id');
             $table->foreignId('author_id')->nullable()->constrained('authors');
             $table->string('title');
+            $table->string('body')->nullable();
             $table->json('meta')->nullable();
             $table->unsignedTinyInteger('status');
             $table->unsignedTinyInteger('is_draft')->nullable();

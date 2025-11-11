@@ -1,231 +1,253 @@
-# Consultas "GraphQL-like" via REST com Controller-Basics-Extension
+### Query Builder — Field syntax, options and examples
 
-Este documento descreve um padrão de uso do pacote para expor consultas ricas (aninhamento de relações, filtros, paginação por relação, contagens, etc.) em uma REST API, inspirando-se no estilo do GraphQL. Todo o conteúdo aqui foi elaborado a partir dos testes localizados em `tests/Feature` e `tests/Unit` deste repositório.
+This document explains how to use the package’s Query Builder to fetch Eloquent models using a compact, GraphQL‑like field syntax. The behavior described here is derived from the feature tests in `tests/Feature/Builder/QueryBuilder/*` and the builder’s source code.
 
-## Visão Geral
+#### What it does
 
-A ideia é permitir que o cliente construa uma consulta declarativa usando:
-- fields: para informar quais relações e sub‑relações devem ser carregadas (e contadas);
-- filters: para filtrar o modelo raiz e/ou relações usando uma sintaxe compacta;
-- paginação por relação: para definir `per_page` e `page` em cada relação, inclusive aninhadas.
+- Accepts a root Eloquent `Model` and a field selection (string or array).
+- Eager-loads nested relations respecting the field selection.
+- Automatically adds `withCount` for non-BelongsTo relations (e.g., `comments_count`, `tags_count`).
+- Supports per‑relation pagination (limit/offset) and ordering.
+- Supports flexible filtering on the root model and on any included relation path.
 
-Internamente, o pacote utiliza:
-- BuilderQuery: monta a consulta do Eloquent com includes, withCount, filtros e limites por relação;
-- FilterSupport: faz o parse da sintaxe de filtros em um formato estruturado;
-- PaginationSupport: converte parâmetros de paginação em estrutura aninhada e aplica limites seguros.
+The entry point is `QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder::execute()` which returns an `Illuminate\Database\Eloquent\Builder`. You then finish with standard Eloquent methods such as `get()`, `sole()`, `paginate()`, or `simplePaginate()`.
 
-Assim, é possível, por exemplo, buscar um Post com seu Author, Comments e Likes de Comments, filtrando Comments, paginando por relação e retornando contagens — tudo via REST.
+---
 
-## Exemplo mínimo de uso
+### Quick start
 
-Objetivo: retornar um Post com seu Author carregado (sem filtros nem paginação).
+```php
+use QuantumTecnology\ControllerBasicsExtension\Builder\QueryBuilder;
+use App\Models\Post; // your app’s model
 
-- Requisição simples (GET):
-  - `GET /posts/123?fields[author][]=id`
-  - curl: `curl -X GET "https://sua-api.test/posts/123?fields[author][]=id"`
+$builder = app(QueryBuilder::class);
 
-- Controller/Service (Laravel, conceitual):
-  -
-    ```php
-    use Illuminate\Http\Request;
-    use App\Models\Post;
-    use QuantumTecnology\ControllerBasicsExtension\Builder\BuilderQuery;
+// 1) Minimal: fetch one post with default fields (all model columns) and without relations
+$post = $builder->execute(new Post())->sole();
 
-    class PostController
-    {
-        public function show(Post $post, Request $request, BuilderQuery $builder)
-        {
-            $fields     = (array) $request->input('fields', []);   // quais relações incluir
-            $filters    = (array) $request->input('filters', []);  // filtros opcionais
-            $pagination = [];                                      // opcional para um exemplo mínimo
+// 2) With relations using GraphQL-like string
+$fields = 'id author { name }';
+$post   = $builder->execute(new Post(), $fields)->sole();
 
-            $query = $builder->execute(Post::query()->getModel(), $fields, $filters, $pagination);
+// 3) With nested relations using array syntax
+$fields = ['id', 'comments' => ['likes' => ['comment']], 'author'];
+$post   = $builder->execute(new Post(), $fields)->sole();
+```
 
-            return $query->whereKey($post->id)->firstOrFail();
-        }
-    }
-    ```
+---
 
-Resultado: o JSON do Post 123 com a relação `author` incluída e o campo `author` presente no payload. Para relações diretas listadas em `fields`, o pacote também calcula `*_count` quando aplicável.
+### Field selection syntax
 
-## fields: selecionando relações (e contagens)
+You can express fields either as a string (GraphQL‑like) or as a PHP array.
 
-O parâmetro `fields` é uma estrutura em árvore que descreve quais relações devem ser incluídas. Somente chaves com valor array são consideradas relações. Exemplos (em PHP, como vem dos testes):
+- String examples
+    - `"id author { name }"`
+    - `"id title comments { id likes { comment } }"`
+- Array examples
+    - `[ 'id', 'author' => [], ]`
+    - `[ 'id', 'comments' => ['likes' => ['comment']], 'author', ]`
 
-- Simples, com relações e sub‑relações:
-  - `['author' => ['id'], 'comments' => ['id', 'likes' => ['id']]]`
-  - Inclui: `author`, `comments` e `comments.likes`.
-- Profundamente aninhado, apenas para ilustrar o comportamento:
-  - `['a' => ['b' => ['c' => ['d' => ['id']]]]]`
-  - Inclui: `a`, `a.b`, `a.b.c`, `a.b.c.d`.
+Notes
+- Scalars and relation names can be mixed at the same level. A relation becomes “active” when followed by a `{ ... }` block (string syntax) or when mapped to an array (array syntax).
+- BelongsTo relations are loaded as normal, but counts are not added to them (counts are added to non‑BelongsTo relations only).
+- When you include a BelongsTo relation, the builder ensures the parent’s foreign key is selected automatically.
 
-Com base nisso, o BuilderQuery:
-- Adiciona withCount para cada relação direta listada em `fields` (por exemplo, `comments_count` para `comments`), e também pode adicionar withCount para sub‑relações, se presentes;
-- Aplica includes (`with`) nas relações em notação camelCase quando necessário;
-- Para relações do tipo BelongsTo, não aplica paginação (faz sentido, pois retorna no máx. 1 registro);
-- Para as demais (HasMany/MorphMany/BelongsToMany/MorphToMany), aplica paginação por relação se você fornecer `per_page` e `page` (veja a seção de paginação).
+---
 
-Como enviar em REST:
-- JSON (corpo da requisição): `fields` como objeto/array aninhado.
-- Query string: `fields[comments][likes][]=id` etc. (Laravel converte em array).
+### Relation counts
 
-## filters: filtrando raiz e relações
+For every non‑BelongsTo relation included, the builder prepares a corresponding `*_count` at the appropriate level via `withCount()`.
 
-A sintaxe dos filtros segue o padrão: `relation_path(campo,operador)` como a chave; o valor pode ser único, lista (array), ou string separada por vírgula/pipe. Exemplos tirados dos testes:
+Examples from tests
+- Including `comments` on `Post` yields `comments_count` on the `Post` instances.
+- Including `likes` on a `Comment` yields `likes_count` on the `Comment` instances.
 
-- Filtrar relação filha por operador customizado:
-  - Chave: `comments(id,<=)` Valor: `20`
-  - Interpretação: em `comments`, `id <= 20`.
-- Igualdade (operador padrão `=` se omitido):
-  - Chave: `comments(id)` Valor: `3`
-  - Interpretação: em `comments`, `id = 3`.
-- Filtro no modelo raiz (sem relação):
-  - Chave: `(is_draft)` Valor: `true` ou `false` (strings serão convertidas para boolean)
-  - Interpretação: no modelo raiz, `is_draft = true|false`.
-- Busca textual em múltiplas colunas com "byFilter":
-  - Chave: `(byFilter,title)` Valor: `testing`
-  - Interpretação: cria um where que faz OR com LIKE em `title`, buscando por prefixo (ex.: `title LIKE 'testing%'`).
-  - Dica: você pode combinar múltiplas colunas separando no operador: `(byFilter,title;subtitle)` com Valor: `foo`. Isso aplica OR em `title` e `subtitle`.
-- Scopes/filters customizados começando com "by":
-  - Se a chave começar com `by`, o pacote chamará o método correspondente no query builder (ex.: `(bySomething)` chama `$query->bySomething(...)`). O valor é repassado como `Collection`.
-- Valores múltiplos:
-  - `user(id)` com valor `1,2,3` ou `1|2|3` vira `IN (1,2,3)`.
+---
 
-Notas:
-- Valores `"true"`/`"false"` (strings) são convertidos para bool automaticamente.
-- Para operador `like`, o pacote constrói internamente um OR com `orWhereLike` em cada item informado.
-- Para o modelo raiz, utilize a sintaxe sem relação: `(campo,operador)`.
+### Pagination and ordering per relation
 
-Como enviar em REST:
-- Query string, por exemplo: `?comments(id,%3C%3D)=20&(is_draft)=true`.
-- JSON (corpo): um objeto no formato chave/valor, por ex.:
-  - `{ "comments(id,<=)": 20, "(is_draft)": "true" }`.
+You can paginate and order each included relation independently using dynamic option keys. Keys are formed by taking the relation “path” and joining segments with underscores.
 
-## Paginação por relação
+Key patterns
+- Pagination
+    - `page_limit_{path}`: max number of related records to load for that path
+    - `page_offset_{path}`: zero‑based offset of related records for that path
+- Ordering
+    - `order_column_{path}`: column used to sort the related records
+    - `order_direction_{path}`: `asc` (default) or `desc`
 
-Você pode definir `per_page` e `page` individualmente por relação (e sub‑relação), via parâmetros com o seguinte formato:
-- `per_page_<path>` e `page_<path>`
-- O `<path>` aceita pontos para navegação em profundidade (ex.: `users.posts.comments`).
+Path naming
+- A simple relation `comments` → path is `comments`.
+- A nested relation `comments.likes` → path is `comments_likes`.
 
-Exemplos de query string (dos testes de unidade):
-- `per_page_users=10&page_users=1`
-- `per_page_users.posts=5&page_users.posts=2`
-- `per_page_users.posts.comments=20&page_users.posts.comments=4`
+Defaults
+- If you don’t pass pagination options for a path, the builder uses:
+    - `page_limit`: `config('page.per_page')` (commonly 10 in the tests)
+    - `page_offset`: 0
+- If `order_direction_{path}` is omitted, it defaults to `asc`.
 
-Comportamento e limites:
-- Se `per_page` não for informado para uma relação, usa `config('page.per_page')`.
-- Se `per_page` exceder `config('page.max_page')`, o valor será limitado ao máximo e registrado via LogSupport.
-- Se após todas as checagens `per_page` ficar "falsy", cai para `1`.
-- Para relações BelongsTo não há paginação (é ignorada).
+Examples
+```php
+$fields  = ['id', 'comments' => ['likes' => ['comment']], 'author'];
 
-## Exemplos práticos
+// Paginate comments on Post: take 4, skip first 3
+$options = [
+    'page_offset_comments' => 3,
+    'page_limit_comments'  => 4,
+];
+$post = $builder->execute(new Post(), $fields, $options)->sole();
 
-1) Post com Author e Comments paginados, incluindo Likes dos Comments:
-- fields:
-  - `{"author": ["id"], "comments": ["id", "likes": ["id"]]}`
-- paginação (query string):
-  - `per_page_comments=5&page_comments=2`
-- filtros (opcionais):
-  - `comments(id,<=)=20` ou `(is_draft)=true`
+// Paginate likes under comments: take 2, skip first 2
+$options = [
+    'page_offset_comments_likes' => 2,
+    'page_limit_comments_likes'  => 2,
+];
+$post = $builder->execute(new Post(), $fields, $options)->sole();
 
-Requisição (exemplos):
-- GET com query string e fields em query:
-  - `GET /posts/123?per_page_comments=5&page_comments=2&comments(id,%3C%3D)=20&fields[author][]=id&fields[comments][]=id&fields[comments][likes][]=id`
-- POST/GET com body JSON (quando seu endpoint aceitar):
-  - Body:
-    - `{ "fields": { "author": ["id"], "comments": ["id", { "likes": ["id"] }] }, "filters": { "comments(id,<=)": 20 }, "pagination": { "per_page_comments": 5, "page_comments": 2 } }`
+// Order comments DESC and likes under comments DESC
+$options = [
+    'order_column_comments'          => 'id',
+    'order_direction_comments'       => 'desc',
+    'order_column_comments_likes'    => 'id',
+    'order_direction_comments_likes' => 'desc',
+];
+$post = $builder->execute(new Post(), $fields, $options)->sole();
+```
 
-Resultado esperado (conceitual):
-- O Post 123 virá com:
-  - `author` carregado;
-  - `comments` da página 2 com `per_page` 5;
-  - `comments_count` (contagem total de comments do post) calculado;
-  - `likes` carregados para cada comment, possivelmente com `likes_count` quando solicitado.
+---
 
-2) Busca textual no título dos Posts:
-- filtros: `(byFilter,title)=testing`
-- Se existir um Post com título começando com `testing_...`, ele será retornado. Se não, resultado vazio. Isso está espelhado nos testes em `BuilderQueryPostCommentsTest`.
+### Filtering
 
-3) Filtrar por boolean no modelo raiz:
-- filtros: `(is_draft)=true` retorna somente registros com `is_draft` verdadeiro; `(is_draft)=false` filtra pelos falsos. As strings são convertidas para boolean automaticamente.
+Filters are passed as option keys that start with `filter` and contain a descriptor in parentheses. The general form is:
 
-## Integração com Controllers/Services (Laravel)
+- Root model filter
+    - `filter(field,op) => value`
+    - If `op` is omitted: `filter(field) => value` defaults to `=`
+- Relation path filter
+    - `filter_{path}(field,op) => value`
+    - Use underscores for the path: e.g., `comments.likes` → `comments_likes`
 
-- O pacote oferece traits e services que facilitam a montagem de respostas REST. Você pode, por exemplo, dentro do seu Service/Controller, coletar `fields`, `filters` e parâmetros de paginação do Request e repassá‑los ao `BuilderQuery`.
-- Exemplo conceitual (Service):
-  - `$query = app(BuilderQuery::class)->execute(Post::query()->getModel(), $fields, $filters, $pagination);`
-  - `return $query->where('id', $id)->sole();`
-- Ao usar os traits/serviços base (veja README principal), você pode combinar com este padrão para expor endpoints flexíveis e consistentes.
+Supported operations and value forms (from `FilterParser`/`ApplyFilter`)
+- Equality / IN
+    - `op =` or `==` with value: one value or multiple using `|`
+    - Example: `filter(title,=) => 'Hello'` or `filter(id,=) => '1|2|3'`
+- Comparisons
+    - Any SQL operator like `>`, `>=`, `<`, `<=`, `!=`, `<>`, `like`, etc.
+    - Multiple values are applied as separate `where field op value` clauses within a grouped `where`.
+- Nullability
+    - Use `null` or `not-null` as the operation; the value should be `'true'` (string)
+    - Example: `filter(deleted_at,null) => 'true'`
+- Boolean strings
+    - If value is the string `'true'` or `'false'`, it is cast to boolean and applied with the given operator.
+- Custom scopes via `by_...`
+    - If the field name starts with `by_`, the builder calls a camelCase method on the query, passing:
+        - First argument: a collection of tokens from the operation string split by `|`
+        - Second argument: the collection of values
+    - Example: `filter(by_created_between,year|month) => '2024-01-01|2024-12-31'` calls `$query->byCreatedBetween(collect(['year','month']), collect(['2024-01-01','2024-12-31']))`
 
-### Exemplo usando a trait AsGraphQLController
+Filter grouping
+- Filters are grouped by model/table automatically. For relation paths, use the path in the key prefix to target that relation’s query closure.
 
-A trait AsGraphQLController expõe automaticamente as ações de CRUD (index, show, store, update, destroy) já integradas ao padrão GraphQL-like deste documento. Basta definir o model() e, opcionalmente, allowedFields().
+Examples
+```php
+$fields = ['id', 'comments' => ['likes' => []]];
 
-- Controller mínimo:
-  
-  ```php
-  use Illuminate\Database\Eloquent\Model;
-  use App\Models\Post;
-  use QuantumTecnology\ControllerBasicsExtension\Traits\AsGraphQLController;
-  
-  final class PostController
-  {
-      use AsGraphQLController;
-  
-      // Define o Model base
-      protected function model(): Model
-      {
-          return new Post();
-      }
-  
-      // Opcional: restringe os fields que podem ser solicitados
-      protected function allowedFields(): array
-      {
-          return [
-              'id',
-              'title',
-              'comments' => [
-                  'id',
-                  'likes' => ['id'],
-              ],
-          ];
-      }
-  }
-  ```
+$options = [
+    // Root Post filters
+    'filter(title,like)' => '%Laravel%',
+    'filter(id,=)'       => '1|2|3',
 
-- Rotas (exemplos Laravel):
-  - `GET /posts` → index()
-  - `GET /posts/{post}` → show()
-  - `POST /posts` → store()
-  - `PUT/PATCH /posts/{post}` → update()
-  - `DELETE /posts/{post}` → destroy()
+    // Filter comments under posts
+    'filter_comments(body,like)' => '%great%'
+];
 
-- Como enviar parâmetros com a trait:
-  - fields: igual às demais seções, via query string (ex.: `fields[comments][likes][]=id`) ou JSON.
-  - filters: prefixe as chaves com `filter_` seguindo a sintaxe deste guia. Exemplos:
-    - `?filter_(is_draft)=false` (filtro no modelo raiz)
-    - `?filter_comments(id,%3C%3D)=20` (filtro na relação comments, `id <= 20`)
-    - Parâmetros de rota também viram filtros automaticamente. Ex.: em `GET /posts/123`, o trait aplica `(id)=123` internamente.
-  - Paginação por relação: use `per_page_<path>` e `page_<path>`, como em `?per_page_comments=5&page_comments=2`.
+$posts = $builder->execute(new Post(), $fields, $options)->get();
+```
 
-- Respostas:
-  - index(): retorna JSON paginado pelo GraphQlService, incluindo relações, withCount e paginação por relação.
-  - show(): retorna o recurso único formatado pelo GraphQlService.
-  - store/update/destroy: validam dados via Requests convencionados pelo caminho do Controller (ver README principal) e persistem relações via RelationshipService.
+---
 
-## Dicas e cuidados
+### Return types and chaining
 
-- Sempre valide/normalize `fields`, `filters` e paginação no Request (ex.: colunas permitidas, relações válidas), para evitar abuso.
-- Combine com políticas de autorização ao incluir relações sensíveis.
-- Ajuste `page.per_page` e `page.max_page` nas configs do seu app para limites adequados.
-- Use `byFilter` para buscas simples em múltiplas colunas, e crie métodos `by...` no seu model para lógicas de filtro específicas.
+`execute()` returns an `Eloquent\Builder` for the provided model. You can use any standard terminal method on it:
 
-## Referências de testes usados como base
+- `get()` → `Collection<Model>`
+- `sole()` → single `Model` (throws if not exactly one)
+- `paginate($perPage)` / `simplePaginate($perPage)` → paginator instances on the root query
 
-- `tests/Feature/Builder/BuilderQueryPostCommentsTest.php`
-- `tests/Feature/Support/PaginationSupportTest.php`
-- `tests/Unit/Support/FilterSupportTest.php`
-- `tests/Unit/Support/PaginationSupportTest.php`
-- `tests/Unit/Builder/BuilderQueryTest.php`
+When using the separate Graph layer provided by this package (see tests under `tests/Feature/Builder/GraphBuilder`), the per‑relation pagination and counts are transformed into a serializable array structure with `data`/`meta`. At the Query Builder level, you receive Eloquent models with relations loaded and counts available as `*_count`.
 
-Esses testes demonstram a sintaxe, o parse e o comportamento esperado que você pode reproduzir na sua API REST para obter uma experiência "GraphQL-like" sem abandonar o padrão REST.
+---
+
+### End‑to‑end examples (from tests)
+
+Fetch a post with its author
+```php
+$post = $builder->execute(new Post(), 'id author { name }')->sole();
+// $post->author->name is available
+```
+
+Fetch a post with tags and counts
+```php
+$post = $builder->execute(new Post(), 'id tags { name }')->sole();
+// $post->tags_count === 20 (for example)
+// $post->tags->count() defaults to config('page.per_page') (10 in tests)
+```
+
+Nested includes with pagination and ordering
+```php
+$fields = ['id', 'comments' => ['likes' => ['comment']], 'author'];
+
+$options = [
+    'page_offset_comments'          => 3,
+    'page_limit_comments'           => 4,
+    'page_offset_comments_likes'    => 2,
+    'page_limit_comments_likes'     => 2,
+    'order_column_comments'         => 'id',
+    'order_direction_comments'      => 'desc',
+    'order_column_comments_likes'   => 'id',
+    'order_direction_comments_likes'=> 'desc',
+];
+
+$post = $builder->execute(new Post(), $fields, $options)->sole();
+// Access loaded relations: $post->comments, $post->comments->first()->likes, etc.
+// Counts available: $post->comments_count, $post->comments->first()->likes_count
+```
+
+---
+
+### Tips and caveats
+
+- The default per‑relation page limit comes from `config('page.per_page')`. In the test suite it is 10.
+- Offsets are zero‑based in options; make sure your expectations match when verifying specific record positions.
+- Counts are only generated for non‑BelongsTo relations.
+- For nested counts, the builder injects `withCount()` inside the relation closures automatically; at the root level it applies `withCount()` directly on the main query.
+- If you include a BelongsTo relation, the builder makes sure the foreign key is selected on the parent to avoid missing column errors.
+
+---
+
+### Reference of dynamic option keys
+
+- Pagination
+    - `page_limit_{path}`
+    - `page_offset_{path}`
+- Ordering
+    - `order_column_{path}`
+    - `order_direction_{path}` (`asc` or `desc`)
+- Filters
+    - Root: `filter(field,op)` / `filter(field)`
+    - Relation: `filter_{path}(field,op)` / `filter_{path}(field)`
+
+Where `{path}` is the relation path with dots replaced by underscores. Examples: `comments`, `comments_likes`, `author_posts`, etc.
+
+---
+
+### Troubleshooting
+
+- Nothing loads from a relation
+    - Ensure the relation name is included correctly in the field selection and that it has a block (`author { ... }`) or an array value in PHP syntax.
+- Counts not appearing
+    - Verify the relation is not a BelongsTo; counts are only added for non‑BelongsTo relations.
+- Ordering seems ignored
+    - Provide both `order_column_{path}` and, if needed, `order_direction_{path}`. Defaults to `asc` if direction is omitted.
+- Filters not applied
+    - Check the filter key syntax. For nested relations, remember to use the underscore path form, e.g., `filter_comments(body,like)`.
