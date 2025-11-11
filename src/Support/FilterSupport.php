@@ -13,7 +13,7 @@ class FilterSupport
         $filters = [];
 
         foreach ($data as $key => $value) {
-            if (preg_match('/^(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', $key, $matches)) {
+            if (preg_match('/^(\w*)?\(([^,()]+)(?:,([^\)]+))?\)$/', (string) $key, $matches)) {
                 [$relationPath, $field, $operator] = [
                     '' !== $matches[1] ? $matches[1] : '[__model__]',
                     $matches[2],

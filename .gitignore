@@ -1,2 +1,4 @@
 /vendor/
 coverage_report*
+.idea
+.php-cs-fixer.cache

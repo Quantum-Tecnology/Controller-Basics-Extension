@@ -30,7 +30,7 @@ final class LogMiddleware
                 }
 
                 if ($enableQueryLog) {
-                    $data['query_log'] = array_map(function (array $entry) {
+                    $data['query_log'] = array_map(function (array $entry): array {
                         $entry['query'] = str_replace(['\\', '"'], ['', ''], $entry['query']);
 
                         return $entry;

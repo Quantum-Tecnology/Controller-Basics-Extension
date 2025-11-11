@@ -324,7 +324,7 @@ it('it orders posts by title ascending and descending', function (): void {
         ]);
 });
 
-it('it orders nested comments and likes correctly', function () {
+it('it orders nested comments and likes correctly', function (): void {
     $post = Post::factory()->hasComments(5)->create(['title' => 'abc']);
     Post::factory()->hasComments(3)->create(['title' => 'abc']);
 
