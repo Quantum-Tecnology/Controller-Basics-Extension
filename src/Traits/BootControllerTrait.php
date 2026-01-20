@@ -77,6 +77,10 @@ trait BootControllerTrait
 
     public function getResource(): string
     {
+        if (DefaultResource::class === $this->defaultResource && is_string($this->defaultService)) {
+            $this->booted();
+        }
+
         return $this->defaultResource;
     }
 }
