@@ -91,7 +91,7 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
-        list($modelSave, $data) = $this->executeAction($this->model(), $dataValues, 'store');
+        list($modelSave, $data) = $this->execute($this->model(), $dataValues, 'store');
 
         event(self::class . '::created', [
             'model' => $modelSave,
@@ -105,7 +105,7 @@ trait AsGraphQLController
     {
         $dataValues             = $this->getDataRequest('update');
         $model                  = $this->findBy(request()->fields);
-        list($modelSave, $data) = $this->executeAction($model, $dataValues, 'update');
+        list($modelSave, $data) = $this->execute($model, $dataValues, 'update');
 
         event(self::class . '::updated', [
             'model' => $modelSave,
@@ -208,12 +208,7 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function execute(Model $model, array $data)
-    {
-        return DB::transaction(fn () => app(RelationshipService::class)->execute($model, $data));
-    }
-
-    protected function executeAction(Model $model, array $dataValues, ?string $action = null): array
+    protected function execute(Model $model, array $dataValues, ?string $action = null): array
     {
         $keyName      = $this->model()->getKeyName();
         $fields       = request()->query('fields', [$keyName]);
@@ -222,7 +217,7 @@ trait AsGraphQLController
 
         $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
             ? $this->getService()->{$action}($model, $dataValues)
-            : $this->execute($model, $dataValues));
+            : $this->transactionService($model, $dataValues));
 
         $data = [
             'data' => app(Builder\GraphBuilder::class)->execute(
@@ -238,6 +233,11 @@ trait AsGraphQLController
         }
 
         return [$modelSave, $data];
+    }
+
+    private function transactionService(Model $model, array $data)
+    {
+        return DB::transaction(fn () => app(RelationshipService::class)->execute($model, $data));
     }
 
     private function getService()
