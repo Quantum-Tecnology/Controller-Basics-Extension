@@ -44,7 +44,7 @@ trait AsGraphQLController
             $result->orderBy($request->query('order_column'), $request->query('order_direction'));
         }
 
-        if (app()->isLocal() && $request->has('sql')) {
+        if (!app()->isProduction() && $request->has('sql')) {
             $result->ddRawSql();
         }
 
@@ -57,7 +57,7 @@ trait AsGraphQLController
             options: $request->query()
         );
 
-        if (app()->isLocal()) {
+        if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
         }
 
@@ -80,67 +80,27 @@ trait AsGraphQLController
             ),
         ];
 
-        if (app()->isLocal()) {
+        if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
         }
 
         return response()->json($data);
     }
 
-    public function store(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
+    public function store(): JsonResponse
     {
         $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
-        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\StoreServiceInterface
-            ? $this->getService()->store($dataValues)
-            : $this->execute($this->model(), $dataValues);
+        list($data) = $this->execute($this->model(), $dataValues, 'store', 'created');
 
-        $keyName      = $this->model()->getKeyName();
-        $fields       = request()->query('fields', [$keyName]);
-        $onlyFields   = $this->allowedFields();
-        $onlyFields[] = $keyName;
-
-        $data = [
-            'data' => $graphBuilder->execute(
-                data: $modelSave,
-                fields: $fields,
-                onlyFields: $onlyFields,
-                options: $request->query()
-            ),
-        ];
-
-        if (app()->isLocal()) {
-            $data['allowed_fields'] = $onlyFields;
-        }
-
-        return response()->json($data);
+        return response()->json($data, Response::HTTP_CREATED);
     }
 
-    public function update(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
+    public function update(): JsonResponse
     {
-        $dataValues   = $this->getDataRequest('update');
-        $keyName      = $this->model()->getKeyName();
-        $fields       = request()->query('fields', [$keyName]);
-        $model        = $this->findBy($fields);
-        $onlyFields   = $this->allowedFields();
-        $onlyFields[] = $keyName;
-
-        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
-            ? $this->getService()->update($model, $dataValues)
-            : $this->execute($model, $dataValues);
-
-        $data = [
-            'data' => $graphBuilder->execute(
-                data: $modelSave,
-                fields: $fields,
-                onlyFields: $onlyFields,
-                options: $request->query()
-            ),
-        ];
-
-        if (app()->isLocal()) {
-            $data['allowed_fields'] = $onlyFields;
-        }
+        $dataValues = $this->getDataRequest('update');
+        $model      = $this->findBy(request()->fields);
+        list($data) = $this->execute($model, $dataValues, 'update', 'updated');
 
         return response()->json($data);
     }
@@ -151,11 +111,16 @@ trait AsGraphQLController
 
         $fields = request()->query('fields');
 
-        $model = $this->findBy($fields);
+        $model     = $this->findBy($fields);
+        $modelSave = clone $model;
 
         DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\DeleteServiceInterface
             ? $this->getService()->delete($model)
             : $model->delete());
+
+        event(self::class . '::deleted', [
+            'model_id' => $this->getIdFromModel($modelSave),
+        ]);
 
         return response()->noContent();
     }
@@ -179,7 +144,7 @@ trait AsGraphQLController
             ] + $routeParams,
         );
 
-        if (app()->isLocal() && request()->has('sql')) {
+        if (!app()->isProduction() && request()->has('sql')) {
             $result->ddRawSql();
         }
 
@@ -233,7 +198,52 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function execute(Model $model, array $data)
+    protected function execute(
+        Model $model,
+        array $dataValues,
+        ?string $action = null,
+        object | string | null $event = null,
+    ): array {
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
+
+        $modelActual = clone $model;
+
+        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
+            ? DB::transaction(fn () => $this->getService()->{$action}($model, $dataValues))
+            : $this->transactionService($model, $dataValues);
+
+        $data = [
+            'data' => app(Builder\GraphBuilder::class)->execute(
+                data: $modelSave,
+                fields: $fields,
+                onlyFields: $onlyFields,
+                options: request()->query()
+            ),
+        ];
+
+        if (!app()->isProduction()) {
+            $data['allowed_fields'] = $onlyFields;
+        }
+
+        if ($event && ($model->wasRecentlyCreated || ($modelActual->hasAttribute('updated_at') && $modelActual->updated_at->timestamp !== $modelSave->updated_at->timestamp))) {
+            is_object($event) ? event($event) : event(self::class . '::' . $event, array_filter([
+                'model_id' => $this->getIdFromModel($modelSave),
+                'data'     => $data,
+            ], fn ($item): bool => !blank($item)));
+        }
+
+        return [$data];
+    }
+
+    private function getIdFromModel(Model $model): int | string
+    {
+        return $model->{$model->getKeyName()};
+    }
+
+    private function transactionService(Model $model, array $data)
     {
         return DB::transaction(fn () => app(RelationshipService::class)->execute($model, $data));
     }

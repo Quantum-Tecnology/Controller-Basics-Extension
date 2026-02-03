@@ -13,7 +13,7 @@ class RelationshipService
     {
         [$attributes, $relations] = $this->splitAttributesAndRelations($model, $data);
 
-        $model->fill($attributes);
+        $model->fill(array_intersect_key($attributes, array_flip($model->getFillable())));
 
         $model->save();
 
