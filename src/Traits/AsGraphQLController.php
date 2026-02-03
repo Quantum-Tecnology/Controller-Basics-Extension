@@ -113,7 +113,10 @@ trait AsGraphQLController
             $data['allowed_fields'] = $onlyFields;
         }
 
-        event(self::class . '::created', model: $modelSave, data: $data);
+        event(self::class . '::created', [
+            'model' => $modelSave,
+            'data'  => $data,
+        ]);
 
         return response()->json($data);
     }
@@ -144,7 +147,10 @@ trait AsGraphQLController
             $data['allowed_fields'] = $onlyFields;
         }
 
-        event(self::class . '::updated', model: $modelSave, data: $data);
+        event(self::class . '::updated', [
+            'model' => $modelSave,
+            'data'  => $data,
+        ]);
 
         return response()->json($data);
     }
@@ -155,14 +161,17 @@ trait AsGraphQLController
 
         $fields = request()->query('fields');
 
-        $model    = $this->findBy($fields);
-        $oldModel = clone $model;
+        $model     = $this->findBy($fields);
+        $modelSave = clone $model;
 
         DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\DeleteServiceInterface
             ? $this->getService()->delete($model)
             : $model->delete());
 
-        event(self::class . '::deleted', model: $oldModel);
+        event(self::class . '::deleted', [
+            'model' => $modelSave,
+            'data'  => $data,
+        ]);
 
         return response()->noContent();
     }
