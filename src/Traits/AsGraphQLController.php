@@ -44,7 +44,7 @@ trait AsGraphQLController
             $result->orderBy($request->query('order_column'), $request->query('order_direction'));
         }
 
-        if (app()->isLocal() && $request->has('sql')) {
+        if (!app()->isProduction() && $request->has('sql')) {
             $result->ddRawSql();
         }
 
@@ -57,7 +57,7 @@ trait AsGraphQLController
             options: $request->query()
         );
 
-        if (app()->isLocal()) {
+        if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
         }
 
@@ -80,7 +80,7 @@ trait AsGraphQLController
             ),
         ];
 
-        if (app()->isLocal()) {
+        if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
         }
 
@@ -109,7 +109,7 @@ trait AsGraphQLController
             ),
         ];
 
-        if (app()->isLocal()) {
+        if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
         }
 
@@ -138,7 +138,7 @@ trait AsGraphQLController
             ),
         ];
 
-        if (app()->isLocal()) {
+        if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
         }
 
@@ -179,7 +179,7 @@ trait AsGraphQLController
             ] + $routeParams,
         );
 
-        if (app()->isLocal() && request()->has('sql')) {
+        if (!app()->isProduction() && request()->has('sql')) {
             $result->ddRawSql();
         }
 
