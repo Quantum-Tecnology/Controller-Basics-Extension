@@ -202,14 +202,12 @@ trait AsGraphQLController
         Model $model,
         array $dataValues,
         ?string $action = null,
-        ?string $event = null,
-        array $dataEvent = [],
+        object | string | null $event = null,
     ): array {
         $keyName      = $this->model()->getKeyName();
         $fields       = request()->query('fields', [$keyName]);
         $onlyFields   = $this->allowedFields();
         $onlyFields[] = $keyName;
-        $changed      = true;
 
         $modelActual = clone $model;
 
@@ -231,7 +229,7 @@ trait AsGraphQLController
         }
 
         if ($event && ($model->wasRecentlyCreated || ($modelActual->hasAttribute('updated_at') && $modelActual->updated_at->timestamp !== $modelSave->updated_at->timestamp))) {
-            event(self::class . '::' . $event, array_filter([
+            is_object($event) ? event($event) : event(self::class . '::' . $event, array_filter([
                 'model_id' => $this->getIdFromModel($modelSave),
                 'event'    => $dataEvent,
                 'data'     => $data,
