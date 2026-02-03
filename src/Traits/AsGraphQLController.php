@@ -91,26 +91,16 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
-        list($modelSave, $data) = $this->execute($this->model(), $dataValues, 'store');
-
-        event(self::class . '::created', [
-            'model_id' => $this->getIdFromModel($modelSave),
-            'data'     => $data,
-        ]);
+        list($data) = $this->execute($this->model(), $dataValues, 'store', 'created');
 
         return response()->json($data);
     }
 
     public function update(): JsonResponse
     {
-        $dataValues             = $this->getDataRequest('update');
-        $model                  = $this->findBy(request()->fields);
-        list($modelSave, $data) = $this->execute($model, $dataValues, 'update');
-
-        event(self::class . '::updated', [
-            'model_id' => $this->getIdFromModel($modelSave),
-            'data'     => $data,
-        ]);
+        $dataValues = $this->getDataRequest('update');
+        $model      = $this->findBy(request()->fields);
+        list($data) = $this->execute($model, $dataValues, 'update');
 
         return response()->json($data);
     }
@@ -208,8 +198,12 @@ trait AsGraphQLController
         return self::getDataRequest();
     }
 
-    protected function execute(Model $model, array $dataValues, ?string $action = null): array
-    {
+    protected function execute(
+        Model $model,
+        array $dataValues,
+        ?string $action = null,
+        ?string $event = null,
+    ): array {
         $keyName      = $this->model()->getKeyName();
         $fields       = request()->query('fields', [$keyName]);
         $onlyFields   = $this->allowedFields();
@@ -230,6 +224,13 @@ trait AsGraphQLController
 
         if (!app()->isProduction()) {
             $data['allowed_fields'] = $onlyFields;
+        }
+
+        if ($event) {
+            event(self::class . '::' . $event, [
+                'model_id' => $this->getIdFromModel($modelSave),
+                'data'     => $data,
+            ]);
         }
 
         return [$modelSave, $data];
