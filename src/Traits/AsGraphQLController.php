@@ -94,7 +94,7 @@ trait AsGraphQLController
         list($modelSave, $data) = $this->execute($this->model(), $dataValues, 'store');
 
         event(self::class . '::created', [
-            'model' => $modelSave,
+            'model' => $this->getIdFromModel($modelSave),
             'data'  => $data,
         ]);
 
@@ -108,8 +108,8 @@ trait AsGraphQLController
         list($modelSave, $data) = $this->execute($model, $dataValues, 'update');
 
         event(self::class . '::updated', [
-            'model' => $modelSave,
-            'data'  => $data,
+            'model_id' => $this->getIdFromModel($modelSave),
+            'data'     => $data,
         ]);
 
         return response()->json($data);
@@ -129,7 +129,7 @@ trait AsGraphQLController
             : $model->delete());
 
         event(self::class . '::deleted', [
-            'model' => $modelSave,
+            'model_id' => $this->getIdFromModel($modelSave),
         ]);
 
         return response()->noContent();
@@ -233,6 +233,11 @@ trait AsGraphQLController
         }
 
         return [$modelSave, $data];
+    }
+
+    private function getIdFromModel(Model $model): int | string
+    {
+        return $model->{$model->getKeyName()};
     }
 
     private function transactionService(Model $model, array $data)
