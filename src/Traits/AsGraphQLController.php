@@ -100,7 +100,7 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('update');
         $model      = $this->findBy(request()->fields);
-        list($data) = $this->execute($model, $dataValues, 'update');
+        list($data) = $this->execute($model, $dataValues, 'update', 'updated');
 
         return response()->json($data);
     }
