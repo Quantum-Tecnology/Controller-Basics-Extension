@@ -94,8 +94,8 @@ trait AsGraphQLController
         list($modelSave, $data) = $this->execute($this->model(), $dataValues, 'store');
 
         event(self::class . '::created', [
-            'model' => $this->getIdFromModel($modelSave),
-            'data'  => $data,
+            'model_id' => $this->getIdFromModel($modelSave),
+            'data'     => $data,
         ]);
 
         return response()->json($data);
