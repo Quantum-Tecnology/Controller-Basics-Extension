@@ -222,7 +222,7 @@ trait AsGraphQLController
 
         $modelActual = clone $model;
 
-        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
+        $modelSave = $this->getService() && method_exists($this->getService(), $action)
             ? DB::transaction(fn () => $this->getService()->{$action}($model, $dataValues))
             : $this->transactionService($model, $dataValues);
 
