@@ -87,31 +87,11 @@ trait AsGraphQLController
         return response()->json($data);
     }
 
-    public function store(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
+    public function store(): JsonResponse
     {
         $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
-        $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\StoreServiceInterface
-            ? $this->getService()->store($dataValues)
-            : $this->execute($this->model(), $dataValues));
-
-        $keyName      = $this->model()->getKeyName();
-        $fields       = request()->query('fields', [$keyName]);
-        $onlyFields   = $this->allowedFields();
-        $onlyFields[] = $keyName;
-
-        $data = [
-            'data' => $graphBuilder->execute(
-                data: $modelSave,
-                fields: $fields,
-                onlyFields: $onlyFields,
-                options: $request->query()
-            ),
-        ];
-
-        if (!app()->isProduction()) {
-            $data['allowed_fields'] = $onlyFields;
-        }
+        list($modelSave, $data) = $this->executeAction($this->model(), $dataValues, 'store');
 
         event(self::class . '::created', [
             'model' => $modelSave,
@@ -121,31 +101,11 @@ trait AsGraphQLController
         return response()->json($data);
     }
 
-    public function update(Builder\GraphBuilder $graphBuilder, Request $request): JsonResponse
+    public function update(): JsonResponse
     {
-        $dataValues   = $this->getDataRequest('update');
-        $keyName      = $this->model()->getKeyName();
-        $fields       = request()->query('fields', [$keyName]);
-        $model        = $this->findBy($fields);
-        $onlyFields   = $this->allowedFields();
-        $onlyFields[] = $keyName;
-
-        $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
-            ? $this->getService()->update($model, $dataValues)
-            : $this->execute($model, $dataValues));
-
-        $data = [
-            'data' => $graphBuilder->execute(
-                data: $modelSave,
-                fields: $fields,
-                onlyFields: $onlyFields,
-                options: $request->query()
-            ),
-        ];
-
-        if (!app()->isProduction()) {
-            $data['allowed_fields'] = $onlyFields;
-        }
+        $dataValues             = $this->getDataRequest('update');
+        $model                  = $this->findBy(request()->fields);
+        list($modelSave, $data) = $this->executeAction($model, $dataValues, 'update');
 
         event(self::class . '::updated', [
             'model' => $modelSave,
@@ -251,6 +211,33 @@ trait AsGraphQLController
     protected function execute(Model $model, array $data)
     {
         return DB::transaction(fn () => app(RelationshipService::class)->execute($model, $data));
+    }
+
+    protected function executeAction(Model $model, array $dataValues, ?string $action = null): array
+    {
+        $keyName      = $this->model()->getKeyName();
+        $fields       = request()->query('fields', [$keyName]);
+        $onlyFields   = $this->allowedFields();
+        $onlyFields[] = $keyName;
+
+        $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
+            ? $this->getService()->{$action}($model, $dataValues)
+            : $this->execute($model, $dataValues));
+
+        $data = [
+            'data' => app(Builder\GraphBuilder::class)->execute(
+                data: $modelSave,
+                fields: $fields,
+                onlyFields: $onlyFields,
+                options: request()->query()
+            ),
+        ];
+
+        if (!app()->isProduction()) {
+            $data['allowed_fields'] = $onlyFields;
+        }
+
+        return [$modelSave, $data];
     }
 
     private function getService()
