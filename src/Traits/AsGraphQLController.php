@@ -98,8 +98,14 @@ trait AsGraphQLController
 
     public function update(): JsonResponse
     {
+        $model     = $this->findBy(request()->fields);
+        $keysRoute = array_keys(request()->route()->parameters());
+        $routeName = end($keysRoute);
+
+        request()->merge(["__model__{$routeName}" => $model]);
+
         $dataValues = $this->getDataRequest('update');
-        $model      = $this->findBy(request()->fields);
+
         list($data) = $this->execute($model, $dataValues, 'update', 'updated');
 
         return response()->json($data);
@@ -107,6 +113,11 @@ trait AsGraphQLController
 
     public function destroy(): Response
     {
+        $keysRoute = array_keys(request()->route()->parameters());
+        $routeName = end($keysRoute);
+
+        request()->merge(["__model__{$routeName}" => $model]);
+
         $this->getDataRequest('destroy', true);
 
         $fields = request()->query('fields');
