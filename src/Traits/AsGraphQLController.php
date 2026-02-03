@@ -231,7 +231,6 @@ trait AsGraphQLController
         if ($event && ($model->wasRecentlyCreated || ($modelActual->hasAttribute('updated_at') && $modelActual->updated_at->timestamp !== $modelSave->updated_at->timestamp))) {
             is_object($event) ? event($event) : event(self::class . '::' . $event, array_filter([
                 'model_id' => $this->getIdFromModel($modelSave),
-                'event'    => $dataEvent,
                 'data'     => $data,
             ], fn ($item): bool => !blank($item)));
         }
