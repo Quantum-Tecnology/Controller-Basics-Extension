@@ -170,7 +170,6 @@ trait AsGraphQLController
 
         event(self::class . '::deleted', [
             'model' => $modelSave,
-            'data'  => $data,
         ]);
 
         return response()->noContent();
