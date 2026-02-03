@@ -91,9 +91,9 @@ trait AsGraphQLController
     {
         $dataValues = $this->getDataRequest('store') + $this->routeParams(false);
 
-        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\StoreServiceInterface
+        $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\StoreServiceInterface
             ? $this->getService()->store($dataValues)
-            : $this->execute($this->model(), $dataValues);
+            : $this->execute($this->model(), $dataValues));
 
         $keyName      = $this->model()->getKeyName();
         $fields       = request()->query('fields', [$keyName]);
@@ -127,9 +127,9 @@ trait AsGraphQLController
         $onlyFields   = $this->allowedFields();
         $onlyFields[] = $keyName;
 
-        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
+        $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
             ? $this->getService()->update($model, $dataValues)
-            : $this->execute($model, $dataValues);
+            : $this->execute($model, $dataValues));
 
         $data = [
             'data' => $graphBuilder->execute(
@@ -155,7 +155,8 @@ trait AsGraphQLController
 
         $fields = request()->query('fields');
 
-        $model = $this->findBy($fields);
+        $model    = $this->findBy($fields);
+        $oldModel = clone $model;
 
         DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\DeleteServiceInterface
             ? $this->getService()->delete($model)
