@@ -235,7 +235,7 @@ trait AsGraphQLController
             ], fn ($item): bool => !blank($item)));
         }
 
-        return [$modelSave, $data];
+        return [$data];
     }
 
     private function getIdFromModel(Model $model): int | string
