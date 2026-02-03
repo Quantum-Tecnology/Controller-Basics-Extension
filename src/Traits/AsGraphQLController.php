@@ -113,6 +113,8 @@ trait AsGraphQLController
             $data['allowed_fields'] = $onlyFields;
         }
 
+        event(self::class . '::created', model: $modelSave, data: $data);
+
         return response()->json($data);
     }
 
@@ -142,6 +144,8 @@ trait AsGraphQLController
             $data['allowed_fields'] = $onlyFields;
         }
 
+        event(self::class . '::updated', model: $modelSave, data: $data);
+
         return response()->json($data);
     }
 
@@ -156,6 +160,8 @@ trait AsGraphQLController
         DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\DeleteServiceInterface
             ? $this->getService()->delete($model)
             : $model->delete());
+
+        event(self::class . '::deleted', model: $oldModel);
 
         return response()->noContent();
     }

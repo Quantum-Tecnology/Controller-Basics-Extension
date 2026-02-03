@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V3.6.0 (02/03/2025)
+
+# PT-BR
+
+- Adicionar despacho de eventos para ações de criação, atualização e exclusão no AsGraphQLController. @bhcosta90
+
+# EN
+
+- Add event dispatching for created, updated, and deleted actions in AsGraphQLController. @bhcosta90
+
 ## V3.5.0 (11/11/2025)
 
 # PT-BR
