@@ -209,9 +209,11 @@ trait AsGraphQLController
         $onlyFields   = $this->allowedFields();
         $onlyFields[] = $keyName;
 
-        $modelSave = DB::transaction(fn () => $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
-            ? $this->getService()->{$action}($model, $dataValues)
-            : $this->transactionService($model, $dataValues));
+        $modelActual = clone $model;
+
+        $modelSave = $this->getService() && $this->getService() instanceof Interfaces\UpdateServiceInterface
+            ? DB::transaction(fn () => $this->getService()->{$action}($model, $dataValues))
+            : $this->transactionService($model, $dataValues);
 
         $data = [
             'data' => app(Builder\GraphBuilder::class)->execute(
@@ -226,7 +228,7 @@ trait AsGraphQLController
             $data['allowed_fields'] = $onlyFields;
         }
 
-        if ($event) {
+        if ($event && ($model->wasRecentlyCreated || ($modelActual->hasAttribute('updated_at') && $modelActual->updated_at->timestamp !== $modelSave->updated_at->timestamp))) {
             event(self::class . '::' . $event, [
                 'model_id' => $this->getIdFromModel($modelSave),
                 'data'     => $data,
