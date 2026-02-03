@@ -93,7 +93,7 @@ trait AsGraphQLController
 
         list($data) = $this->execute($this->model(), $dataValues, 'store', 'created');
 
-        return response()->json($data);
+        return response()->json($data, Response::HTTP_CREATED);
     }
 
     public function update(): JsonResponse
