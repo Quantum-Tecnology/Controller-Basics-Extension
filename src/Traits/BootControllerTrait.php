@@ -63,7 +63,7 @@ trait BootControllerTrait
 
     public function getService(): ServiceInterface | string
     {
-        if(is_string($this->defaultService)) {
+        if (is_string($this->defaultService)) {
             $this->booted();
         }
 
