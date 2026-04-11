@@ -42,6 +42,10 @@ class CryptographyMiddleware
 
     private function isEnabledForCryptography(Request $request): bool
     {
+        if (!class_exists(\Vinkla\Hashids\Facades\Hashids::class)) {
+            return false;
+        }
+
         if (!app()->isProduction() && $request->has('crypt')) {
             return 'true' === $request->crypt;
         }

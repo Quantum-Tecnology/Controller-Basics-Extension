@@ -71,8 +71,8 @@ class Decoder
 
                 if (self::wasDecoded($decoded)) {
                     $request->route()->setParameter($key, $decoded);
-                } elseif (!config('app.debug')) {
-                    abort(Response::HTTP_BAD_REQUEST, "Error decoding hashids by Inputs ['{$key}': '{$value}'].");
+                } else {
+                    abort(Response::HTTP_BAD_REQUEST, 'Identificador inválido.');
                 }
             }
         }
@@ -93,15 +93,13 @@ class Decoder
             self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
             if (!blank($value) && is_string($value) && self::isIdentifier($key)) {
-                $value = collect(explode(',', $value))->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(self::wasDecoded(...))->implode(',');
+                $decoded = collect(explode(',', $value))
+                    ->transform(fn ($unit) => current(Hashids::decode($unit)))
+                    ->filter(self::wasDecoded(...));
 
-                $decoded = current(Hashids::decode($value));
+                abort_if($decoded->isEmpty(), Response::HTTP_BAD_REQUEST, 'Identificador inválido.');
 
-                if (self::wasDecoded($decoded)) {
-                    $value = $decoded;
-                } elseif (!config('app.debug')) {
-                    abort(Response::HTTP_BAD_REQUEST, "Error decoding hashids by Inputs ['{$key}': '{$value}'].");
-                }
+                $value = $decoded->count() === 1 ? $decoded->first() : $decoded->implode(',');
             }
         });
 
