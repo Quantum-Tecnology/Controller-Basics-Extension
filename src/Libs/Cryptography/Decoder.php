@@ -81,18 +81,32 @@ class Decoder
     private static function decodeRouteInputs(Request $request): void
     {
         $inputs = $request->all();
+        self::decodeRecursive($inputs);
+        $request->merge($inputs);
+    }
 
-        array_walk($inputs, function (&$value, $key): void {
-            if (!blank($value) && !is_int($value) && self::isIdentifier($key) && is_array($value)) {
+    private static function decodeRecursive(array &$data): void
+    {
+        foreach ($data as $key => &$value) {
+            if (is_array($value)) {
+                if (self::isIdentifier((string) $key)) {
+                    $decoded = collect($value)
+                        ->transform(fn ($unit) => is_string($unit) ? current(Hashids::decode($unit)) : $unit)
+                        ->filter(self::wasDecoded(...));
 
-                $value = collect($value)->transform(fn ($unit) => current(Hashids::decode($unit)))->filter(self::wasDecoded(...))->all();
+                    abort_if($decoded->isEmpty(), Response::HTTP_BAD_REQUEST, 'Identificador inválido.');
+
+                    $value = $decoded->all();
+                } else {
+                    self::decodeRecursive($value);
+                }
+
+                continue;
             }
-        });
 
-        array_walk_recursive($inputs, function (&$value, $key): void {
-            self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
+            if (!blank($value) && is_string($value) && self::isIdentifier((string) $key)) {
+                self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
-            if (!blank($value) && is_string($value) && self::isIdentifier($key)) {
                 $decoded = collect(explode(',', $value))
                     ->transform(fn ($unit) => current(Hashids::decode($unit)))
                     ->filter(self::wasDecoded(...));
@@ -101,9 +115,7 @@ class Decoder
 
                 $value = $decoded->count() === 1 ? $decoded->first() : $decoded->implode(',');
             }
-        });
-
-        $request->merge($inputs);
+        }
     }
 
     /**
