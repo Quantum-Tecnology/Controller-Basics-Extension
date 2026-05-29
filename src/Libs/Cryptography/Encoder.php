@@ -33,12 +33,30 @@ class Encoder
     public static function encodeArray($responseData): array
     {
         array_walk_recursive($responseData, function (&$value, $key): void {
-            if (self::isIdentifier((string) $key)) {
+            if (self::isIdentifier((string) $key) && self::isEncodable($value)) {
                 $value = Hashids::encode($value);
             }
         });
 
         return $responseData;
+    }
+
+    /**
+     * Hashids::encode requires a non-negative integer (or numeric string of
+     * one). Null, empty strings, booleans and non-numeric strings would crash
+     * gmp_mod inside Hashids — skip them and leave the original value.
+     */
+    private static function isEncodable(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value >= 0;
+        }
+
+        if (is_string($value) && ctype_digit($value)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

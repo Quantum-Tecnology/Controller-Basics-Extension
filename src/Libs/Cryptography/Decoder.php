@@ -90,6 +90,10 @@ class Decoder
         foreach ($data as $key => &$value) {
             if (is_array($value)) {
                 if (self::isIdentifier((string) $key)) {
+                    if (empty($value)) {
+                        continue;
+                    }
+
                     $decoded = collect($value)
                         ->transform(fn ($unit) => is_string($unit) ? current(Hashids::decode($unit)) : $unit)
                         ->filter(self::wasDecoded(...));
@@ -113,7 +117,7 @@ class Decoder
 
                 abort_if($decoded->isEmpty(), Response::HTTP_BAD_REQUEST, 'Identificador inválido.');
 
-                $value = $decoded->count() === 1 ? $decoded->first() : $decoded->implode(',');
+                $value = 1 === $decoded->count() ? $decoded->first() : $decoded->implode(',');
             }
         }
     }
