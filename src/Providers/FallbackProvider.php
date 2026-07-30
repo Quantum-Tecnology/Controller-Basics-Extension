@@ -58,14 +58,32 @@ class FallbackProvider extends ServiceProvider
                 app()->forgetInstance('cache');
                 \Illuminate\Support\Facades\Cache::setDefaultDriver('database');
 
+                app()->forgetInstance('cache.store');
+
                 // O RateLimiter é um SINGLETON que guarda o store resolvido no
                 // momento em que foi criado — e ele costuma ser criado ANTES
-                // deste boot(). Sem esquecê-lo, ele continua segurando o
-                // RedisStore antigo e toda rota com `throttle` (o LOGIN, entre
-                // elas) segue batendo no Redis morto e devolvendo 500, mesmo
-                // com o cache já caído para database.
-                app()->forgetInstance('cache.store');
-                app()->forgetInstance(\Illuminate\Cache\RateLimiter::class);
+                // deste boot(). Sem trocar o store dele, ele continua segurando
+                // o RedisStore antigo e toda rota com `throttle` (o LOGIN,
+                // entre elas) segue batendo no Redis morto e devolvendo 500,
+                // mesmo com o cache já caído para database.
+                //
+                // Troca-se o store POR DENTRO, em vez de esquecer a instância:
+                // os limiters ficam registrados NO PRÓPRIO objeto (RateLimiter
+                // ::for('login', ...) no AppServiceProvider). Recriá-lo perde
+                // todos eles e o 500 de Redis vira
+                // "Rate limiter [login] is not defined".
+                if (app()->resolved(\Illuminate\Cache\RateLimiter::class)) {
+                    try {
+                        $limiter  = app(\Illuminate\Cache\RateLimiter::class);
+                        $property = new \ReflectionProperty($limiter, 'cache');
+                        $property->setAccessible(true);
+                        $property->setValue($limiter, \Illuminate\Support\Facades\Cache::driver('database'));
+                    } catch (Throwable) {
+                        // Se a propriedade mudar de nome numa versão futura do
+                        // framework, seguir sem trocar é melhor que derrubar o
+                        // boot inteiro por causa de um fallback.
+                    }
+                }
             }
 
             // Fallback session driver if currently set to redis
