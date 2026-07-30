@@ -57,6 +57,15 @@ class FallbackProvider extends ServiceProvider
                 // Ensure the cache manager uses the new default in this request lifecycle
                 app()->forgetInstance('cache');
                 \Illuminate\Support\Facades\Cache::setDefaultDriver('database');
+
+                // O RateLimiter é um SINGLETON que guarda o store resolvido no
+                // momento em que foi criado — e ele costuma ser criado ANTES
+                // deste boot(). Sem esquecê-lo, ele continua segurando o
+                // RedisStore antigo e toda rota com `throttle` (o LOGIN, entre
+                // elas) segue batendo no Redis morto e devolvendo 500, mesmo
+                // com o cache já caído para database.
+                app()->forgetInstance('cache.store');
+                app()->forgetInstance(\Illuminate\Cache\RateLimiter::class);
             }
 
             // Fallback session driver if currently set to redis
