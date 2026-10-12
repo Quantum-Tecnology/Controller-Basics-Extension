@@ -16,8 +16,13 @@ use Illuminate\Support\Str;
  */
 final class Identifier
 {
-    /** Sufixos que sempre são id, além do `hashids.regex` configurado. */
-    private const string DEFAULT_REGEX = '/_id$|Id$/';
+    /**
+     * Sufixos que sempre são id, além do `hashids.regex` configurado.
+     *
+     * ⚠️ Sem tipo na constante: o pacote suporta PHP 8.2, e constante tipada
+     * só existe a partir do 8.3.
+     */
+    private const DEFAULT_REGEX = '/_id$|Id$/';
 
     /**
      * O campo é um id pelo NOME (`id`, `user_id`, `plan_ids`...)?

@@ -4,7 +4,11 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\ControllerBasicsExtension\Providers;
 
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\ServiceProvider;
+use ReflectionProperty;
 use Throwable;
 
 class FallbackProvider extends ServiceProvider
@@ -39,7 +43,7 @@ class FallbackProvider extends ServiceProvider
         try {
             // Try to ping Redis quickly; if it throws, we'll fallback drivers below
             // Using default connection; adjust if you use custom names
-            \Illuminate\Support\Facades\Redis::connection('default')->ping();
+            Redis::connection('default')->ping();
             $redisAvailable = true;
         } catch (Throwable) {
             $redisAvailable = false;
@@ -56,7 +60,7 @@ class FallbackProvider extends ServiceProvider
                 config(['cache.default' => 'database']);
                 // Ensure the cache manager uses the new default in this request lifecycle
                 app()->forgetInstance('cache');
-                \Illuminate\Support\Facades\Cache::setDefaultDriver('database');
+                Cache::setDefaultDriver('database');
 
                 app()->forgetInstance('cache.store');
 
@@ -72,12 +76,12 @@ class FallbackProvider extends ServiceProvider
                 // ::for('login', ...) no AppServiceProvider). Recriá-lo perde
                 // todos eles e o 500 de Redis vira
                 // "Rate limiter [login] is not defined".
-                if (app()->resolved(\Illuminate\Cache\RateLimiter::class)) {
+                if (app()->resolved(RateLimiter::class)) {
                     try {
-                        $limiter  = app(\Illuminate\Cache\RateLimiter::class);
-                        $property = new \ReflectionProperty($limiter, 'cache');
+                        $limiter  = app(RateLimiter::class);
+                        $property = new ReflectionProperty($limiter, 'cache');
                         $property->setAccessible(true);
-                        $property->setValue($limiter, \Illuminate\Support\Facades\Cache::driver('database'));
+                        $property->setValue($limiter, Cache::driver('database'));
                     } catch (Throwable) {
                         // Se a propriedade mudar de nome numa versão futura do
                         // framework, seguir sem trocar é melhor que derrubar o
