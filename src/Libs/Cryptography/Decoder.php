@@ -29,7 +29,7 @@ class Decoder
 
         $value->each(function ($unit) use ($key, $sttribute): void {
             abort_if(
-                !blank($unit) && !is_int($unit) && self::isIdentifier($key) && !($newValue = current(Hashids::decode($unit))) && !is_int($newValue),
+                !blank($unit) && !is_int($unit) && !Identifier::isIgnoredUuid($unit) && self::isIdentifierKey($key) && !($newValue = current(Hashids::decode($unit))) && !is_int($newValue),
                 Response::HTTP_BAD_REQUEST,
                 __('Non-decodable values found in the request ' . $sttribute . '.')
             );
@@ -46,7 +46,7 @@ class Decoder
                 foreach (explode(',', (string) $encodedIds) as $unit) {
                     self::abortIfInvalidIdentifier($key, $unit, 'header-params');
 
-                    $decoded = current(Hashids::decode($unit));
+                    $decoded = self::decodeUnit($unit);
 
                     if (self::wasDecoded($decoded)) {
                         $decodedIds[] = $decoded;
@@ -64,7 +64,12 @@ class Decoder
     private static function decodeRouteParams(Request $request): void
     {
         foreach (($request->route()?->parameters() ?? []) as $key => $value) {
-            if (self::isIdentifier($key)) {
+            if (self::isIdentifierKey($key)) {
+                // UUID ignorado fica como veio: nem hash, nem 404.
+                if (Identifier::isIgnoredUuid($value)) {
+                    continue;
+                }
+
                 throw_if(!self::hashIsValid($value), NotFoundHttpException::class);
                 self::abortIfInvalidIdentifier($key, $value, 'route-params');
                 $decoded = current(Hashids::decode($value));
@@ -89,13 +94,13 @@ class Decoder
     {
         foreach ($data as $key => &$value) {
             if (is_array($value)) {
-                if (self::isIdentifier((string) $key)) {
+                if (self::isIdentifierKey((string) $key)) {
                     if (empty($value)) {
                         continue;
                     }
 
                     $decoded = collect($value)
-                        ->transform(fn ($unit) => is_string($unit) ? current(Hashids::decode($unit)) : $unit)
+                        ->transform(fn ($unit) => is_string($unit) ? self::decodeUnit($unit) : $unit)
                         ->filter(self::wasDecoded(...));
 
                     abort_if($decoded->isEmpty(), Response::HTTP_BAD_REQUEST, 'Identificador inválido.');
@@ -108,11 +113,11 @@ class Decoder
                 continue;
             }
 
-            if (!blank($value) && is_string($value) && self::isIdentifier((string) $key)) {
+            if (!blank($value) && is_string($value) && self::isIdentifierKey((string) $key)) {
                 self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
                 $decoded = collect(explode(',', $value))
-                    ->transform(fn ($unit) => current(Hashids::decode($unit)))
+                    ->transform(fn ($unit) => self::decodeUnit($unit))
                     ->filter(self::wasDecoded(...));
 
                 abort_if($decoded->isEmpty(), Response::HTTP_BAD_REQUEST, 'Identificador inválido.');
@@ -120,6 +125,16 @@ class Decoder
                 $value = 1 === $decoded->count() ? $decoded->first() : $decoded->implode(',');
             }
         }
+    }
+
+    /**
+     * Decodifica uma unidade (hashid → inteiro). Com `hashids.ignore_uuid`, um
+     * UUID volta intacto, o que permite misturar ids inteiros e UUID na mesma
+     * lista (`?filter[ids]=v5rNVenmKP,0199a3f2-...`).
+     */
+    private static function decodeUnit(string $unit): mixed
+    {
+        return Identifier::isIgnoredUuid($unit) ? $unit : current(Hashids::decode($unit));
     }
 
     /**
@@ -131,14 +146,12 @@ class Decoder
     }
 
     /**
-     * Check if parameter is an identifier.
+     * Na entrada, cabeçalho também carrega id (`X-User`...): a regra do nome
+     * (`Identifier`) mais a dos cabeçalhos, como sempre foi.
      */
-    private static function isIdentifier(string | int $paramKey, string $regexp = '/_id$|Id$/'): bool
+    private static function isIdentifierKey(string | int $key): bool
     {
-        return preg_match(config('hashids.regex', ''), (string) $paramKey)
-            || preg_match(config('hashids.headers.regex', ''), (string) $paramKey)
-            || preg_match($regexp, (string) $paramKey)
-            || in_array($paramKey, config('hashids.attributes', []));
+        return Identifier::isIdentifier($key) || Identifier::isIdentifierHeader($key);
     }
 
     private static function hashIsValid(string $key): bool
