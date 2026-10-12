@@ -33,7 +33,7 @@ class Encoder
     public static function encodeArray($responseData): array
     {
         array_walk_recursive($responseData, function (&$value, $key): void {
-            if (self::isIdentifier((string) $key) && self::isEncodable($value)) {
+            if (Identifier::isIdentifier($key) && !Identifier::isIgnoredUuid($value) && self::isEncodable($value)) {
                 $value = Hashids::encode($value);
             }
         });
@@ -57,13 +57,5 @@ class Encoder
         }
 
         return false;
-    }
-
-    /**
-     * Check if parameter is an identifier.
-     */
-    private static function isIdentifier(string $paramKey, string $regexp = '/_id$|Id$/'): bool
-    {
-        return preg_match(config('hashids.regex'), $paramKey) || preg_match($regexp, $paramKey) || in_array($paramKey, config('hashids.attributes', []));
     }
 }

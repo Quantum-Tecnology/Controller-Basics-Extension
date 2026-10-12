@@ -115,3 +115,21 @@ it('a resposta codifica o inteiro e deixa o UUID intacto', function (): void {
         ->assertJsonPath('id', hashid(42))
         ->assertJsonPath('uuid_pk.id', UUID);
 });
+
+it('entrada e saída usam a mesma regra de id (Identifier)', function (): void {
+    // Campo que só é id por estar em `hashids.attributes`: se a regra estivesse
+    // duplicada e divergisse, um lado o trataria como id e o outro não.
+    config(['hashids.attributes' => ['codigo'], 'hashids.ignore_uuid' => true]);
+
+    Route::middleware(CryptographyMiddleware::class)->get('/crypt-simetria', fn (Request $request) => response()->json([
+        'recebido' => $request->input('codigo'),
+        'codigo'   => 77,
+        'outro'    => ['codigo' => UUID],
+    ]));
+
+    $this->getJson('/crypt-simetria?codigo=' . hashid(77))
+        ->assertOk()
+        ->assertJsonPath('recebido', 77)
+        ->assertJsonPath('codigo', hashid(77))
+        ->assertJsonPath('outro.codigo', UUID);
+});

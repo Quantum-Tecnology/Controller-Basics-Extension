@@ -6,7 +6,6 @@ namespace QuantumTecnology\ControllerBasicsExtension\Libs\Cryptography;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -30,7 +29,7 @@ class Decoder
 
         $value->each(function ($unit) use ($key, $sttribute): void {
             abort_if(
-                !blank($unit) && !is_int($unit) && !self::isIgnoredUuid($unit) && self::isIdentifier($key) && !($newValue = current(Hashids::decode($unit))) && !is_int($newValue),
+                !blank($unit) && !is_int($unit) && !Identifier::isIgnoredUuid($unit) && self::isIdentifierKey($key) && !($newValue = current(Hashids::decode($unit))) && !is_int($newValue),
                 Response::HTTP_BAD_REQUEST,
                 __('Non-decodable values found in the request ' . $sttribute . '.')
             );
@@ -65,9 +64,9 @@ class Decoder
     private static function decodeRouteParams(Request $request): void
     {
         foreach (($request->route()?->parameters() ?? []) as $key => $value) {
-            if (self::isIdentifier($key)) {
+            if (self::isIdentifierKey($key)) {
                 // UUID ignorado fica como veio: nem hash, nem 404.
-                if (self::isIgnoredUuid($value)) {
+                if (Identifier::isIgnoredUuid($value)) {
                     continue;
                 }
 
@@ -95,7 +94,7 @@ class Decoder
     {
         foreach ($data as $key => &$value) {
             if (is_array($value)) {
-                if (self::isIdentifier((string) $key)) {
+                if (self::isIdentifierKey((string) $key)) {
                     if (empty($value)) {
                         continue;
                     }
@@ -114,7 +113,7 @@ class Decoder
                 continue;
             }
 
-            if (!blank($value) && is_string($value) && self::isIdentifier((string) $key)) {
+            if (!blank($value) && is_string($value) && self::isIdentifierKey((string) $key)) {
                 self::abortIfInvalidIdentifier($key, $value, 'route-inputs');
 
                 $decoded = collect(explode(',', $value))
@@ -135,20 +134,7 @@ class Decoder
      */
     private static function decodeUnit(string $unit): mixed
     {
-        return self::isIgnoredUuid($unit) ? $unit : current(Hashids::decode($unit));
-    }
-
-    /**
-     * Valor que deve passar sem decodificar: UUID, com `hashids.ignore_uuid`.
-     *
-     * Por VALOR, não por nome: o `regex` só vê o nome do campo, e uma tabela de
-     * chave UUID recebe o id em `{id}`/`*_id` como qualquer outra.
-     */
-    private static function isIgnoredUuid(mixed $value): bool
-    {
-        return is_string($value)
-            && config('hashids.ignore_uuid', false)
-            && Str::isUuid($value);
+        return Identifier::isIgnoredUuid($unit) ? $unit : current(Hashids::decode($unit));
     }
 
     /**
@@ -160,14 +146,12 @@ class Decoder
     }
 
     /**
-     * Check if parameter is an identifier.
+     * Na entrada, cabeçalho também carrega id (`X-User`...): a regra do nome
+     * (`Identifier`) mais a dos cabeçalhos, como sempre foi.
      */
-    private static function isIdentifier(string | int $paramKey, string $regexp = '/_id$|Id$/'): bool
+    private static function isIdentifierKey(string | int $key): bool
     {
-        return preg_match(config('hashids.regex', ''), (string) $paramKey)
-            || preg_match(config('hashids.headers.regex', ''), (string) $paramKey)
-            || preg_match($regexp, (string) $paramKey)
-            || in_array($paramKey, config('hashids.attributes', []));
+        return Identifier::isIdentifier($key) || Identifier::isIdentifierHeader($key);
     }
 
     private static function hashIsValid(string $key): bool
