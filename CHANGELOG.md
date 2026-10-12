@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+## V3.7.0 (12/10/2026)
+
+# PT-BR
+
+- Nova configuração `hashids.ignore_uuid` (`HASHID_IGNORE_UUID`, padrão `false`). Ligada, o `CryptographyMiddleware` deixa passar intactos os valores com formato de UUID em parâmetro de rota, query, corpo e cabeçalho; o resto continua sendo decodificado. Serve para o projeto que mistura chave inteira (exposta como hashid) com tabela de chave UUID: o `regex` escolhe os campos pelo NOME, então um UUID em `{id}` ou `*_id` era decodificado e a requisição voltava 404/400, só com a criptografia ligada. Desligada, nada muda. @GustavoSantarosa
+
+# EN
+
+- New `hashids.ignore_uuid` setting (`HASHID_IGNORE_UUID`, default `false`). When enabled, `CryptographyMiddleware` leaves UUID-shaped values untouched in route params, query, body and headers; everything else is still decoded. Meant for projects that mix integer keys (exposed as hashids) with UUID-keyed tables: `regex` matches fields by NAME, so a UUID in `{id}` or `*_id` was decoded and the request failed with 404/400, only with cryptography on. When disabled, nothing changes. @GustavoSantarosa
+
 ## V3.6.0 (02/03/2025)
 
 # PT-BR
